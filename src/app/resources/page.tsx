@@ -1,3 +1,5 @@
+'use client'
+
 import { CTA } from '../_components/CTA'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
@@ -8,7 +10,7 @@ export default function ResourcesPage() {
       type: 'Whitepaper',
       title: 'Emotion-Aware AI: The Future of Customer Engagement',
       description:
-        'Deep dive into SOYL\'s approach to multimodal emotion intelligence and adaptive agents.',
+        'Deep dive into SOYL&apos;s approach to multimodal emotion intelligence and adaptive agents.',
       link: '#',
       download: true,
     },
@@ -16,7 +18,7 @@ export default function ResourcesPage() {
       type: 'Case Study',
       title: 'RetailTech Inc.: 40% Conversion Rate Increase',
       description:
-        'Learn how RetailTech integrated SOYL\'s emotion-aware agents into their e-commerce platform.',
+        'Learn how RetailTech integrated SOYL&apos;s emotion-aware agents into their e-commerce platform.',
       link: '#',
       download: false,
     },
@@ -71,7 +73,7 @@ export default function ResourcesPage() {
           </h1>
           <p className="text-xl text-muted max-w-3xl">
             Explore whitepapers, case studies, research citations, and webinars
-            to learn more about emotion-aware AI and SOYL's technology.
+            to learn more about emotion-aware AI and SOYL&apos;s technology.
           </p>
         </motion.div>
 
@@ -123,7 +125,7 @@ export default function ResourcesPage() {
           >
             <h2 className="text-3xl font-bold mb-8">Research Citations</h2>
             <p className="text-muted mb-6">
-              SOYL's research builds on established multimodal emotion datasets
+              SOYL&apos;s research builds on established multimodal emotion datasets
               and methodologies:
             </p>
             <div className="space-y-4">

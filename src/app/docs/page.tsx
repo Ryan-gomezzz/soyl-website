@@ -1,3 +1,5 @@
+'use client'
+
 import { CTA } from '../_components/CTA'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
@@ -85,7 +87,7 @@ console.log(result.confidence); // 0.0 - 1.0`,
             Documentation
           </h1>
           <p className="text-xl text-muted max-w-3xl">
-            Get started with SOYL's emotion-aware AI APIs and SDKs. Build
+            Get started with SOYL&apos;s emotion-aware AI APIs and SDKs. Build
             powerful applications with multimodal emotion detection and adaptive
             agents.
           </p>

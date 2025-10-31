@@ -1,3 +1,5 @@
+'use client'
+
 import { CTA } from '../_components/CTA'
 import { motion } from 'framer-motion'
 import { careers } from '@/lib/data/careers'
@@ -16,7 +18,7 @@ export default function CareersPage() {
             Careers at SOYL
           </h1>
           <p className="text-xl text-muted max-w-3xl mx-auto">
-            Join us in building the future of emotion-aware AI. We're looking
+            Join us in building the future of emotion-aware AI. We&apos;re looking
             for talented individuals who share our passion for multimodal AI
             and adaptive agents.
           </p>
@@ -83,10 +85,10 @@ export default function CareersPage() {
           transition={{ duration: 0.6 }}
           className="glass rounded-xl p-8 border border-white/10 text-center"
         >
-          <h2 className="text-2xl font-bold mb-4">Don't See a Role That Fits?</h2>
+          <h2 className="text-2xl font-bold mb-4">Don&apos;t See a Role That Fits?</h2>
           <p className="text-muted mb-6">
-            We're always looking for exceptional talent. Send us your resume
-            and we'll reach out if a role becomes available.
+            We&apos;re always looking for exceptional talent. Send us your resume
+            and we&apos;ll reach out if a role becomes available.
           </p>
           <CTA href="mailto:jobs@soyl.ai?subject=General Application" variant="secondary" size="md">
             Send General Application
