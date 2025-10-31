@@ -63,7 +63,7 @@ export default function CareersPage() {
                 </div>
                 <div className="lg:w-48 flex-shrink-0">
                   <CTA
-                    href="mailto:jobs@soyl.ai?subject=Application: {career.title}"
+                    href={`mailto:jobs@soyl.ai?subject=Application: ${encodeURIComponent(career.title)}`}
                     variant="primary"
                     size="md"
                     className="w-full"
