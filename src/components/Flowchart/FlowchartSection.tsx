@@ -22,7 +22,7 @@ export function FlowchartSection() {
         <DotPattern className="absolute inset-0 opacity-10" />
       </motion.div>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-[1200px] px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -56,7 +56,7 @@ export function FlowchartSection() {
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="relative"
+          className="relative flex justify-center"
         >
           <FlowchartCanvas />
         </motion.div>
