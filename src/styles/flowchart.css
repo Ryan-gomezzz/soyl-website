@@ -1,0 +1,112 @@
+/* Flowchart Styles */
+
+/* Canvas centering */
+.flowchart-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .flowchart-container {
+    padding: 0 2rem;
+  }
+}
+
+/* Flowchart canvas wrapper */
+.flowchart-canvas-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Node button styles */
+.flow-node-btn {
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  will-change: transform;
+}
+
+.flow-node-btn:hover,
+.flow-node-btn:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(31, 182, 255, 0.2);
+}
+
+/* Popup positioning and animation */
+.flow-node-popup {
+  position: absolute;
+  z-index: 50;
+  pointer-events: auto;
+  animation: fadeInScale 0.2s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .flow-node-btn {
+    transition: none;
+  }
+  
+  .flow-node-popup {
+    animation: none;
+  }
+  
+  .flow-node-btn:hover,
+  .flow-node-btn:focus {
+    transform: none;
+  }
+}
+
+/* Popup shadows */
+.flow-node-popup {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
+              0 4px 12px rgba(31, 182, 255, 0.15);
+}
+
+/* Accessibility: ensure popup is readable */
+.flow-node-popup a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: text-decoration 0.2s ease;
+}
+
+.flow-node-popup a:hover,
+.flow-node-popup a:focus {
+  text-decoration: underline;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Ambient layer container */
+.ambient-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Canvas z-index stacking */
+.flowchart-svg {
+  position: relative;
+  z-index: 20;
+}
+
+/* Ensure popups render above canvas */
+.flow-node-popup {
+  z-index: 50;
+}
+
