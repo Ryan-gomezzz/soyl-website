@@ -104,7 +104,7 @@ export function FlowNodePopup({ node, anchorRef, onClose }: FlowNodePopupProps) 
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: reduced ? 0 : 5 }}
       transition={transition}
-      className="absolute z-50 bg-[var(--panel)]/95 backdrop-blur-md border border-white/20 rounded-lg p-4 max-w-xs shadow-xl pointer-events-auto"
+      className="fixed z-50 bg-[var(--panel)]/95 backdrop-blur-md border border-white/20 rounded-lg p-4 max-w-xs shadow-xl pointer-events-auto"
       style={{
         top: `${position.top}px`,
         left: `${position.left}px`,
