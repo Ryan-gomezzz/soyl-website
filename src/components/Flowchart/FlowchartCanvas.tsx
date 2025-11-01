@@ -1,10 +1,11 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { useRef, useState, useEffect, useCallback } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import { flow } from './flow-data'
 import { FlowNode } from './FlowNode'
 import { FlowEdge } from './FlowEdge'
+import { AmbientLayer } from './AmbientLayer'
 
 interface FlowchartCanvasProps {
   onNodeClick?: (node: typeof flow.nodes[0]) => void
@@ -14,27 +15,37 @@ export function FlowchartCanvas({ onNodeClick }: FlowchartCanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null)
   const [size, setSize] = useState({ w: 1200, h: 700 })
   const [hoveredNode, setHoveredNode] = useState<string | null>(null)
-  const [tooltip, setTooltip] = useState<typeof flow.nodes[0] | null>(null)
+  const reduced = useReducedMotion()
 
-  useEffect(() => {
-    function measure() {
-      if (canvasRef.current) {
-        const rect = canvasRef.current.getBoundingClientRect()
-        setSize({ w: rect.width, h: rect.height })
-      }
+  const measure = useCallback(() => {
+    if (canvasRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect()
+      setSize({ w: rect.width, h: rect.height })
     }
-
-    measure()
-    window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
   }, [])
 
-  const handleNodeHover = (node: typeof flow.nodes[0] | null) => {
-    setHoveredNode(node?.id || null)
-    setTooltip(node || null)
-  }
+  useEffect(() => {
+    measure()
+    
+    // Throttle resize events
+    let timeoutId: NodeJS.Timeout
+    function handleResize() {
+      clearTimeout(timeoutId)
+      timeoutId = setTimeout(measure, 100)
+    }
 
-  const handleNodeClick = (node: typeof flow.nodes[0]) => {
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      clearTimeout(timeoutId)
+    }
+  }, [measure])
+
+  const handleNodeHover = useCallback((node: typeof flow.nodes[0] | null) => {
+    setHoveredNode(node?.id || null)
+  }, [])
+
+  const handleNodeClick = useCallback((node: typeof flow.nodes[0]) => {
     if (node.cta?.href) {
       if (node.cta.action === 'pilot' || node.cta.action === 'contact') {
         window.location.href = node.cta.href
@@ -43,11 +54,20 @@ export function FlowchartCanvas({ onNodeClick }: FlowchartCanvasProps) {
       }
     }
     onNodeClick?.(node)
-  }
+  }, [onNodeClick])
+
+  // Check for reduced motion preference for ambient layer
+  const prefersReducedMotion = 
+    typeof window !== 'undefined' &&
+    window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   return (
     <div ref={canvasRef} className="relative w-full h-[520px] md:h-[640px] overflow-hidden">
-      <svg width={size.w} height={size.h} className="absolute inset-0">
+      {/* Ambient animation layer */}
+      <AmbientLayer enabled={!prefersReducedMotion && !reduced} width={size.w} height={size.h} />
+
+      <svg width={size.w} height={size.h} className="absolute inset-0 z-20">
         <defs>
           {/* Arrow marker with glow */}
           <marker
@@ -105,37 +125,23 @@ export function FlowchartCanvas({ onNodeClick }: FlowchartCanvasProps) {
               y={nodeY}
               width={node.size === 'lg' ? 256 : node.size === 'sm' ? 192 : 224}
               height={node.size === 'lg' ? 64 : node.size === 'sm' ? 48 : 56}
-              initial={{ opacity: 0, scale: 0.8, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{
-                duration: 0.6,
-                delay: index * 0.15,
-                ease: [0.22, 1, 0.36, 1],
-              }}
+              initial={reduced ? { opacity: 1 } : { opacity: 0, scale: 0.8, y: 20 }}
+              animate={reduced ? {} : { opacity: 1, scale: 1, y: 0 }}
+              transition={
+                reduced
+                  ? {}
+                  : {
+                      duration: 0.6,
+                      delay: index * 0.15,
+                      ease: [0.22, 1, 0.36, 1],
+                    }
+              }
             >
               <FlowNode node={node} onHover={handleNodeHover} onClick={handleNodeClick} />
             </motion.foreignObject>
           )
         })}
       </svg>
-
-      {/* Tooltip */}
-      {tooltip && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 10 }}
-          className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-[var(--panel)]/90 backdrop-blur-md border border-white/10 rounded-lg p-4 max-w-md z-20 pointer-events-none"
-        >
-          <h4 className="text-white font-semibold text-sm mb-1">{tooltip.title}</h4>
-          {tooltip.subtitle && (
-            <p className="text-[var(--muted)] text-xs mb-2">{tooltip.subtitle}</p>
-          )}
-          {tooltip.description && (
-            <p className="text-[var(--muted)] text-xs leading-relaxed">{tooltip.description}</p>
-          )}
-        </motion.div>
-      )}
     </div>
   )
 }
