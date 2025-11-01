@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 
 interface DotClusterProps {
@@ -9,19 +10,21 @@ interface DotClusterProps {
 
 const colors = ['var(--dot-1)', 'var(--dot-2)', 'var(--dot-3)', 'var(--dot-4)']
 
-export function DotCluster({ size = 48, className = '' }: DotClusterProps) {
-  const reduced = useReducedMotion()
+export const DotCluster = React.forwardRef<SVGSVGElement, DotClusterProps>(
+  function DotCluster({ size = 48, className = '' }, ref) {
+    const reduced = useReducedMotion()
 
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 48 48"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      aria-hidden="true"
-    >
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 48 48"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden="true"
+      >
       {colors.map((color, i) => {
         const angle = (i / colors.length) * Math.PI * 2
         const radius = 12
@@ -55,7 +58,8 @@ export function DotCluster({ size = 48, className = '' }: DotClusterProps) {
           />
         )
       })}
-    </svg>
-  )
-}
+      </svg>
+    )
+  }
+)
 

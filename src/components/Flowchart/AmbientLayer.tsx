@@ -11,16 +11,14 @@ interface AmbientLayerProps {
 export function AmbientLayer({ enabled = true, width, height }: AmbientLayerProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
+  // Check for reduced motion preference early
+  const prefersReducedMotion = 
+    typeof window !== 'undefined' &&
+    window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
   useEffect(() => {
-    if (!enabled) return
-    
-    // Check for reduced motion preference
-    const prefersReducedMotion = 
-      typeof window !== 'undefined' &&
-      window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    
-    if (prefersReducedMotion) return
+    if (!enabled || prefersReducedMotion) return
 
     const canvas = canvasRef.current
     if (!canvas) return
@@ -74,9 +72,9 @@ export function AmbientLayer({ enabled = true, width, height }: AmbientLayerProp
     return () => {
       cancelAnimationFrame(raf)
     }
-  }, [enabled, width, height])
+  }, [enabled, width, height, prefersReducedMotion])
 
-  if (!enabled) return null
+  if (!enabled || prefersReducedMotion) return null
 
   return (
     <canvas

@@ -1,4 +1,4 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react'
 import { FlowNode } from '../FlowNode'
 import { AmbientLayer } from '../AmbientLayer'
 import { flow } from '../flow-data'
@@ -88,16 +88,47 @@ jest.mock('framer-motion', () => {
 })
 
 // Mock DotCluster
-jest.mock('../../FeatureGrid/DotCluster', () => ({
-  DotCluster: ({ size }: { size?: number }) => (
-    <div data-testid="dot-cluster" data-size={size} />
-  ),
-}))
+jest.mock('../../FeatureGrid/DotCluster', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const React = require('react')
+  return {
+    DotCluster: React.forwardRef<SVGSVGElement, { size?: number }>(
+      ({ size }, _ref) => (
+        <div data-testid="dot-cluster" data-size={size} />
+      )
+    ),
+  }
+})
 
 // Mock FlowEdge
 jest.mock('../FlowEdge', () => ({
   FlowEdge: () => <g data-testid="flow-edge">Flow Edge</g>,
 }))
+
+// Mock FlowNodePopup
+jest.mock('../FlowNodePopup', () => ({
+  FlowNodePopup: ({ node, onClose }: { node: typeof flow.nodes[0]; onClose: () => void }) => (
+    <div role="tooltip" data-testid="flow-node-popup">
+      <h4>{node.title}</h4>
+      {node.description && <p>{node.description}</p>}
+      <button onClick={onClose} aria-label="Close popup">Close</button>
+    </div>
+  ),
+}))
+
+// Mock canvas getContext globally
+Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
+  writable: true,
+  value: jest.fn().mockReturnValue({
+    clearRect: jest.fn(),
+    beginPath: jest.fn(),
+    arc: jest.fn(),
+    fill: jest.fn(),
+    fillStyle: '',
+    strokeStyle: '',
+    lineWidth: 0,
+  }),
+})
 
 describe('Flowchart Hover/Focus/Tap Behavior', () => {
   beforeEach(() => {
@@ -194,9 +225,14 @@ describe('Flowchart Hover/Focus/Tap Behavior', () => {
 
     fireEvent.blur(button)
     
+    // Wait for setTimeout in handleBlur (100ms delay)
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 150))
+    })
+    
     await waitFor(() => {
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
-    }, { timeout: 200 })
+    })
   })
 
   it('toggles popup on tap for touch devices', async () => {
@@ -239,6 +275,21 @@ describe('Flowchart Hover/Focus/Tap Behavior', () => {
   })
 
   it('renders ambient layer with pointer-events-none', () => {
+    // Mock matchMedia to return false for prefers-reduced-motion
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: jest.fn().mockImplementation((query: string) => ({
+        matches: query !== '(prefers-reduced-motion: reduce)',
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+      })),
+    })
+
     const { container } = render(<AmbientLayer enabled={true} width={1200} height={700} />)
     const canvas = container.querySelector('canvas')
     
@@ -293,7 +344,7 @@ describe('Flowchart Hover/Focus/Tap Behavior', () => {
     
     await waitFor(() => {
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
-    }, { timeout: 200 })
+    })
   })
 })
 

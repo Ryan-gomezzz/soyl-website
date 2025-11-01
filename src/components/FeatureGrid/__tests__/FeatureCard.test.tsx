@@ -9,14 +9,42 @@ jest.mock('../DotCluster', () => ({
 }))
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => (
-      <div {...props}>{children}</div>
-    ),
-  },
-  useReducedMotion: () => false,
-}))
+jest.mock('framer-motion', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const React = require('react')
+  const createMotionComponent = (tag: string) => {
+    const Component = ({
+      children,
+      whileInView: _whileInView,
+      whileHover: _whileHover,
+      whileTap: _whileTap,
+      animate: _animate,
+      initial: _initial,
+      exit: _exit,
+      transition: _transition,
+      ...props
+    }: {
+      children?: React.ReactNode
+      whileInView?: unknown
+      whileHover?: unknown
+      whileTap?: unknown
+      animate?: unknown
+      initial?: unknown
+      exit?: unknown
+      transition?: unknown
+      [key: string]: unknown
+    }) => {
+      return React.createElement(tag, props, children)
+    }
+    return Component
+  }
+  return {
+    motion: {
+      div: createMotionComponent('div'),
+    },
+    useReducedMotion: () => false,
+  }
+})
 
 describe('FeatureCard', () => {
   const mockFeature = {
