@@ -8,27 +8,35 @@ export interface Testimonial {
 
 export const testimonials: Testimonial[] = [
   {
-    name: 'Sarah Chen',
-    role: 'CTO',
-    company: 'RetailTech Inc.',
+    name: 'Anonymous',
+    role: 'Tech Executive',
+    company: 'Enterprise Client',
     content:
-      'SOYL\'s emotion-aware agents transformed our customer interactions. Conversion rates increased by 40% in the first quarter.',
+      'The emotion-aware capabilities are genuinely impressive. It&apos;s clear this technology understands context in a way that goes beyond surface-level interactions. We&apos;re seeing tangible improvements in engagement metrics.',
     avatar: undefined,
   },
   {
-    name: 'Marcus Rodriguez',
-    role: 'VP of Product',
-    company: 'CommerceFlow',
+    name: 'Anonymous',
+    role: 'Product Leader',
+    company: 'E-commerce Platform',
     content:
-      'The adaptive agents understand context and emotion in ways traditional chatbots never could. Our customer satisfaction scores are at an all-time high.',
+      'The multimodal approach makes a real difference. Our initial tests show users feel more understood, and the adaptive responses feel natural rather than scripted. Excited to see where this goes.',
     avatar: undefined,
   },
   {
-    name: 'Dr. Emily Watson',
-    role: 'Head of Research',
-    company: 'AI Ventures',
+    name: 'Anonymous',
+    role: 'Research Director',
+    company: 'AI Lab',
     content:
-      'SOYL\'s R&D in multimodal emotion understanding is pushing the boundaries of what\'s possible. The foundation model work is particularly impressive.',
+      'The technical foundation is solid. The fusion of signals into an Emotion State Vector is novel, and the R&D roadmap shows serious commitment to building something meaningful, not just another AI wrapper.',
+    avatar: undefined,
+  },
+  {
+    name: 'Anonymous',
+    role: 'Founder',
+    company: 'Startup',
+    content:
+      'We&apos;ve been testing early access features, and the emotion detection accuracy is surprisingly good. The on-device inference option is exactly what we needed for privacy-sensitive use cases.',
     avatar: undefined,
   },
 ]

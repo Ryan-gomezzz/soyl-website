@@ -11,8 +11,9 @@ interface DotPatternProps {
 export function DotPattern({ className }: DotPatternProps) {
   const [mounted, setMounted] = useState(false)
   const { scrollY } = useScroll()
-  const x = useTransform(scrollY, [0, 1000], [0, 50])
-  const y = useTransform(scrollY, [0, 1000], [0, 30])
+  const x = useTransform(scrollY, [0, 1000], [0, 80], { clamp: false })
+  const y = useTransform(scrollY, [0, 1000], [0, 50], { clamp: false })
+  const opacity = useTransform(scrollY, [0, 500, 1000], [0.3, 0.5, 0.3])
 
   useEffect(() => {
     setMounted(true)
@@ -25,7 +26,7 @@ export function DotPattern({ className }: DotPatternProps) {
   return (
     <motion.svg
       className={clsx('absolute inset-0 w-full h-full', className)}
-      style={{ x, y }}
+      style={{ x, y, opacity }}
       width="100%"
       height="100%"
       xmlns="http://www.w3.org/2000/svg"

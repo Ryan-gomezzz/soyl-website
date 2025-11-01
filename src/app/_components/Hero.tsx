@@ -12,32 +12,59 @@ export function Hero() {
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8 py-32 lg:py-40">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             className="space-y-8"
           >
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-balance">
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-balance"
+            >
               SOYL —{' '}
-              <span className="text-accent">Story Of Your Life</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-muted max-w-2xl text-balance">
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                className="text-accent"
+              >
+                Story Of Your Life
+              </motion.span>
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              className="text-xl md:text-2xl text-muted max-w-2xl text-balance"
+            >
               Multimodal emotion intelligence and adaptive agents for modern
               commerce.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="flex flex-col sm:flex-row gap-4"
+            >
               <CTA href="#request-pilot" variant="primary" size="lg">
                 Request a pilot
               </CTA>
               <CTA href="/docs" variant="secondary" size="lg">
                 Read the docs
               </CTA>
-            </div>
+            </motion.div>
           </motion.div>
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ 
+              duration: 1, 
+              delay: 0.3,
+              ease: [0.22, 1, 0.36, 1],
+              scale: { type: "spring", stiffness: 100, damping: 15 }
+            }}
             className="relative"
           >
             <div className="relative aspect-square rounded-2xl overflow-hidden glass border border-white/10">

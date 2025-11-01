@@ -38,8 +38,9 @@ export function CTA({
 
   const content = (
     <motion.span
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
       className="inline-block"
     >
       {children}

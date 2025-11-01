@@ -55,11 +55,14 @@ export function TestimonialCarousel() {
       <AnimatePresence mode="wait">
         <motion.div
           key={currentIndex}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.3 }}
-          className="glass rounded-xl p-8 border border-white/10"
+          initial={{ opacity: 0, x: 30, scale: 0.95 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          exit={{ opacity: 0, x: -30, scale: 0.95 }}
+          transition={{ 
+            duration: 0.5,
+            ease: [0.22, 1, 0.36, 1]
+          }}
+          className="glass rounded-xl p-8 border border-white/10 hover:border-accent/30 transition-all"
         >
           <blockquote className="text-lg md:text-xl text-text mb-6">
             &ldquo;{testimonials[currentIndex].content}&rdquo;
@@ -78,32 +81,45 @@ export function TestimonialCarousel() {
         </motion.div>
       </AnimatePresence>
       <div className="flex gap-4 mt-6 justify-center">
-        <button
+        <motion.button
           onClick={prev}
+          whileHover={{ scale: 1.1, x: -2 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ duration: 0.2 }}
           className="p-2 rounded-lg glass border border-white/10 hover:border-accent transition-colors"
           aria-label="Previous testimonial"
         >
           <ChevronLeftIcon className="h-5 w-5" />
-        </button>
+        </motion.button>
         <div className="flex gap-2 items-center">
           {testimonials.map((_, index) => (
-            <button
+            <motion.button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={`w-2 h-2 rounded-full transition-all ${
-                index === currentIndex ? 'bg-accent w-6' : 'bg-white/20'
+              whileHover={{ scale: 1.3 }}
+              whileTap={{ scale: 0.9 }}
+              animate={{
+                width: index === currentIndex ? 24 : 8,
+                opacity: index === currentIndex ? 1 : 0.5
+              }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className={`h-2 rounded-full ${
+                index === currentIndex ? 'bg-accent' : 'bg-white/20'
               }`}
               aria-label={`Go to testimonial ${index + 1}`}
             />
           ))}
         </div>
-        <button
+        <motion.button
           onClick={next}
+          whileHover={{ scale: 1.1, x: 2 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ duration: 0.2 }}
           className="p-2 rounded-lg glass border border-white/10 hover:border-accent transition-colors"
           aria-label="Next testimonial"
         >
           <ChevronRightIcon className="h-5 w-5" />
-        </button>
+        </motion.button>
       </div>
     </div>
   )

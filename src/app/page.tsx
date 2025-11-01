@@ -29,7 +29,19 @@ export default function Home() {
               Emotion-aware AI that understands context and adapts in real-time
             </p>
           </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={{
+              visible: {
+                transition: {
+                  staggerChildren: 0.15,
+                },
+              },
+            }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          >
             {features.map((feature, index) => (
               <FeatureCard
                 key={feature.title}
@@ -39,7 +51,7 @@ export default function Home() {
                 delay={index * 0.1}
               />
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -57,16 +69,44 @@ export default function Home() {
               How it works
             </h2>
           </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={{
+              visible: {
+                transition: {
+                  staggerChildren: 0.2,
+                },
+              },
+            }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          >
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
+              variants={{
+                hidden: { opacity: 0, y: 30, scale: 0.9 },
+                visible: { opacity: 1, y: 0, scale: 1 },
+              }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -8, scale: 1.03 }}
               className="text-center"
             >
-              <div className="glass rounded-xl p-8 border border-white/10 mb-6">
-                <div className="text-5xl mb-4">📷</div>
+              <div className="glass rounded-xl p-8 border border-white/10 mb-6 hover:border-accent/30 transition-all">
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 10, -10, 0]
+                  }}
+                  transition={{ 
+                    duration: 3,
+                    repeat: Infinity,
+                    repeatDelay: 2,
+                    ease: "easeInOut"
+                  }}
+                  className="text-5xl mb-4 inline-block"
+                >
+                  📷
+                </motion.div>
                 <h3 className="text-2xl font-semibold mb-2">Detect</h3>
                 <p className="text-muted">
                   Camera, microphone, and text input capture multimodal signals
@@ -74,14 +114,30 @@ export default function Home() {
               </div>
             </motion.div>
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+              variants={{
+                hidden: { opacity: 0, y: 30, scale: 0.9 },
+                visible: { opacity: 1, y: 0, scale: 1 },
+              }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -8, scale: 1.03 }}
               className="text-center"
             >
-              <div className="glass rounded-xl p-8 border border-white/10 mb-6">
-                <div className="text-5xl mb-4">🧠</div>
+              <div className="glass rounded-xl p-8 border border-white/10 mb-6 hover:border-accent/30 transition-all">
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.2, 1],
+                    rotate: [0, -10, 10, 0]
+                  }}
+                  transition={{ 
+                    duration: 3,
+                    repeat: Infinity,
+                    repeatDelay: 2,
+                    ease: "easeInOut"
+                  }}
+                  className="text-5xl mb-4 inline-block"
+                >
+                  🧠
+                </motion.div>
                 <h3 className="text-2xl font-semibold mb-2">Understand</h3>
                 <p className="text-muted">
                   Fuse signals into unified Emotion State Vector
@@ -89,21 +145,37 @@ export default function Home() {
               </div>
             </motion.div>
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              variants={{
+                hidden: { opacity: 0, y: 30, scale: 0.9 },
+                visible: { opacity: 1, y: 0, scale: 1 },
+              }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -8, scale: 1.03 }}
               className="text-center"
             >
-              <div className="glass rounded-xl p-8 border border-white/10 mb-6">
-                <div className="text-5xl mb-4">🤖</div>
+              <div className="glass rounded-xl p-8 border border-white/10 mb-6 hover:border-accent/30 transition-all">
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 5, -5, 0]
+                  }}
+                  transition={{ 
+                    duration: 3,
+                    repeat: Infinity,
+                    repeatDelay: 2,
+                    ease: "easeInOut"
+                  }}
+                  className="text-5xl mb-4 inline-block"
+                >
+                  🤖
+                </motion.div>
                 <h3 className="text-2xl font-semibold mb-2">Act</h3>
                 <p className="text-muted">
                   Adaptive Sales Agent responds with context-aware suggestions
                 </p>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -121,15 +193,29 @@ export default function Home() {
               Product & Features
             </h2>
           </motion.div>
-          <div className="space-y-12">
-            {productFeatures.map((feature, index) => (
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={{
+              visible: {
+                transition: {
+                  staggerChildren: 0.15,
+                },
+              },
+            }}
+            className="space-y-12"
+          >
+            {productFeatures.map((feature) => (
               <motion.div
                 key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="glass rounded-xl p-8 border border-white/10 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center"
+                variants={{
+                  hidden: { opacity: 0, y: 30, scale: 0.95 },
+                  visible: { opacity: 1, y: 0, scale: 1 },
+                }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                whileHover={{ y: -5, scale: 1.01 }}
+                className="glass rounded-xl p-8 border border-white/10 hover:border-accent/30 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center transition-all"
               >
                 <div>
                   <h3 className="text-2xl font-semibold mb-3">{feature.title}</h3>
@@ -142,7 +228,7 @@ export default function Home() {
                 </div>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -157,7 +243,7 @@ export default function Home() {
             className="text-center mb-16"
           >
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-              What Early Partners Say
+              First Impressions
             </h2>
           </motion.div>
           <TestimonialCarousel />
