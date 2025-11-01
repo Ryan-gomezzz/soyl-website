@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { usePathname } from 'next/navigation'
 import { MCQEngine, FlowJson } from './MCQEngine'
 import { useChatbotState } from './hooks/useChatbotState'
 import defaultFlow from './mcq-flows/default-flow.json'
@@ -80,13 +81,18 @@ export function ChatbotPanel({ flow: flowProp, requestModalModeForFlow }: Chatbo
     }
   }, [requestModalModeForFlow])
 
-  // Handle ESC key (unless pinned)
+  // Handle ESC key - close if not pinned, minimize if pinned
   useEffect(() => {
     if (!open) return
 
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !pinned) {
-        setOpen(false)
+      if (e.key === 'Escape') {
+        if (!pinned) {
+          setOpen(false)
+        } else {
+          // If pinned, minimize instead of closing
+          setMinimized(true)
+        }
       }
     }
 
@@ -94,7 +100,7 @@ export function ChatbotPanel({ flow: flowProp, requestModalModeForFlow }: Chatbo
     return () => {
       document.removeEventListener('keydown', handleEsc)
     }
-  }, [open, pinned, setOpen])
+  }, [open, pinned, setOpen, setMinimized])
 
   // Prevent body scroll only in modal mode
   useEffect(() => {
@@ -137,33 +143,13 @@ export function ChatbotPanel({ flow: flowProp, requestModalModeForFlow }: Chatbo
     }
   }, [open, consent])
 
-  // Handle navigation (close if not pinned)
+  // Handle navigation (close if not pinned) - using Next.js pathname
+  const pathname = usePathname()
   useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    const handleNavigation = () => {
-      if (!pinned && open) {
-        setOpen(false)
-      }
+    if (!pinned && open) {
+      setOpen(false)
     }
-
-    // Listen for Next.js route changes via popstate
-    window.addEventListener('popstate', handleNavigation)
-
-    // Also watch for programmatic navigation (Next.js Link clicks)
-    const originalPushState = history.pushState
-    history.pushState = function (...args) {
-      originalPushState.apply(history, args)
-      if (!pinned && open) {
-        setTimeout(handleNavigation, 0)
-      }
-    }
-
-    return () => {
-      window.removeEventListener('popstate', handleNavigation)
-      history.pushState = originalPushState
-    }
-  }, [pinned, open, setOpen])
+  }, [pathname, pinned, open, setOpen])
 
   const handleClose = () => {
     if (pinned) {
@@ -224,7 +210,7 @@ export function ChatbotPanel({ flow: flowProp, requestModalModeForFlow }: Chatbo
         aria-modal={prefersModal ? 'true' : undefined}
         aria-label="SOYL Assistant panel"
         className={clsx(
-          'chat-panel fixed right-4 top-8 z-[70] h-[calc(100vh-4rem)] w-[420px] max-w-full bg-[var(--panel)]/90 backdrop-blur-md shadow-2xl rounded-lg border border-white/10 flex flex-col overflow-hidden',
+          'chat-panel fixed right-4 top-7 z-[70] h-[calc(100vh-3.5rem)] w-[420px] max-w-[calc(100vw-2rem)] bg-[var(--panel)]/90 backdrop-blur-md shadow-2xl rounded-lg border border-white/10 flex flex-col overflow-hidden',
           'max-sm:w-full max-sm:right-0 max-sm:top-0 max-sm:h-full max-sm:rounded-none'
         )}
       >
