@@ -91,12 +91,14 @@ jest.mock('framer-motion', () => {
 jest.mock('../../FeatureGrid/DotCluster', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const React = require('react')
+  const DotClusterMock = React.forwardRef<SVGSVGElement, { size?: number }>(
+    ({ size }, _ref) => (
+      <div data-testid="dot-cluster" data-size={size} />
+    )
+  )
+  DotClusterMock.displayName = 'DotCluster'
   return {
-    DotCluster: React.forwardRef<SVGSVGElement, { size?: number }>(
-      ({ size }, _ref) => (
-        <div data-testid="dot-cluster" data-size={size} />
-      )
-    ),
+    DotCluster: DotClusterMock,
   }
 })
 
