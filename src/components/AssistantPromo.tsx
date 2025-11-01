@@ -60,12 +60,31 @@ export function AssistantPromo() {
               {/* Cyan glow effect */}
               <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-accent/20 rounded-full blur-3xl pointer-events-none" />
 
-              <h2
+              <motion.h2
                 id="assistant-promo-title"
                 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-text"
+                animate={
+                  prefersReducedMotion
+                    ? {}
+                    : {
+                        backgroundPosition: ['0%', '100%', '0%'],
+                      }
+                }
+                transition={{
+                  duration: 5,
+                  repeat: Infinity,
+                  ease: 'linear',
+                }}
+                style={{
+                  background: 'linear-gradient(90deg, var(--text) 0%, var(--accent) 50%, var(--text) 100%)',
+                  backgroundSize: '200% auto',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
               >
                 SOYL Assistant
-              </h2>
+              </motion.h2>
               <p className="text-lg text-muted mb-8 max-w-lg">
                 Try our multimodal, emotion-aware AI assistant — an adaptive salesperson that
                 listens and helps convert.

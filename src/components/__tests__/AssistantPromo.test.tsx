@@ -19,16 +19,68 @@ jest.mock('@/app/_components/DotPattern', () => ({
 }))
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => (
-      <div {...props}>{children}</div>
-    ),
-    button: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => (
-      <button {...props}>{children}</button>
-    ),
-  },
-}))
+jest.mock('framer-motion', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const React = require('react')
+  // Create a component factory that strips animation props
+  const createMotionComponent = (tag: string) => {
+    const Component = ({ 
+      children, 
+      animate: _animate, 
+      initial: _initial, 
+      whileInView: _whileInView, 
+      whileHover: _whileHover,
+      whileTap: _whileTap,
+      whileFocus: _whileFocus,
+      whileDrag: _whileDrag,
+      transition: _transition, 
+      viewport: _viewport, 
+      exit: _exit,
+      variants: _variants,
+      ...props 
+    }: { 
+      children?: React.ReactNode; 
+      animate?: unknown; 
+      initial?: unknown; 
+      whileInView?: unknown;
+      whileHover?: unknown;
+      whileTap?: unknown;
+      whileFocus?: unknown;
+      whileDrag?: unknown;
+      transition?: unknown; 
+      viewport?: unknown;
+      exit?: unknown;
+      variants?: unknown;
+      [key: string]: unknown 
+    }) => {
+      return React.createElement(tag, props, children)
+    }
+    return Component
+  }
+  
+  // Create motion object with common HTML and SVG elements
+  const motionElements = ['div', 'section', 'h1', 'h2', 'h3', 'p', 'span', 'a', 'button', 'ul', 'li', 'svg', 'path', 'text', 'g', 'circle', 'rect', 'line', 'polyline', 'polygon', 'ellipse', 'foreignObject']
+  const motion: Record<string, React.ComponentType<{ children?: React.ReactNode; [key: string]: unknown }>> = {}
+  
+  motionElements.forEach(tag => {
+    motion[tag] = createMotionComponent(tag)
+  })
+  
+  // Create mock MotionValue
+  const createMotionValue = (value: number) => ({
+    get: () => value,
+    set: () => {},
+    subscribe: () => () => {},
+  })
+
+  return {
+    motion,
+    AnimatePresence: ({ children }: { children?: React.ReactNode }) => children,
+    useReducedMotion: () => false,
+    useScroll: () => ({ scrollY: createMotionValue(0) }),
+    useTransform: () => createMotionValue(0),
+  }
+})
 
 describe('AssistantPromo', () => {
   beforeEach(() => {

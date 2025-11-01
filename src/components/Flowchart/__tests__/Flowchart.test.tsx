@@ -24,14 +24,39 @@ jest.mock('../FlowEdge', () => ({
 }))
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => (
-      <div {...props}>{children}</div>
-    ),
-  },
-  useReducedMotion: () => false,
-}))
+jest.mock('framer-motion', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const React = require('react')
+  // Create a component factory that strips animation props
+  const createMotionComponent = (tag: string) => {
+    const Component = ({ children, animate: _animate, initial: _initial, whileInView: _whileInView, transition: _transition, viewport: _viewport, ...props }: { children?: React.ReactNode; animate?: unknown; initial?: unknown; whileInView?: unknown; transition?: unknown; viewport?: unknown; [key: string]: unknown }) => {
+      return React.createElement(tag, props, children)
+    }
+    return Component
+  }
+  
+  // Create motion object with common HTML and SVG elements
+  const motionElements = ['div', 'section', 'h1', 'h2', 'h3', 'p', 'span', 'a', 'button', 'ul', 'li', 'svg', 'path', 'text', 'g', 'circle', 'rect', 'line', 'polyline', 'polygon', 'ellipse']
+  const motion: Record<string, React.ComponentType<{ children?: React.ReactNode; [key: string]: unknown }>> = {}
+  
+  motionElements.forEach(tag => {
+    motion[tag] = createMotionComponent(tag)
+  })
+  
+  // Create mock MotionValue
+  const createMotionValue = (value: number) => ({
+    get: () => value,
+    set: () => {},
+    subscribe: () => () => {},
+  })
+
+  return {
+    motion,
+    useReducedMotion: () => false,
+    useScroll: () => ({ scrollY: createMotionValue(0) }),
+    useTransform: () => createMotionValue(0),
+  }
+})
 
 describe('FlowchartSection', () => {
   it('renders flowchart section with heading', async () => {

@@ -37,14 +37,36 @@ export function FlowNode({ node, onHover, onClick }: FlowNodeProps) {
 
   return (
     <div className={`relative ${sizeClasses[node.size || 'md']}`}>
+      {/* Pulsing glow effect */}
+      {!reduced && (
+        <motion.div
+          animate={{
+            opacity: [0.3, 0.6, 0.3],
+            scale: [1, 1.05, 1],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+          className="absolute inset-0 rounded-lg bg-accent/10 blur-xl -z-10"
+        />
+      )}
+
       <motion.button
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onClick={handleClick}
         aria-labelledby={`${node.id}-title`}
-        className="w-full h-full p-4 text-left rounded-lg bg-[var(--panel)]/70 border border-white/10 hover:border-accent/50 hover:bg-[var(--panel)]/90 transition-all focus:outline focus:outline-2 focus:outline-[var(--accent)] focus:outline-offset-2"
-        whileHover={reduced ? {} : { scale: 1.03 }}
-        transition={{ duration: 0.2 }}
+        className="w-full h-full p-4 text-left rounded-lg bg-[var(--panel)]/70 border border-white/10 hover:border-accent/50 hover:bg-[var(--panel)]/90 transition-all focus:outline focus:outline-2 focus:outline-[var(--accent)] focus:outline-offset-2 relative z-10"
+        whileHover={reduced ? {} : { scale: 1.05, y: -2 }}
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{
+          duration: 0.5,
+          delay: 0.2,
+          hover: { duration: 0.2 },
+        }}
       >
         <div className="flex items-start justify-between h-full">
           <div className="flex-1 min-w-0">

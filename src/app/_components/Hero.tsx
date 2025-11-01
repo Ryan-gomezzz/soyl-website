@@ -89,12 +89,15 @@ export function Hero() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-bg/80 via-transparent to-transparent" />
             </div>
+            {/* Multiple floating orbs for depth */}
             <motion.div
               animate={{
-                y: [0, -10, 0],
+                y: [0, -15, 0],
+                x: [0, 5, 0],
+                scale: [1, 1.1, 1],
               }}
               transition={{
-                duration: 4,
+                duration: 6,
                 repeat: Infinity,
                 ease: 'easeInOut',
               }}
@@ -102,7 +105,9 @@ export function Hero() {
             />
             <motion.div
               animate={{
-                y: [0, 10, 0],
+                y: [0, 12, 0],
+                x: [0, -8, 0],
+                scale: [1, 1.15, 1],
               }}
               transition={{
                 duration: 5,
@@ -111,6 +116,20 @@ export function Hero() {
                 delay: 1,
               }}
               className="absolute -bottom-4 -left-4 w-40 h-40 bg-accent-2/20 rounded-full blur-2xl"
+            />
+            <motion.div
+              animate={{
+                y: [0, -8, 0],
+                x: [0, -10, 0],
+                scale: [1, 1.05, 1],
+              }}
+              transition={{
+                duration: 7,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                delay: 2,
+              }}
+              className="absolute top-1/2 -right-8 w-24 h-24 bg-accent/15 rounded-full blur-xl"
             />
           </motion.div>
         </div>
