@@ -110,14 +110,18 @@ jest.mock('../FlowNodePopup', () => ({
   ),
 }))
 
-// Mock canvas getContext
-beforeAll(() => {
-  HTMLCanvasElement.prototype.getContext = jest.fn().mockReturnValue({
+// Mock canvas getContext globally
+Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
+  writable: true,
+  value: jest.fn().mockReturnValue({
     clearRect: jest.fn(),
     beginPath: jest.fn(),
     arc: jest.fn(),
     fill: jest.fn(),
-  })
+    fillStyle: '',
+    strokeStyle: '',
+    lineWidth: 0,
+  }),
 })
 
 describe('Flowchart Hover/Focus/Tap Behavior', () => {
