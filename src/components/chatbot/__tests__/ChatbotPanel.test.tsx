@@ -36,7 +36,8 @@ jest.mock('../MCQEngine', () => ({
 jest.mock('framer-motion', () => {
   // Filter out framer-motion specific props that shouldn't be passed to DOM
   const filterProps = (props: { [key: string]: unknown }) => {
-    const { initial, animate, exit, whileHover, whileTap, transition, ...domProps } = props
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { initial: _initial, animate: _animate, exit: _exit, whileHover: _whileHover, whileTap: _whileTap, transition: _transition, ...domProps } = props
     return domProps
   }
   return {
