@@ -29,8 +29,8 @@ export function AmbientLayer({ enabled = true, width, height }: AmbientLayerProp
     if (!ctx) return
 
     let raf = 0
-    let w = (canvas.width = width)
-    let h = (canvas.height = height)
+    const w = (canvas.width = width)
+    const h = (canvas.height = height)
 
     // Create small set of particles
     const particleCount = 30
