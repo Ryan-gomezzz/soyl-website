@@ -1,0 +1,341 @@
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { ChatbotPanel } from '../ChatbotPanel'
+
+// Mock the useChatbotState hook
+const mockSetOpen = jest.fn()
+const mockSetPinned = jest.fn()
+const mockSetMinimized = jest.fn()
+const mockSetPrefersModal = jest.fn()
+
+jest.mock('../hooks/useChatbotState', () => ({
+  useChatbotState: () => ({
+    open: false,
+    pinned: false,
+    minimized: false,
+    prefersModal: false,
+    setOpen: mockSetOpen,
+    setPinned: mockSetPinned,
+    setMinimized: mockSetMinimized,
+    setPrefersModal: mockSetPrefersModal,
+    requestModalModeForFlow: mockSetPrefersModal,
+    lastY: 0,
+    setLastY: jest.fn(),
+  }),
+})))
+
+// Mock MCQEngine
+jest.mock('../MCQEngine', () => ({
+  MCQEngine: () => <div>MCQ Engine Content</div>,
+  FlowJson: {},
+}))
+
+// Mock framer-motion
+jest.mock('framer-motion', () => ({
+  motion: {
+    aside: ({ children, ...props }: any) => <aside {...props}>{children}</aside>,
+    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+  },
+  AnimatePresence: ({ children }: any) => <>{children}</>,
+}))
+
+// Mock default flow
+jest.mock('../mcq-flows/default-flow.json', () => ({
+  id: 'test-flow',
+  meta: { title: 'Test', version: '1.0' },
+  startNode: 'n_start',
+  nodes: { n_start: { type: 'question', text: 'Start' } },
+}))
+
+describe('ChatbotPanel', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    sessionStorage.clear()
+    // Reset mock to return closed by default
+    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+      open: false,
+      pinned: false,
+      minimized: false,
+      prefersModal: false,
+      setOpen: mockSetOpen,
+      setPinned: mockSetPinned,
+      setMinimized: mockSetMinimized,
+      setPrefersModal: mockSetPrefersModal,
+      requestModalModeForFlow: mockSetPrefersModal,
+      lastY: 0,
+      setLastY: jest.fn(),
+    })
+  })
+
+  it('renders nothing when panel is closed', () => {
+    const { container } = render(<ChatbotPanel />)
+    expect(container.firstChild).toBeNull()
+  })
+
+  it('renders panel when open', () => {
+    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+      open: true,
+      pinned: false,
+      minimized: false,
+      prefersModal: false,
+      setOpen: mockSetOpen,
+      setPinned: mockSetPinned,
+      setMinimized: mockSetMinimized,
+      setPrefersModal: mockSetPrefersModal,
+      requestModalModeForFlow: mockSetPrefersModal,
+      lastY: 0,
+      setLastY: jest.fn(),
+    })
+
+    render(<ChatbotPanel />)
+    expect(screen.getByLabelText('SOYL Assistant panel')).toBeInTheDocument()
+  })
+
+  it('overlay has pointer-events-none by default', () => {
+    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+      open: true,
+      pinned: false,
+      minimized: false,
+      prefersModal: false,
+      setOpen: mockSetOpen,
+      setPinned: mockSetPinned,
+      setMinimized: mockSetMinimized,
+      setPrefersModal: mockSetPrefersModal,
+      requestModalModeForFlow: mockSetPrefersModal,
+      lastY: 0,
+      setLastY: jest.fn(),
+    })
+
+    const { container } = render(<ChatbotPanel />)
+    const overlay = container.querySelector('.chat-overlay')
+    expect(overlay).toHaveClass('pointer-events-none')
+  })
+
+  it('overlay becomes blocking when modal mode is enabled', () => {
+    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+      open: true,
+      pinned: false,
+      minimized: false,
+      prefersModal: true,
+      setOpen: mockSetOpen,
+      setPinned: mockSetPinned,
+      setMinimized: mockSetMinimized,
+      setPrefersModal: mockSetPrefersModal,
+      requestModalModeForFlow: mockSetPrefersModal,
+      lastY: 0,
+      setLastY: jest.fn(),
+    })
+
+    const { container } = render(<ChatbotPanel />)
+    const overlay = container.querySelector('.chat-overlay')
+    expect(overlay).toHaveClass('pointer-events-auto')
+  })
+
+  it('allows background clicks when overlay is non-blocking', () => {
+    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+      open: true,
+      pinned: false,
+      minimized: false,
+      prefersModal: false,
+      setOpen: mockSetOpen,
+      setPinned: mockSetPinned,
+      setMinimized: mockSetMinimized,
+      setPrefersModal: mockSetPrefersModal,
+      requestModalModeForFlow: mockSetPrefersModal,
+      lastY: 0,
+      setLastY: jest.fn(),
+    })
+
+    // Create a button outside the panel
+    const { container } = render(
+      <>
+        <button data-testid="background-button">Click me</button>
+        <ChatbotPanel />
+      </>
+    )
+
+    const backgroundButton = screen.getByTestId('background-button')
+    fireEvent.click(backgroundButton)
+    
+    // Button click should work (no blocking)
+    expect(backgroundButton).toBeInTheDocument()
+  })
+
+  it('closes panel on ESC when not pinned', () => {
+    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+      open: true,
+      pinned: false,
+      minimized: false,
+      prefersModal: false,
+      setOpen: mockSetOpen,
+      setPinned: mockSetPinned,
+      setMinimized: mockSetMinimized,
+      setPrefersModal: mockSetPrefersModal,
+      requestModalModeForFlow: mockSetPrefersModal,
+      lastY: 0,
+      setLastY: jest.fn(),
+    })
+
+    render(<ChatbotPanel />)
+    
+    fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' })
+    
+    expect(mockSetOpen).toHaveBeenCalledWith(false)
+  })
+
+  it('does not close panel on ESC when pinned', () => {
+    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+      open: true,
+      pinned: true,
+      minimized: false,
+      prefersModal: false,
+      setOpen: mockSetOpen,
+      setPinned: mockSetPinned,
+      setMinimized: mockSetMinimized,
+      setPrefersModal: mockSetPrefersModal,
+      requestModalModeForFlow: mockSetPrefersModal,
+      lastY: 0,
+      setLastY: jest.fn(),
+    })
+
+    render(<ChatbotPanel />)
+    
+    fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' })
+    
+    expect(mockSetOpen).not.toHaveBeenCalled()
+  })
+
+  it('enables modal mode when toggle is checked', async () => {
+    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+      open: true,
+      pinned: false,
+      minimized: false,
+      prefersModal: false,
+      setOpen: mockSetOpen,
+      setPinned: mockSetPinned,
+      setMinimized: mockSetMinimized,
+      setPrefersModal: mockSetPrefersModal,
+      requestModalModeForFlow: mockSetPrefersModal,
+      lastY: 0,
+      setLastY: jest.fn(),
+    })
+
+    render(<ChatbotPanel />)
+    
+    const checkbox = screen.getByLabelText(/Modal Assist Mode/i)
+    await userEvent.click(checkbox)
+    
+    expect(mockSetPrefersModal).toHaveBeenCalledWith(true)
+  })
+
+  it('has aria-modal=true when modal mode is enabled', () => {
+    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+      open: true,
+      pinned: false,
+      minimized: false,
+      prefersModal: true,
+      setOpen: mockSetOpen,
+      setPinned: mockSetPinned,
+      setMinimized: mockSetMinimized,
+      setPrefersModal: mockSetPrefersModal,
+      requestModalModeForFlow: mockSetPrefersModal,
+      lastY: 0,
+      setLastY: jest.fn(),
+    })
+
+    render(<ChatbotPanel />)
+    const panel = screen.getByLabelText('SOYL Assistant panel')
+    expect(panel).toHaveAttribute('aria-modal', 'true')
+    expect(panel).toHaveAttribute('role', 'dialog')
+  })
+
+  it('has role="complementary" when modal mode is disabled', () => {
+    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+      open: true,
+      pinned: false,
+      minimized: false,
+      prefersModal: false,
+      setOpen: mockSetOpen,
+      setPinned: mockSetPinned,
+      setMinimized: mockSetMinimized,
+      setPrefersModal: mockSetPrefersModal,
+      requestModalModeForFlow: mockSetPrefersModal,
+      lastY: 0,
+      setLastY: jest.fn(),
+    })
+
+    render(<ChatbotPanel />)
+    const panel = screen.getByLabelText('SOYL Assistant panel')
+    expect(panel).not.toHaveAttribute('aria-modal')
+    expect(panel).toHaveAttribute('role', 'complementary')
+  })
+
+  it('has minimize and pin buttons', () => {
+    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+      open: true,
+      pinned: false,
+      minimized: false,
+      prefersModal: false,
+      setOpen: mockSetOpen,
+      setPinned: mockSetPinned,
+      setMinimized: mockSetMinimized,
+      setPrefersModal: mockSetPrefersModal,
+      requestModalModeForFlow: mockSetPrefersModal,
+      lastY: 0,
+      setLastY: jest.fn(),
+    })
+
+    render(<ChatbotPanel />)
+    
+    expect(screen.getByLabelText('Minimize panel')).toBeInTheDocument()
+    expect(screen.getByLabelText('Pin panel')).toBeInTheDocument()
+    expect(screen.getByLabelText('Close panel')).toBeInTheDocument()
+  })
+
+  it('calls setMinimized when minimize button is clicked', async () => {
+    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+      open: true,
+      pinned: false,
+      minimized: false,
+      prefersModal: false,
+      setOpen: mockSetOpen,
+      setPinned: mockSetPinned,
+      setMinimized: mockSetMinimized,
+      setPrefersModal: mockSetPrefersModal,
+      requestModalModeForFlow: mockSetPrefersModal,
+      lastY: 0,
+      setLastY: jest.fn(),
+    })
+
+    render(<ChatbotPanel />)
+    
+    const minimizeButton = screen.getByLabelText('Minimize panel')
+    await userEvent.click(minimizeButton)
+    
+    expect(mockSetMinimized).toHaveBeenCalledWith(true)
+  })
+
+  it('calls setPinned when pin button is clicked', async () => {
+    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+      open: true,
+      pinned: false,
+      minimized: false,
+      prefersModal: false,
+      setOpen: mockSetOpen,
+      setPinned: mockSetPinned,
+      setMinimized: mockSetMinimized,
+      setPrefersModal: mockSetPrefersModal,
+      requestModalModeForFlow: mockSetPrefersModal,
+      lastY: 0,
+      setLastY: jest.fn(),
+    })
+
+    render(<ChatbotPanel />)
+    
+    const pinButton = screen.getByLabelText('Pin panel')
+    await userEvent.click(pinButton)
+    
+    expect(mockSetPinned).toHaveBeenCalledWith(true)
+  })
+})
+
