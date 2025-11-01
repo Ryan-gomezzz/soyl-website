@@ -4,11 +4,10 @@ import Home from '../page'
 // Mock next/image
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: ({ src, alt, fill, priority, ...props }: any) => {
+  default: ({ src, alt, fill: _fill, priority: _priority, ...props }: { src: string; alt: string; fill?: boolean; priority?: boolean; [key: string]: unknown }) => {
     // Remove Next.js specific props that cause warnings in test environment
-    const { fill: _, priority: __, ...imgProps } = props
     // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-    return <img src={src} alt={alt} {...imgProps} />
+    return <img src={src} alt={alt} {...props} />
   },
 }))
 
