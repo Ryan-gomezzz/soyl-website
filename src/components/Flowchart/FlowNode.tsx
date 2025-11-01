@@ -170,7 +170,7 @@ export function FlowNode({ node, onHover, onClick }: FlowNodeProps) {
       )}
 
       {/* Popup */}
-      {popupOpen && nodeRef.current && (
+      {popupOpen && (
         <FlowNodePopup node={node} anchorRef={nodeRef} onClose={() => setPopupOpen(false)} />
       )}
     </div>
