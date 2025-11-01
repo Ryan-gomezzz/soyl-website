@@ -1,3 +1,5 @@
+'use client'
+
 import { CTA } from '../_components/CTA'
 import { motion } from 'framer-motion'
 
@@ -52,7 +54,7 @@ export default function CustomAgentsPage() {
           </h1>
           <p className="text-xl text-muted max-w-3xl mx-auto">
             Drag-and-deploy agent templates for various verticals. Custom AI
-            agents tailored to your industry and use case, powered by SOYL's
+            agents tailored to your industry and use case, powered by SOYL&apos;s
             emotion-aware technology.
           </p>
         </motion.div>
@@ -79,7 +81,7 @@ export default function CustomAgentsPage() {
               <div className="text-5xl mb-4">⚙️</div>
               <h3 className="text-xl font-semibold mb-2">Customize</h3>
               <p className="text-muted text-sm">
-                Tailor the agent's personality, knowledge base, and response
+                Tailor the agent&apos;s personality, knowledge base, and response
                 style.
               </p>
             </div>

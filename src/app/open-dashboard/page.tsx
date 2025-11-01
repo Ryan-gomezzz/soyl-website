@@ -1,3 +1,5 @@
+'use client'
+
 import { motion } from 'framer-motion'
 import { CTA } from '../_components/CTA'
 
@@ -16,13 +18,13 @@ export default function OpenDashboardPage() {
               Coming Soon
             </h1>
             <p className="text-xl text-muted mb-8 max-w-2xl mx-auto">
-              The SOYL Dashboard is currently under development. We're building
+              The SOYL Dashboard is currently under development. We&apos;re building
               a powerful interface to manage your emotion-aware AI agents,
               monitor performance, and access analytics.
             </p>
             <div className="space-y-4">
               <p className="text-muted">
-                Want to be notified when it's ready? Join our waitlist.
+                Want to be notified when it&apos;s ready? Join our waitlist.
               </p>
               <CTA
                 href="mailto:hello@soyl.ai?subject=Dashboard Waitlist"

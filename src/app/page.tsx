@@ -1,10 +1,11 @@
+'use client'
+
 import { Hero } from './_components/Hero'
 import { FeatureCard } from './_components/FeatureCard'
 import { TestimonialCarousel } from './_components/TestimonialCarousel'
 import { CTA } from './_components/CTA'
 import { features, productFeatures } from '@/lib/data/features'
 import { motion } from 'framer-motion'
-import Link from 'next/link'
 
 export default function Home() {
   return (

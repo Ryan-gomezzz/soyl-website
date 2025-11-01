@@ -1,3 +1,5 @@
+'use client'
+
 import { CTA } from '../_components/CTA'
 import { motion } from 'framer-motion'
 

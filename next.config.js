@@ -5,9 +5,6 @@ const nextConfig = {
     domains: ['localhost'],
     formats: ['image/avif', 'image/webp'],
   },
-  experimental: {
-    optimizePackageImports: ['framer-motion', '@headlessui/react'],
-  },
 }
 
 module.exports = nextConfig
