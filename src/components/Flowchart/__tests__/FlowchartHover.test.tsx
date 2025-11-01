@@ -88,11 +88,17 @@ jest.mock('framer-motion', () => {
 })
 
 // Mock DotCluster
-jest.mock('../../FeatureGrid/DotCluster', () => ({
-  DotCluster: ({ size }: { size?: number }) => (
-    <div data-testid="dot-cluster" data-size={size} />
-  ),
-}))
+jest.mock('../../FeatureGrid/DotCluster', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const React = require('react')
+  return {
+    DotCluster: React.forwardRef<SVGSVGElement, { size?: number }>(
+      ({ size }, _ref) => (
+        <div data-testid="dot-cluster" data-size={size} />
+      )
+    ),
+  }
+})
 
 // Mock FlowEdge
 jest.mock('../FlowEdge', () => ({
