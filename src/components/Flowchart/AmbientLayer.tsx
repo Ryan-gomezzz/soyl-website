@@ -68,15 +68,8 @@ export function AmbientLayer({ enabled = true, width, height }: AmbientLayerProp
 
     draw()
 
-    function onResize() {
-      w = canvas.width = width
-      h = canvas.height = height
-      // Reset particles if canvas size changed significantly
-      for (const p of particles) {
-        if (p.x > w) p.x = Math.random() * w
-        if (p.y > h) p.y = Math.random() * h
-      }
-    }
+    // Note: resize is handled by width/height prop changes in useEffect deps
+    // When width/height props change, useEffect re-runs and recreates canvas with new dimensions
 
     return () => {
       cancelAnimationFrame(raf)

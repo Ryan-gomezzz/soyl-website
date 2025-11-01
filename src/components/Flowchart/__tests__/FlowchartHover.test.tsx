@@ -1,6 +1,5 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import { FlowNode } from '../FlowNode'
-import { FlowchartCanvas } from '../FlowchartCanvas'
 import { AmbientLayer } from '../AmbientLayer'
 import { flow } from '../flow-data'
 
