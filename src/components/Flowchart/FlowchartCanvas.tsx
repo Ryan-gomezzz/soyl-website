@@ -49,27 +49,37 @@ export function FlowchartCanvas({ onNodeClick }: FlowchartCanvasProps) {
     <div ref={canvasRef} className="relative w-full h-[520px] md:h-[640px] overflow-hidden">
       <svg width={size.w} height={size.h} className="absolute inset-0">
         <defs>
-          {/* Arrow marker */}
+          {/* Arrow marker with glow */}
           <marker
             id="arrowhead"
-            markerWidth="10"
-            markerHeight="10"
-            refX="9"
-            refY="5"
+            markerWidth="12"
+            markerHeight="12"
+            refX="10"
+            refY="6"
             orient="auto"
             markerUnits="strokeWidth"
           >
-            <polygon points="0 0, 10 5, 0 10" fill="var(--accent)" opacity="0.5" />
+            <polygon
+              points="0 0, 12 6, 0 12"
+              fill="var(--accent)"
+              opacity={hoveredNode ? 0.9 : 0.5}
+            />
           </marker>
 
-          {/* Glow filter */}
+          {/* Enhanced glow filter */}
           <filter id="glow">
-            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+            <feGaussianBlur stdDeviation="4" result="coloredBlur" />
             <feMerge>
               <feMergeNode in="coloredBlur" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
+
+          {/* Radial gradient for particles */}
+          <radialGradient id="particle-gradient">
+            <stop offset="0%" stopColor="var(--dot-1)" stopOpacity="1" />
+            <stop offset="100%" stopColor="var(--dot-1)" stopOpacity="0" />
+          </radialGradient>
         </defs>
 
         {/* Render edges */}
@@ -83,21 +93,28 @@ export function FlowchartCanvas({ onNodeClick }: FlowchartCanvasProps) {
           />
         ))}
 
-        {/* Render nodes */}
-        {flow.nodes.map((node) => {
+        {/* Render nodes with stagger animation */}
+        {flow.nodes.map((node, index) => {
           const nodeX = node.x * size.w - (node.size === 'lg' ? 128 : node.size === 'sm' ? 96 : 112)
           const nodeY = node.y * size.h - (node.size === 'lg' ? 48 : node.size === 'sm' ? 32 : 40)
 
           return (
-            <foreignObject
+            <motion.foreignObject
               key={node.id}
               x={nodeX}
               y={nodeY}
               width={node.size === 'lg' ? 256 : node.size === 'sm' ? 192 : 224}
               height={node.size === 'lg' ? 64 : node.size === 'sm' ? 48 : 56}
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{
+                duration: 0.6,
+                delay: index * 0.15,
+                ease: [0.22, 1, 0.36, 1],
+              }}
             >
               <FlowNode node={node} onHover={handleNodeHover} onClick={handleNodeClick} />
-            </foreignObject>
+            </motion.foreignObject>
           )
         })}
       </svg>

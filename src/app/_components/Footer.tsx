@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 import { siteConfig } from '@/lib/siteConfig'
 
 // SVG icons inline
@@ -41,40 +44,55 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
           <div className="lg:col-span-1">
-            <Link href="/" className="-m-1.5 p-1.5">
-              <span className="text-2xl font-bold text-accent">SOYL</span>
+            <Link href="/" className="-m-1.5 p-1.5 inline-block group">
+              <motion.span
+                className="text-2xl font-bold text-accent inline-block"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              >
+                SOYL
+              </motion.span>
             </Link>
             <p className="mt-4 text-sm text-muted">
               {siteConfig.tagline}
             </p>
             <div className="mt-6 flex gap-x-4">
-              <a
+              <motion.a
                 href={siteConfig.social.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted hover:text-accent transition-colors"
+                className="text-muted hover:text-accent transition-colors inline-block"
                 aria-label="LinkedIn"
+                whileHover={{ scale: 1.2, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.2 }}
               >
                 <LinkedinIcon className="h-5 w-5" />
-              </a>
-              <a
+              </motion.a>
+              <motion.a
                 href={siteConfig.social.twitter}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted hover:text-accent transition-colors"
+                className="text-muted hover:text-accent transition-colors inline-block"
                 aria-label="Twitter/X"
+                whileHover={{ scale: 1.2, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.2 }}
               >
                 <TwitterIcon className="h-5 w-5" />
-              </a>
-              <a
+              </motion.a>
+              <motion.a
                 href={siteConfig.social.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted hover:text-accent transition-colors"
+                className="text-muted hover:text-accent transition-colors inline-block"
                 aria-label="GitHub"
+                whileHover={{ scale: 1.2, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.2 }}
               >
                 <GithubIcon className="h-5 w-5" />
-              </a>
+              </motion.a>
             </div>
           </div>
           <div className="lg:col-span-3">

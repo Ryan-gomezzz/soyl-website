@@ -51,8 +51,14 @@ export function Header() {
         aria-label="Global"
       >
         <div className="flex lg:flex-1">
-          <Link href="/" className="-m-1.5 p-1.5">
-            <span className="text-2xl font-bold text-accent">SOYL</span>
+          <Link href="/" className="-m-1.5 p-1.5 group">
+            <motion.span
+              className="text-2xl font-bold text-accent inline-block"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            >
+              SOYL
+            </motion.span>
           </Link>
         </div>
         <div className="flex lg:hidden">
@@ -70,14 +76,24 @@ export function Header() {
           </button>
         </div>
         <div className="hidden lg:flex lg:gap-x-8">
-          {siteConfig.nav.map((item) => (
-            <Link
+          {siteConfig.nav.map((item, index) => (
+            <motion.div
               key={item.name}
-              href={item.href}
-              className="text-sm font-medium text-text/80 transition-colors hover:text-accent"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
             >
-              {item.name}
-            </Link>
+              <Link
+                href={item.href}
+                className="text-sm font-medium text-text/80 transition-colors hover:text-accent relative group"
+              >
+                {item.name}
+                <motion.span
+                  className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"
+                  whileHover={{ width: '100%' }}
+                />
+              </Link>
+            </motion.div>
           ))}
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center lg:gap-x-4">

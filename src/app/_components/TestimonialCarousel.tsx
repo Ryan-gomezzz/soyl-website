@@ -51,8 +51,24 @@ export function TestimonialCarousel() {
   }
 
   return (
-    <div className="relative">
-      <AnimatePresence mode="wait">
+    <section className="py-24 lg:py-32">
+      <div className="mx-auto max-w-4xl px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+            What Our Users Say
+          </h2>
+          <p className="text-lg text-muted max-w-2xl mx-auto">
+            Real feedback from developers and teams using SOYL
+          </p>
+        </motion.div>
+        <div className="relative">
+          <AnimatePresence mode="wait">
         <motion.div
           key={currentIndex}
           initial={{ opacity: 0, x: 30, scale: 0.95 }}
@@ -79,8 +95,8 @@ export function TestimonialCarousel() {
             </div>
           </div>
         </motion.div>
-      </AnimatePresence>
-      <div className="flex gap-4 mt-6 justify-center">
+          </AnimatePresence>
+          <div className="flex gap-4 mt-6 justify-center">
         <motion.button
           onClick={prev}
           whileHover={{ scale: 1.1, x: -2 }}
@@ -120,8 +136,10 @@ export function TestimonialCarousel() {
         >
           <ChevronRightIcon className="h-5 w-5" />
         </motion.button>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   )
 }
 

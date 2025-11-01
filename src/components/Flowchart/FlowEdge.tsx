@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 
 interface FlowEdgeProps {
   edge: { from: string; to: string; label?: string }
@@ -12,6 +12,7 @@ interface FlowEdgeProps {
 export function FlowEdge({ edge, nodes, canvas, highlighted = false }: FlowEdgeProps) {
   const fromNode = nodes.find((n) => n.id === edge.from)
   const toNode = nodes.find((n) => n.id === edge.to)
+  const reduced = useReducedMotion()
 
   if (!fromNode || !toNode) return null
 
@@ -42,29 +43,61 @@ export function FlowEdge({ edge, nodes, canvas, highlighted = false }: FlowEdgeP
         d={pathData}
         fill="none"
         stroke={highlighted ? 'var(--accent)' : 'rgba(31, 182, 255, 0.3)'}
-        strokeWidth={highlighted ? 2 : 1.5}
+        strokeWidth={highlighted ? 2.5 : 1.5}
         strokeDasharray={highlighted ? '0' : '6 6'}
         initial={{ pathLength: 0, opacity: 0 }}
-        animate={{ pathLength: 1, opacity: highlighted ? 0.8 : 0.4 }}
+        animate={{
+          pathLength: 1,
+          opacity: highlighted ? 0.9 : 0.4,
+          strokeWidth: highlighted ? 2.5 : 1.5,
+        }}
         transition={{
-          pathLength: { duration: 1, ease: 'easeInOut' },
+          pathLength: { duration: reduced ? 0 : 1.5, ease: 'easeInOut' },
           opacity: { duration: 0.3 },
+          strokeWidth: { duration: 0.3 },
         }}
         markerEnd="url(#arrowhead)"
       />
 
-      {/* Edge label */}
+      {/* Flowing particles along edge - using SVG animateMotion */}
+      {!reduced && highlighted && (
+        <g>
+          <path
+            id={`edge-${edge.from}-${edge.to}`}
+            d={pathData}
+            fill="none"
+            stroke="none"
+            visibility="hidden"
+          />
+          <circle r="3" fill="var(--accent)" opacity="0.8">
+            <animateMotion dur="2s" repeatCount="indefinite" calcMode="linear">
+              <mpath href={`#edge-${edge.from}-${edge.to}`} />
+            </animateMotion>
+            <animate
+              attributeName="opacity"
+              values="0;1;0.5;1;0"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+          </circle>
+        </g>
+      )}
+
+      {/* Edge label with fade animation */}
       {edge.label && (
-        <text
+        <motion.text
           x={midX}
           y={midY - 5}
           fontSize="10"
-          fill="var(--muted)"
+          fill={highlighted ? 'var(--accent)' : 'var(--muted)'}
           textAnchor="middle"
           className="select-none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
         >
           {edge.label}
-        </text>
+        </motion.text>
       )}
     </g>
   )

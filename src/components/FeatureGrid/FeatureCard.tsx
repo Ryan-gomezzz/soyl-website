@@ -48,8 +48,44 @@ export function FeatureCard({
       {isHovered && (
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="absolute inset-0 rounded-xl bg-gradient-to-br from-accent/10 via-transparent to-accent-2/10 pointer-events-none"
+          animate={{
+            opacity: [0, 0.8, 0.6],
+            scale: [1, 1.02, 1],
+          }}
+          transition={{
+            opacity: {
+              duration: 0.6,
+              repeat: Infinity,
+              repeatType: 'reverse',
+            },
+            scale: {
+              duration: 2,
+              repeat: Infinity,
+              repeatType: 'reverse',
+            },
+          }}
+          className="absolute inset-0 rounded-xl bg-gradient-to-br from-accent/15 via-transparent to-accent-2/15 pointer-events-none"
+        />
+      )}
+
+      {/* Animated border glow */}
+      {isHovered && (
+        <motion.div
+          className="absolute inset-0 rounded-xl border-2 border-accent/30 pointer-events-none"
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: [0.5, 1, 0.5],
+            boxShadow: [
+              '0 0 20px rgba(31, 182, 255, 0.3)',
+              '0 0 40px rgba(31, 182, 255, 0.5)',
+              '0 0 20px rgba(31, 182, 255, 0.3)',
+            ],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
         />
       )}
 
