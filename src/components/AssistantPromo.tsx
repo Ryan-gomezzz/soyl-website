@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 import { DotPattern } from '@/app/_components/DotPattern'
 import { ChatbotController } from './chatbot/controller'
 
@@ -133,7 +134,7 @@ export function AssistantPromo() {
             </div>
           </motion.div>
 
-          {/* Right side: Visual placeholder */}
+          {/* Right side: Visual */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -141,28 +142,16 @@ export function AssistantPromo() {
             transition={{ duration: prefersReducedMotion ? 0 : 0.6, delay: 0.2 }}
             className="relative flex justify-center items-center"
           >
-            <div className="relative w-full max-w-md h-64 md:h-80 rounded-xl bg-gradient-to-br from-[#08202a] to-[#01212a] border border-white/10 flex items-center justify-center overflow-hidden">
-              {/* Animated cyan ring */}
-              {!prefersReducedMotion && (
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                  className="absolute w-32 h-32 border-2 border-accent/30 rounded-full"
-                />
-              )}
-              <motion.div
-                animate={!prefersReducedMotion ? { scale: [1, 1.1, 1] } : {}}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  repeatDelay: 1,
-                  ease: 'easeInOut',
-                }}
-                className="relative z-10 text-center px-6"
-              >
-                <div className="text-6xl mb-4">🤖</div>
-                <p className="text-muted text-sm">Assistant visual placeholder</p>
-              </motion.div>
+            <div className="relative w-full max-w-md h-64 md:h-80 rounded-xl overflow-hidden glass border border-white/10">
+              <Image
+                src="/images/placeholders/second.png"
+                alt="SOYL Assistant visualization"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority={false}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-bg/20 via-transparent to-transparent" />
             </div>
           </motion.div>
         </div>
