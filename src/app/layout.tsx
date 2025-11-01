@@ -6,6 +6,7 @@ import { Footer } from './_components/Footer'
 import { CustomCursor } from './_components/CustomCursor'
 import { SEO } from './_components/SEO'
 import { Analytics } from './_components/Analytics'
+import { Chatbot } from '@/components/chatbot'
 import { siteConfig } from '@/lib/siteConfig'
 
 const inter = Inter({
@@ -96,6 +97,7 @@ export default function RootLayout({
         <Header />
         <main id="main-content">{children}</main>
         <Footer />
+        <Chatbot />
       </body>
     </html>
   )

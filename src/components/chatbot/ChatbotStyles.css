@@ -1,0 +1,37 @@
+/* Chatbot-specific styles that require absolute positioning or fine-tuning */
+
+.chatbot-launcher {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
+  box-shadow: 0 4px 20px rgba(77, 216, 255, 0.3);
+}
+
+.chatbot-launcher:hover {
+  box-shadow: 0 6px 30px rgba(77, 216, 255, 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chatbot-launcher,
+  .chatbot-launcher:hover {
+    transition: none;
+  }
+}
+
+/* Focus trap container */
+.chatbot-modal-focus-trap {
+  outline: none;
+}
+
+/* PII warning styles */
+.pii-warning {
+  border-left: 3px solid #ef4444;
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.pii-redacted {
+  background-color: rgba(239, 68, 68, 0.2);
+  text-decoration: line-through;
+}
+
