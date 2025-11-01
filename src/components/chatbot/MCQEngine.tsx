@@ -43,6 +43,7 @@ interface MCQEngineProps {
   flow: FlowJson
   consent: boolean
   onConsentChange: (consent: boolean) => void
+  requestModalModeForFlow?: (enable: boolean) => void
 }
 
 interface ConversationHistory {
@@ -87,7 +88,7 @@ async function sendClientLog(data: {
   }, LOG_DEBOUNCE_MS)
 }
 
-export function MCQEngine({ flow, consent, onConsentChange }: MCQEngineProps) {
+export function MCQEngine({ flow, consent, onConsentChange, requestModalModeForFlow }: MCQEngineProps) {
   const sessionId = useSessionId()
   const [currentNodeId, setCurrentNodeId] = useState<string>(flow.startNode)
   const [history, setHistory] = useState<ConversationHistory[]>([])
@@ -303,6 +304,29 @@ export function MCQEngine({ flow, consent, onConsentChange }: MCQEngineProps) {
   
   // Check if we're on the feedback node
   const isFeedbackNode = currentNodeId === 'n_pilot_contact' || hasFeedbackAction
+
+  // Expose requestModalModeForFlow API via window for flows to call
+  useEffect(() => {
+    if (typeof window === 'undefined' || !requestModalModeForFlow) return
+
+    ;(window as Window & { __SOYL_CHAT_REQUEST_MODAL?: (enable: boolean) => void }).__SOYL_CHAT_REQUEST_MODAL = requestModalModeForFlow
+
+    return () => {
+      delete (window as Window & { __SOYL_CHAT_REQUEST_MODAL?: (enable: boolean) => void }).__SOYL_CHAT_REQUEST_MODAL
+    }
+  }, [requestModalModeForFlow])
+
+  // Optionally enable modal mode for feedback nodes (if needed)
+  useEffect(() => {
+    if (requestModalModeForFlow && isFeedbackNode) {
+      // Enable modal mode for feedback nodes to ensure form completion
+      requestModalModeForFlow(true)
+      // Disable when leaving feedback node
+      return () => {
+        requestModalModeForFlow(false)
+      }
+    }
+  }, [isFeedbackNode, requestModalModeForFlow])
 
   return (
     <div className="flex flex-col h-full">
