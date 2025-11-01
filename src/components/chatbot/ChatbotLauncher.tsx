@@ -89,7 +89,7 @@ export function ChatbotLauncher({ onClick }: ChatbotLauncherProps) {
       onClick={handleClick}
       className="chatbot-launcher w-14 h-14 md:w-16 md:h-16 rounded-full bg-accent text-bg flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent cursor-pointer select-none"
       style={{
-        bottom: isTouchDevice ? '32px' : lastY > 0 ? undefined : '32px',
+        bottom: isTouchDevice ? '32px' : 'auto',
         right: '32px',
         position: 'fixed',
         zIndex: 9999,
