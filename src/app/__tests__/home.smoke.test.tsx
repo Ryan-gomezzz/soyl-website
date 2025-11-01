@@ -4,17 +4,22 @@ import Home from '../page'
 // Mock next/image
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => {
+  default: ({ src, alt, fill, priority, ...props }: any) => {
+    // Remove Next.js specific props that cause warnings in test environment
+    const { fill: _, priority: __, ...imgProps } = props
     // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-    return <img {...props} />
+    return <img src={src} alt={alt} {...imgProps} />
   },
 }))
 
 describe('Home Page Smoke Test', () => {
   it('renders hero H1 with SOYL text', () => {
     render(<Home />)
-    const heading = screen.getByText(/SOYL/i)
-    expect(heading).toBeInTheDocument()
+    // Find the hero heading specifically by role
+    const headings = screen.getAllByRole('heading', { level: 1 })
+    const heroHeading = headings.find((h) => h.textContent?.includes('SOYL'))
+    expect(heroHeading).toBeInTheDocument()
+    expect(heroHeading?.textContent).toContain('SOYL')
   })
 
   it('renders "Story Of Your Life" in hero', () => {
@@ -25,13 +30,18 @@ describe('Home Page Smoke Test', () => {
 
   it('renders "Request a pilot" CTA', () => {
     render(<Home />)
-    const cta = screen.getByText(/Request a pilot/i)
-    expect(cta).toBeInTheDocument()
+    // Find the CTA link specifically by role
+    const links = screen.getAllByRole('link')
+    const pilotLink = links.find((link) => 
+      link.textContent?.includes('Request a pilot') && 
+      link.getAttribute('href')?.includes('mailto')
+    )
+    expect(pilotLink).toBeInTheDocument()
   })
 
   it('renders "What SOYL Does" section', () => {
     render(<Home />)
-    const section = screen.getByText(/What SOYL Does/i)
+    const section = screen.getByRole('heading', { name: /What SOYL Does/i })
     expect(section).toBeInTheDocument()
   })
 })
