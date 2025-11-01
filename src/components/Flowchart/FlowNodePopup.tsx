@@ -62,11 +62,13 @@ export function FlowNodePopup({ node, anchorRef, onClose }: FlowNodePopupProps) 
   // Close on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
+      const target = event.target as HTMLElement | null
       if (
         popupRef.current &&
         anchorRef.current &&
-        !popupRef.current.contains(event.target as Node) &&
-        !anchorRef.current.contains(event.target as Node)
+        target &&
+        !popupRef.current.contains(target) &&
+        !anchorRef.current.contains(target)
       ) {
         onClose()
       }
