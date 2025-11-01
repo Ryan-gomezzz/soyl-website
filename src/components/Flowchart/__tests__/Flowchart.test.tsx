@@ -1,6 +1,5 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { FlowchartSection } from '../FlowchartSection'
-import { flow } from '../flow-data'
 
 // Mock DotPattern
 jest.mock('@/app/_components/DotPattern', () => ({
