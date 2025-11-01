@@ -1,175 +1,136 @@
-# Pull Request: Initial SOYL Marketing Site Scaffold
+# feat: MCQ chatbot (modal)
 
-## 📋 Summary
+## Summary
 
-This PR contains the initial scaffold for the SOYL marketing website built with Next.js 14, TypeScript, and Tailwind CSS. The site features a minimalist, premium design inspired by WAPI and Apple with clean layouts, subtle animations, and crisp typography.
+This PR adds a fully-functional, production-ready **MCQ-driven Chatbot** feature to the SOYL marketing website. The chatbot guides users through multiple-choice questions to help them explore products, request pilots, explore careers, and access documentation.
 
-## 🎯 What's Included
+## Features
 
-### Pages Created
-- ✅ Homepage (`/`) with hero, features, testimonials, and R&D preview
-- ✅ SOYL R&D page (`/soyl-rd`) with complete phase overview
-- ✅ Pricing page (`/pricing`) with tiered pricing structure
-- ✅ Documentation page (`/docs`) with quickstart guide
-- ✅ Resources page (`/resources`) with whitepapers and citations
-- ✅ Careers page (`/careers`) with job listings
-- ✅ Enterprise page (`/enterprise`) with pilot flow and contact form
-- ✅ Custom Agents page (`/custom-agents`) with vertical showcases
-- ✅ Open Dashboard page (`/open-dashboard`) with coming soon message
+- **MCQ-driven flow**: Branching conversation based on multiple-choice questions defined in JSON
+- **Modal UI**: Full-screen on mobile, centered modal on desktop with glass-morphism design
+- **Session persistence**: Conversation state saved in sessionStorage (persists across modal close/reopen)
+- **Server-side logging**: Non-PII session logs stored to `/api/chatbot/log` endpoint
+- **Privacy-first**: PII redaction, consent checkbox, no data collection without permission
+- **Accessibility**: Keyboard navigation, focus trap, screen reader support, ARIA labels, reduced-motion support
+- **Analytics hooks**: Integrates with `window.__SOYL_TRACK` if available
 
-### Components Created
-- ✅ Header with responsive mobile menu
-- ✅ Footer with navigation and social links
-- ✅ Hero section with parallax dot pattern
-- ✅ Feature cards with intersection observer animations
-- ✅ Testimonial carousel
-- ✅ CTA buttons (primary/secondary variants)
-- ✅ Custom cursor (desktop only, respects touch devices)
-- ✅ Dot pattern background component
-- ✅ SEO and Analytics placeholder components
+## Files Created
 
-### Technical Setup
-- ✅ Next.js 14 (App Router) with TypeScript
-- ✅ Tailwind CSS with custom design tokens
-- ✅ Framer Motion for animations
-- ✅ React Intersection Observer for scroll reveals
-- ✅ ESLint + Prettier configuration
-- ✅ Jest + React Testing Library setup
-- ✅ GitHub Actions CI workflow
-- ✅ Husky pre-commit hooks (configured)
-- ✅ Design system with CSS variables
+### Frontend Components
+- `src/components/chatbot/index.tsx` - Main chatbot component
+- `src/components/chatbot/ChatbotLauncher.tsx` - Floating button (bottom-right)
+- `src/components/chatbot/ChatbotModal.tsx` - Modal container with focus trap
+- `src/components/chatbot/MCQEngine.tsx` - Flow engine & state management
+- `src/components/chatbot/ChatbotStyles.css` - Custom styles
+- `src/components/chatbot/hooks/useSessionId.ts` - Session ID generation hook
+- `src/components/chatbot/mcq-flows/default-flow.json` - Default conversation flow
+- `src/components/chatbot/__tests__/MCQEngine.test.tsx` - Unit tests
+
+### Server / API
+- `src/app/api/chatbot/log/route.ts` - Serverless endpoint for session logs
 
 ### Documentation
-- ✅ README.md with project overview and setup instructions
-- ✅ CONTRIBUTING.md with development guidelines
-- ✅ LICENSE (MIT)
-- ✅ PR description template
+- `src/components/chatbot/README.md` - Complete chatbot documentation
 
-## 🎨 Design System
+### Modified Files
+- `src/app/layout.tsx` - Added Chatbot component
+- `README.md` - Added chatbot editing guide section
 
-### Colors
-- Background: `#0f1724` (very dark navy)
-- Panel: `#0b1220`
-- Accent: `#4dd8ff` (cyan tech accent)
-- Accent 2: `#9be7c4` (mint secondary)
-- Text: `#e6eef8`
-- Muted: `#94a3b8`
+## Flow JSON Structure
 
-### Typography
-- Font: Inter (system fallback)
-- Responsive headings with fluid typography
-- Balanced text wrapping for readability
+The conversation flow is defined in `src/components/chatbot/mcq-flows/default-flow.json`. The flow includes:
 
-### Motion
-- Subtle animations using Framer Motion
-- Respects `prefers-reduced-motion`
-- Parallax effects on hero background
-- Smooth scroll reveals
+- **Welcome node** with 6 main options (Product, R&D, Pricing, Careers, Contact, Docs)
+- **Product information** nodes (overview, use cases, architecture)
+- **R&D information** nodes (phases, partnerships)
+- **Pricing** nodes (tiers, quotes)
+- **Careers** nodes (roles, applications)
+- **Documentation** nodes (quickstart, API reference)
+- **Pilot request** flow with feedback form
 
-## 📁 File Structure
+See `src/components/chatbot/README.md` for complete documentation on editing flows.
 
-```
-soyl-site/
-├── .github/workflows/ci.yml
-├── src/
-│   ├── app/
-│   │   ├── _components/        # Reusable components
-│   │   ├── page.tsx            # Homepage
-│   │   ├── layout.tsx          # Root layout
-│   │   └── [routes]/           # All page routes
-│   ├── lib/
-│   │   ├── data/               # Static data (features, careers, testimonials)
-│   │   └── siteConfig.ts       # Site configuration
-│   └── styles/
-│       ├── tokens.css          # CSS variables
-│       └── animations.css      # Keyframes
-├── public/
-│   ├── images/                 # Hero images (SVG placeholders)
-│   ├── og/                     # OpenGraph images
-│   └── patterns/              # SVG patterns
-└── [config files]
-```
+## Privacy & Security
 
-## ✅ Checklist for Review
+- **Consent required**: Users must consent to analytics before first interaction
+- **PII detection**: Automatically detects emails/phone numbers in feedback messages
+- **PII redaction**: Shows warning and redacts PII before sending to server
+- **No PII logging**: Server logs only contain `sessionId`, `nodeId`, `choiceId`, and `timestamp`
+- **Session storage**: Conversation state stored locally, never sent to server
+- **Privacy link**: Footer includes "What we collect" disclosure
 
-### Before Merge
-- [ ] Designer assets: Replace placeholder hero images with final designs
-- [ ] R&D content verification: Review SOYL R&D page content against source PDF
-- [ ] Legal review: Privacy flow for emotion capture consent
-- [ ] Analytics integration: Enable analytics provider (Vercel Analytics, etc.)
-- [ ] Backend integration: Connect authentication and pilot signup endpoints
+## Accessibility
 
-### Post-Merge
-- [ ] Set up Vercel deployment (production branch: `main`)
-- [ ] Configure environment variables
-- [ ] Add real API endpoints for forms
-- [ ] Replace placeholder images with final assets
-- [ ] Set up monitoring and error tracking
+- ✅ Keyboard navigation (Tab/Shift+Tab cycles through choices)
+- ✅ Focus trap inside modal
+- ✅ ESC key closes modal
+- ✅ ARIA labels and roles (`role="dialog"`, `aria-modal="true"`)
+- ✅ Screen reader support
+- ✅ Reduced-motion support (`prefers-reduced-motion`)
 
-## 🚀 Next Steps
+## Testing
 
-### For Designers
-1. Replace placeholder hero images (`/public/images/hero-1.svg`, `hero-2.svg`)
-2. Replace OpenGraph image (`/public/og/soyl-og.svg`)
-3. Review design system tokens in `src/styles/tokens.css`
-4. Provide final brand assets (logo, favicon)
+Unit tests for `MCQEngine`:
+- ✅ Renders welcome node
+- ✅ Requires consent before allowing choices
+- ✅ Navigates to next node on choice click
+- ✅ Sends log to API on choice
+- ✅ Allows back navigation
+- ✅ Restarts flow when restart button is clicked
 
-### For Engineers
-1. Integrate backend API endpoints for:
-   - Pilot request forms
-   - Enterprise contact forms
-   - Newsletter subscriptions
-2. Set up authentication system
-3. Enable analytics (Vercel Analytics or similar)
-4. Add error tracking (Sentry or similar)
-5. Set up API endpoints for emotion detection demo
+Run tests: `npm test -- MCQEngine.test.tsx`
 
-### For Legal/Compliance
-1. Review and approve privacy policy page (to be created)
-2. Review consent flow for emotion sensing data capture
-3. Ensure GDPR/DPDP compliance messaging
-4. Add terms of service page
-
-### For Product
-1. Review all copy for accuracy
-2. Verify R&D timeline and milestones match internal docs
-3. Review pricing tiers and features
-4. Add real testimonials when available
-
-## 🔧 How to Test Locally
+## How to Run Locally
 
 ```bash
-# Install dependencies
 npm install
-
-# Run development server
 npm run dev
-
-# Run tests
-npm test
-
-# Build for production
-npm run build
-
-# Start production server
-npm start
 ```
 
-## 📝 Notes
+Open `http://localhost:3000` and click the chatbot launcher (floating button bottom-right).
 
-- All email links use `mailto:` protocol (to be replaced with backend forms)
-- Image placeholders are SVG files (to be replaced with final assets)
-- Analytics component is placeholder (ready for integration)
-- Consent modal for emotion capture not yet implemented (requires legal review)
+## How to Edit the Flow
 
-## 👥 Reviewers
+1. Open `src/components/chatbot/mcq-flows/default-flow.json`
+2. Add/modify nodes following the structure:
+   - `question`: Displays text and provides choices
+   - `info`: Informational message with optional choices
+   - `end`: Terminal node with action buttons
+3. Link nodes via `choices[].next` field
+4. Test locally with `npm run dev`
 
-- @ryan-gomez (team lead)
-- @frontend-dev (frontend review)
+See `src/components/chatbot/README.md` for complete documentation.
+
+## Server Logging
+
+Logs are written to `var/chatbot-logs.json` (newline-delimited JSON) or console.log if filesystem is not available (e.g., serverless environments).
+
+**Note**: Logs do NOT contain PII. Only `sessionId`, `nodeId`, `choiceId`, and `timestamp` are logged.
+
+## Acceptance Criteria
+
+- [x] Chatbot launcher appears and opens modal
+- [x] Consent checkbox must be accepted before first choice is selectable
+- [x] MCQ flow navigates correctly per JSON
+- [x] Session storage preserves progress across modal closes/reopens
+- [x] Logs are posted to `/api/chatbot/log` on each answer (server responds 200)
+- [x] Feedback form redacts PII or asks user for confirmation before sending
+- [x] Unit tests for MCQ engine pass locally
+- [x] Build succeeds with no errors
+- [x] Linting passes with no errors
+
+## Next Steps
+
+- Replace placeholder content with finalized copy (if needed)
+- Add real analytics provider integration (if needed)
+- Customize flow JSON with product-specific content
+- Add additional flow JSON files for different use cases
+
+## Screenshots
+
+_Add screenshots here when available_
 
 ---
 
-**Branch:** `feat/site-scaffold`  
-**Base:** `main`  
-**Status:** Draft PR (ready for review)
-
+**Reviewer**: @ryan-gomez  
+**Assignee**: @frontend-dev (if available)

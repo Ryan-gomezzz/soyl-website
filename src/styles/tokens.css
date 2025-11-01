@@ -1,11 +1,11 @@
 :root {
-  --bg: #0f1724;
-  --panel: #0b1220;
+  --bg: #08090b;        /* near black - WAPI inspired */
+  --panel: #0f1113;
+  --text: #ffffff;
   --muted: #94a3b8;
-  --accent: #4dd8ff;
-  --accent-2: #9be7c4;
+  --accent: #1fb6ff;    /* cyan */
+  --accent-2: #7ce7c5;  /* mint */
   --glass: rgba(255, 255, 255, 0.03);
-  --text: #e6eef8;
   --dot: rgba(255, 255, 255, 0.03);
 }
 
