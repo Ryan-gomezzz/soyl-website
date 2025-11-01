@@ -7,5 +7,10 @@
   --accent-2: #7ce7c5;  /* mint */
   --glass: rgba(255, 255, 255, 0.03);
   --dot: rgba(255, 255, 255, 0.03);
+  /* Multi-color dot palette for hover effects */
+  --dot-1: #1fb6ff;     /* cyan */
+  --dot-2: #7ce7c5;     /* mint */
+  --dot-3: #ffd166;     /* warm yellow */
+  --dot-4: #ff7ab6;     /* soft magenta */
 }
 

@@ -1,7 +1,9 @@
 'use client'
 
 import { Hero } from './_components/Hero'
-import { FeatureCard } from './_components/FeatureCard'
+import { FeatureGrid } from '@/components/FeatureGrid/FeatureGrid'
+import { FlowchartSection } from '@/components/Flowchart/FlowchartSection'
+import { WhyChooseUs } from '@/components/WhyChoose/WhyChooseUs'
 import { TestimonialCarousel } from './_components/TestimonialCarousel'
 import { CTA } from './_components/CTA'
 import { AssistantPromo } from '@/components/AssistantPromo'
@@ -15,6 +17,9 @@ export default function Home() {
 
       {/* SOYL Assistant Promo */}
       <AssistantPromo />
+
+      {/* Flowchart Section */}
+      <FlowchartSection />
 
       {/* What SOYL Does */}
       <section className="py-24 lg:py-32">
@@ -33,31 +38,12 @@ export default function Home() {
               Emotion-aware AI that understands context and adapts in real-time
             </p>
           </motion.div>
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={{
-              visible: {
-                transition: {
-                  staggerChildren: 0.15,
-                },
-              },
-            }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
-          >
-            {features.map((feature, index) => (
-              <FeatureCard
-                key={feature.title}
-                title={feature.title}
-                description={feature.description}
-                icon={feature.icon}
-                delay={index * 0.1}
-              />
-            ))}
-          </motion.div>
+          <FeatureGrid features={features} />
         </div>
       </section>
+
+      {/* Why Choose Us */}
+      <WhyChooseUs />
 
       {/* How it works */}
       <section id="how-it-works" className="py-24 lg:py-32 bg-panel/30">

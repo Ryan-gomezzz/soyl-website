@@ -63,6 +63,30 @@ Then link it from another node by adding to `choices` array.
 
 See `src/components/chatbot/README.md` for complete flow documentation, node types, action types, and security guidelines.
 
+## 📊 Flowchart Visuals — How to Edit
+
+The landing page includes an interactive flowchart showing SOYL's R&D journey and product stack. Node descriptions were adapted from the SOYL R&D document (SOYL R&D (2).pdf).
+
+### Quick Edit Guide
+
+1. **Edit nodes**: Open `src/components/Flowchart/flow-data.ts`
+2. **Adjust positions**: Change `x` and `y` values (0.0 to 1.0, normalized)
+3. **Update copy**: Edit `title`, `subtitle`, `description` fields
+4. **Add nodes**: Add to `flow.nodes` array with unique `id`
+5. **Add connections**: Add to `flow.edges` array
+
+**Example**: Moving a node position:
+```typescript
+{
+  id: "n_phase1",
+  title: "Phase 1 — MVP",
+  x: 0.15,  // 15% from left (0 = left, 1 = right)
+  y: 0.35,  // 35% from top (0 = top, 1 = bottom)
+}
+```
+
+See `src/components/Flowchart/README.md` for complete editing guide, node structure, and citation information.
+
 ## 📁 Project Structure
 
 ```
