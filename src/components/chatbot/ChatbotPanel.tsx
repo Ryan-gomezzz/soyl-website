@@ -173,12 +173,15 @@ export function ChatbotPanel({ flow: flowProp, requestModalModeForFlow }: Chatbo
     }
   }
 
-  // Don't render if minimized
-  if (minimized) {
+  // Don't render if minimized or not open
+  if (minimized || !open) {
     return null
   }
 
-  const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const prefersReducedMotion =
+    typeof window !== 'undefined' &&
+    window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   return (
     <>

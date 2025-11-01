@@ -1,5 +1,4 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { ChatbotPanel } from '../ChatbotPanel'
 import type { ReactNode } from 'react'
 
@@ -34,17 +33,24 @@ jest.mock('../MCQEngine', () => ({
 }))
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
-  motion: {
-    aside: ({ children, ...props }: { children?: ReactNode; [key: string]: unknown }) => (
-      <aside {...props}>{children}</aside>
-    ),
-    div: ({ children, ...props }: { children?: ReactNode; [key: string]: unknown }) => (
-      <div {...props}>{children}</div>
-    ),
-  },
-  AnimatePresence: ({ children }: { children?: ReactNode }) => <>{children}</>,
-}))
+jest.mock('framer-motion', () => {
+  // Filter out framer-motion specific props that shouldn't be passed to DOM
+  const filterProps = (props: { [key: string]: unknown }) => {
+    const { initial, animate, exit, whileHover, whileTap, transition, ...domProps } = props
+    return domProps
+  }
+  return {
+    motion: {
+      aside: ({ children, ...props }: { children?: ReactNode; [key: string]: unknown }) => (
+        <aside {...filterProps(props)}>{children}</aside>
+      ),
+      div: ({ children, ...props }: { children?: ReactNode; [key: string]: unknown }) => (
+        <div {...filterProps(props)}>{children}</div>
+      ),
+    },
+    AnimatePresence: ({ children }: { children?: ReactNode }) => <>{children}</>,
+  }
+})
 
 // Mock default flow
 jest.mock('../mcq-flows/default-flow.json', () => ({
@@ -212,7 +218,7 @@ describe('ChatbotPanel', () => {
     expect(mockSetOpen).not.toHaveBeenCalled()
   })
 
-  it('enables modal mode when toggle is checked', async () => {
+  it('enables modal mode when toggle is checked', () => {
     mockUseChatbotState.mockReturnValue({
       open: true,
       pinned: false,
@@ -230,7 +236,7 @@ describe('ChatbotPanel', () => {
     render(<ChatbotPanel />)
     
     const checkbox = screen.getByLabelText(/Modal Assist Mode/i)
-    await userEvent.click(checkbox)
+    fireEvent.click(checkbox)
     
     expect(mockSetPrefersModal).toHaveBeenCalledWith(true)
   })
@@ -299,7 +305,7 @@ describe('ChatbotPanel', () => {
     expect(screen.getByLabelText('Close panel')).toBeInTheDocument()
   })
 
-  it('calls setMinimized when minimize button is clicked', async () => {
+  it('calls setMinimized when minimize button is clicked', () => {
     mockUseChatbotState.mockReturnValue({
       open: true,
       pinned: false,
@@ -317,12 +323,12 @@ describe('ChatbotPanel', () => {
     render(<ChatbotPanel />)
     
     const minimizeButton = screen.getByLabelText('Minimize panel')
-    await userEvent.click(minimizeButton)
+    fireEvent.click(minimizeButton)
     
     expect(mockSetMinimized).toHaveBeenCalledWith(true)
   })
 
-  it('calls setPinned when pin button is clicked', async () => {
+  it('calls setPinned when pin button is clicked', () => {
     mockUseChatbotState.mockReturnValue({
       open: true,
       pinned: false,
@@ -340,7 +346,7 @@ describe('ChatbotPanel', () => {
     render(<ChatbotPanel />)
     
     const pinButton = screen.getByLabelText('Pin panel')
-    await userEvent.click(pinButton)
+    fireEvent.click(pinButton)
     
     expect(mockSetPinned).toHaveBeenCalledWith(true)
   })
