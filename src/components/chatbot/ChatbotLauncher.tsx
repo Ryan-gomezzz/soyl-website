@@ -20,23 +20,22 @@ export function ChatbotLauncher({ onClick }: ChatbotLauncherProps) {
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
   }, [])
 
-  // Set initial Y position
-  const y = useMotionValue(lastY || 0)
+  // Set initial Y position (transform offset from bottom: 32px)
+  // y: 0 means at bottom: 32px, positive y moves down
+  const y = useMotionValue(0)
   
   // Constrain Y to viewport bounds and save on change
   useEffect(() => {
     const unsubscribe = y.on('change', (latestY) => {
-      const maxY = window.innerHeight - (buttonRef.current?.offsetHeight || 64) - 32
-      const minY = 32
-      const constrainedY = Math.max(minY, Math.min(maxY, latestY))
-      setLastY(constrainedY)
+      // Save the y offset (latestY is transform offset)
+      setLastY(latestY)
     })
     return unsubscribe
   }, [y, setLastY])
 
-  // Load initial position
+  // Load initial position if saved
   useEffect(() => {
-    if (lastY > 0) {
+    if (lastY !== 0) {
       y.set(lastY)
     }
   }, [y, lastY])
@@ -89,7 +88,7 @@ export function ChatbotLauncher({ onClick }: ChatbotLauncherProps) {
       onClick={handleClick}
       className="chatbot-launcher w-14 h-14 md:w-16 md:h-16 rounded-full bg-accent text-bg flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent cursor-pointer select-none"
       style={{
-        bottom: isTouchDevice ? '32px' : 'auto',
+        bottom: '32px',
         right: '32px',
         position: 'fixed',
         zIndex: 9999,
