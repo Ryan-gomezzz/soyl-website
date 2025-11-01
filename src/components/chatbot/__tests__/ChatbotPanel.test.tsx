@@ -81,9 +81,11 @@ describe('ChatbotPanel', () => {
     })
   })
 
-  it('renders nothing when panel is closed', () => {
+  it('renders panel even when closed (for animations)', () => {
     const { container } = render(<ChatbotPanel />)
-    expect(container.firstChild).toBeNull()
+    // Panel should be in DOM but off-screen when closed
+    const panel = container.querySelector('.chat-panel')
+    expect(panel).toBeInTheDocument()
   })
 
   it('renders panel when open', () => {

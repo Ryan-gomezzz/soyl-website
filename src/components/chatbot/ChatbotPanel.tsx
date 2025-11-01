@@ -173,8 +173,8 @@ export function ChatbotPanel({ flow: flowProp, requestModalModeForFlow }: Chatbo
     }
   }
 
-  // Don't render if minimized or not open
-  if (minimized || !open) {
+  // Don't render if minimized (when minimized, panel completely hidden)
+  if (minimized) {
     return null
   }
 
@@ -203,13 +203,16 @@ export function ChatbotPanel({ flow: flowProp, requestModalModeForFlow }: Chatbo
         )}
       </AnimatePresence>
 
-      {/* Panel */}
+      {/* Panel - always render for animations, but slide off-screen when closed */}
       <motion.aside
         ref={containerRef}
         initial={false}
         animate={{
           x: open ? 0 : '100%',
           opacity: open ? 1 : 0,
+        }}
+        style={{
+          pointerEvents: open ? 'auto' : 'none',
         }}
         transition={{
           type: prefersReducedMotion ? 'tween' : 'spring',
@@ -221,7 +224,7 @@ export function ChatbotPanel({ flow: flowProp, requestModalModeForFlow }: Chatbo
         aria-modal={prefersModal ? 'true' : undefined}
         aria-label="SOYL Assistant panel"
         className={clsx(
-          'chat-panel fixed right-4 top-8 z-[70] h-[calc(100vh-4rem)] w-[420px] max-w-full bg-[var(--panel)]/90 backdrop-blur-md shadow-2xl rounded-lg border border-white/10 flex flex-col overflow-hidden pointer-events-auto',
+          'chat-panel fixed right-4 top-8 z-[70] h-[calc(100vh-4rem)] w-[420px] max-w-full bg-[var(--panel)]/90 backdrop-blur-md shadow-2xl rounded-lg border border-white/10 flex flex-col overflow-hidden',
           'max-sm:w-full max-sm:right-0 max-sm:top-0 max-sm:h-full max-sm:rounded-none'
         )}
       >
