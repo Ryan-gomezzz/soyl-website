@@ -69,7 +69,7 @@ export function Hero() {
           >
             <div className="relative aspect-square rounded-2xl overflow-hidden glass border border-white/10">
               <Image
-                src="/images/placeholders/hero-1.svg"
+                src="/images/placeholders/product.png"
                 alt="SOYL product visualization"
                 fill
                 className="object-cover"
