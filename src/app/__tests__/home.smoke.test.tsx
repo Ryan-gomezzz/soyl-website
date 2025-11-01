@@ -11,6 +11,40 @@ jest.mock('next/image', () => ({
   },
 }))
 
+// Mock framer-motion
+jest.mock('framer-motion', () => {
+  const React = require('react')
+  // Create a component factory that strips animation props
+  const createMotionComponent = (tag: string) => {
+    const Component = ({ children, animate, initial, whileInView, transition, viewport, ...props }: any) => {
+      return React.createElement(tag, props, children)
+    }
+    return Component
+  }
+  
+  // Create motion object with common HTML and SVG elements
+  const motionElements = ['div', 'section', 'h1', 'h2', 'h3', 'p', 'span', 'a', 'button', 'ul', 'li', 'svg', 'path', 'text', 'g', 'circle', 'rect', 'line', 'polyline', 'polygon', 'ellipse']
+  const motion: Record<string, React.ComponentType<any>> = {}
+  
+  motionElements.forEach(tag => {
+    motion[tag] = createMotionComponent(tag)
+  })
+  
+  // Create mock MotionValue
+  const createMotionValue = (value: number) => ({
+    get: () => value,
+    set: () => {},
+    subscribe: () => () => {},
+  })
+
+  return {
+    motion,
+    useReducedMotion: () => false,
+    useScroll: () => ({ scrollY: createMotionValue(0) }),
+    useTransform: () => createMotionValue(0),
+  }
+})
+
 describe('Home Page Smoke Test', () => {
   it('renders hero H1 with SOYL text', () => {
     render(<Home />)
