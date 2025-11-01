@@ -36,6 +36,33 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - `npm run test` - Run Jest tests
 - `npm run format` - Format code with Prettier
 
+## 🤖 Chatbot (MCQ) — How to Edit
+
+The SOYL website includes a MCQ-driven chatbot that helps visitors explore products, request pilots, and learn about careers. The conversation flow is defined in JSON format.
+
+### Quick Edit Guide
+
+1. **Edit the flow**: Open `src/components/chatbot/mcq-flows/default-flow.json`
+2. **Add/modify nodes**: See `src/components/chatbot/README.md` for full documentation
+3. **Node types**: `question`, `info`, `end`
+4. **Test locally**: Run `npm run dev` and click the chatbot launcher (bottom-right)
+
+**Example**: To add a new product feature node:
+
+```json
+"n_new_feature": {
+  "type": "info",
+  "text": "New feature description here",
+  "choices": [
+    { "id": "c_back", "text": "Back", "next": "n_product_overview" }
+  ]
+}
+```
+
+Then link it from another node by adding to `choices` array.
+
+See `src/components/chatbot/README.md` for complete flow documentation, node types, action types, and security guidelines.
+
 ## 📁 Project Structure
 
 ```
