@@ -5,7 +5,7 @@ import { ChatbotLauncher } from './ChatbotLauncher'
 import { ChatbotPanel } from './ChatbotPanel'
 
 export function Chatbot() {
-  const { open, setOpen, requestModalModeForFlow } = useChatbotState()
+  const { setOpen, requestModalModeForFlow } = useChatbotState()
 
   return (
     <>

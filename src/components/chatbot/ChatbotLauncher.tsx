@@ -69,7 +69,6 @@ export function ChatbotLauncher({ onClick }: ChatbotLauncherProps) {
       initial={{ scale: 0 }}
       animate={{ 
         scale: 1,
-        y: isTouchDevice ? 0 : y,
       }}
       transition={prefersReducedMotion ? { duration: 0 } : { 
         type: 'spring', 
@@ -81,15 +80,17 @@ export function ChatbotLauncher({ onClick }: ChatbotLauncherProps) {
       drag={!isTouchDevice ? 'y' : false}
       dragConstraints={{ top: 32, bottom: typeof window !== 'undefined' ? window.innerHeight - 96 : 800 }}
       dragElastic={0.1}
+      dragMomentum={false}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onClick={handleClick}
       className="chatbot-launcher w-14 h-14 md:w-16 md:h-16 rounded-full bg-accent text-bg flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent cursor-pointer select-none"
       style={{
-        bottom: isTouchDevice ? undefined : 'auto',
+        bottom: isTouchDevice ? '32px' : 'auto',
         right: '32px',
         position: 'fixed',
         zIndex: 999,
+        ...(isTouchDevice ? {} : { y }),
       }}
       aria-label={minimized ? 'Restore SOYL assistant' : 'Open SOYL assistant'}
       title={minimized ? 'Restore assistant' : 'Ask SOYL'}

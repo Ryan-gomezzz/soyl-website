@@ -1,6 +1,7 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ChatbotPanel } from '../ChatbotPanel'
+import type { ReactNode } from 'react'
 
 // Mock the useChatbotState hook
 const mockSetOpen = jest.fn()
@@ -8,21 +9,23 @@ const mockSetPinned = jest.fn()
 const mockSetMinimized = jest.fn()
 const mockSetPrefersModal = jest.fn()
 
+const mockUseChatbotState = jest.fn(() => ({
+  open: false,
+  pinned: false,
+  minimized: false,
+  prefersModal: false,
+  setOpen: mockSetOpen,
+  setPinned: mockSetPinned,
+  setMinimized: mockSetMinimized,
+  setPrefersModal: mockSetPrefersModal,
+  requestModalModeForFlow: mockSetPrefersModal,
+  lastY: 0,
+  setLastY: jest.fn(),
+}))
+
 jest.mock('../hooks/useChatbotState', () => ({
-  useChatbotState: () => ({
-    open: false,
-    pinned: false,
-    minimized: false,
-    prefersModal: false,
-    setOpen: mockSetOpen,
-    setPinned: mockSetPinned,
-    setMinimized: mockSetMinimized,
-    setPrefersModal: mockSetPrefersModal,
-    requestModalModeForFlow: mockSetPrefersModal,
-    lastY: 0,
-    setLastY: jest.fn(),
-  }),
-})))
+  useChatbotState: () => mockUseChatbotState(),
+}))
 
 // Mock MCQEngine
 jest.mock('../MCQEngine', () => ({
@@ -33,10 +36,14 @@ jest.mock('../MCQEngine', () => ({
 // Mock framer-motion
 jest.mock('framer-motion', () => ({
   motion: {
-    aside: ({ children, ...props }: any) => <aside {...props}>{children}</aside>,
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    aside: ({ children, ...props }: { children?: ReactNode; [key: string]: unknown }) => (
+      <aside {...props}>{children}</aside>
+    ),
+    div: ({ children, ...props }: { children?: ReactNode; [key: string]: unknown }) => (
+      <div {...props}>{children}</div>
+    ),
   },
-  AnimatePresence: ({ children }: any) => <>{children}</>,
+  AnimatePresence: ({ children }: { children?: ReactNode }) => <>{children}</>,
 }))
 
 // Mock default flow
@@ -52,7 +59,7 @@ describe('ChatbotPanel', () => {
     jest.clearAllMocks()
     sessionStorage.clear()
     // Reset mock to return closed by default
-    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+    mockUseChatbotState.mockReturnValue({
       open: false,
       pinned: false,
       minimized: false,
@@ -73,7 +80,7 @@ describe('ChatbotPanel', () => {
   })
 
   it('renders panel when open', () => {
-    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+    mockUseChatbotState.mockReturnValue({
       open: true,
       pinned: false,
       minimized: false,
@@ -92,7 +99,7 @@ describe('ChatbotPanel', () => {
   })
 
   it('overlay has pointer-events-none by default', () => {
-    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+    mockUseChatbotState.mockReturnValue({
       open: true,
       pinned: false,
       minimized: false,
@@ -112,7 +119,7 @@ describe('ChatbotPanel', () => {
   })
 
   it('overlay becomes blocking when modal mode is enabled', () => {
-    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+    mockUseChatbotState.mockReturnValue({
       open: true,
       pinned: false,
       minimized: false,
@@ -132,7 +139,7 @@ describe('ChatbotPanel', () => {
   })
 
   it('allows background clicks when overlay is non-blocking', () => {
-    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+    mockUseChatbotState.mockReturnValue({
       open: true,
       pinned: false,
       minimized: false,
@@ -147,7 +154,7 @@ describe('ChatbotPanel', () => {
     })
 
     // Create a button outside the panel
-    const { container } = render(
+    render(
       <>
         <button data-testid="background-button">Click me</button>
         <ChatbotPanel />
@@ -162,7 +169,7 @@ describe('ChatbotPanel', () => {
   })
 
   it('closes panel on ESC when not pinned', () => {
-    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+    mockUseChatbotState.mockReturnValue({
       open: true,
       pinned: false,
       minimized: false,
@@ -184,7 +191,7 @@ describe('ChatbotPanel', () => {
   })
 
   it('does not close panel on ESC when pinned', () => {
-    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+    mockUseChatbotState.mockReturnValue({
       open: true,
       pinned: true,
       minimized: false,
@@ -206,7 +213,7 @@ describe('ChatbotPanel', () => {
   })
 
   it('enables modal mode when toggle is checked', async () => {
-    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+    mockUseChatbotState.mockReturnValue({
       open: true,
       pinned: false,
       minimized: false,
@@ -229,7 +236,7 @@ describe('ChatbotPanel', () => {
   })
 
   it('has aria-modal=true when modal mode is enabled', () => {
-    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+    mockUseChatbotState.mockReturnValue({
       open: true,
       pinned: false,
       minimized: false,
@@ -250,7 +257,7 @@ describe('ChatbotPanel', () => {
   })
 
   it('has role="complementary" when modal mode is disabled', () => {
-    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+    mockUseChatbotState.mockReturnValue({
       open: true,
       pinned: false,
       minimized: false,
@@ -271,7 +278,7 @@ describe('ChatbotPanel', () => {
   })
 
   it('has minimize and pin buttons', () => {
-    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+    mockUseChatbotState.mockReturnValue({
       open: true,
       pinned: false,
       minimized: false,
@@ -293,7 +300,7 @@ describe('ChatbotPanel', () => {
   })
 
   it('calls setMinimized when minimize button is clicked', async () => {
-    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+    mockUseChatbotState.mockReturnValue({
       open: true,
       pinned: false,
       minimized: false,
@@ -316,7 +323,7 @@ describe('ChatbotPanel', () => {
   })
 
   it('calls setPinned when pin button is clicked', async () => {
-    require('../hooks/useChatbotState').useChatbotState.mockReturnValue({
+    mockUseChatbotState.mockReturnValue({
       open: true,
       pinned: false,
       minimized: false,
