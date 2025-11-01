@@ -28,7 +28,7 @@ The chatbot now uses a **non-blocking slide-in panel** instead of a blocking mod
 
 ### Panel Dimensions
 
-- **Desktop**: 420px wide, fixed right position, vertically centered
+- **Desktop**: 420px wide, fixed right position (`right: 1rem`), top at `1.75rem` (`top: 1.75rem`)
 - **Mobile (<640px)**: Full-width overlay for better usability
 
 ## Flow JSON Structure
