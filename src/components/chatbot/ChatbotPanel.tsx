@@ -81,6 +81,35 @@ export function ChatbotPanel({ flow: flowProp, requestModalModeForFlow }: Chatbo
     }
   }, [requestModalModeForFlow])
 
+  // Listen for programmatic open/close/toggle events from ChatbotController
+  useEffect(() => {
+    const handleOpen = () => {
+      setOpen(true)
+      setMinimized(false)
+    }
+    const handleClose = () => {
+      setOpen(false)
+    }
+    const handleToggle = () => {
+      if (open) {
+        setOpen(false)
+      } else {
+        setOpen(true)
+        setMinimized(false)
+      }
+    }
+
+    window.addEventListener('soyl-chatbot-open', handleOpen)
+    window.addEventListener('soyl-chatbot-close', handleClose)
+    window.addEventListener('soyl-chatbot-toggle', handleToggle)
+
+    return () => {
+      window.removeEventListener('soyl-chatbot-open', handleOpen)
+      window.removeEventListener('soyl-chatbot-close', handleClose)
+      window.removeEventListener('soyl-chatbot-toggle', handleToggle)
+    }
+  }, [open, setOpen, setMinimized])
+
   // Handle ESC key - close if not pinned, minimize if pinned
   useEffect(() => {
     if (!open) return
@@ -206,6 +235,7 @@ export function ChatbotPanel({ flow: flowProp, requestModalModeForFlow }: Chatbo
           damping: prefersReducedMotion ? 0 : 30,
           duration: prefersReducedMotion ? 0.3 : undefined,
         }}
+        id="soyl-assistant-panel"
         role={prefersModal ? 'dialog' : 'complementary'}
         aria-modal={prefersModal ? 'true' : undefined}
         aria-label="SOYL Assistant panel"

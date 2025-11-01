@@ -4,6 +4,7 @@ import { Hero } from './_components/Hero'
 import { FeatureCard } from './_components/FeatureCard'
 import { TestimonialCarousel } from './_components/TestimonialCarousel'
 import { CTA } from './_components/CTA'
+import { AssistantPromo } from '@/components/AssistantPromo'
 import { features, productFeatures } from '@/lib/data/features'
 import { motion } from 'framer-motion'
 
@@ -11,6 +12,9 @@ export default function Home() {
   return (
     <div className="pt-20">
       <Hero />
+
+      {/* SOYL Assistant Promo */}
+      <AssistantPromo />
 
       {/* What SOYL Does */}
       <section className="py-24 lg:py-32">
@@ -56,7 +60,7 @@ export default function Home() {
       </section>
 
       {/* How it works */}
-      <section className="py-24 lg:py-32 bg-panel/30">
+      <section id="how-it-works" className="py-24 lg:py-32 bg-panel/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
