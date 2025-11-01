@@ -17,14 +17,42 @@ jest.mock('framer-motion', () => {
   const React = require('react')
   // Create a component factory that strips animation props
   const createMotionComponent = (tag: string) => {
-    const Component = ({ children, animate: _animate, initial: _initial, whileInView: _whileInView, transition: _transition, viewport: _viewport, ...props }: { children?: React.ReactNode; animate?: unknown; initial?: unknown; whileInView?: unknown; transition?: unknown; viewport?: unknown; [key: string]: unknown }) => {
+    const Component = ({ 
+      children, 
+      animate: _animate, 
+      initial: _initial, 
+      whileInView: _whileInView, 
+      whileHover: _whileHover,
+      whileTap: _whileTap,
+      whileFocus: _whileFocus,
+      whileDrag: _whileDrag,
+      transition: _transition, 
+      viewport: _viewport, 
+      exit: _exit,
+      variants: _variants,
+      ...props 
+    }: { 
+      children?: React.ReactNode; 
+      animate?: unknown; 
+      initial?: unknown; 
+      whileInView?: unknown;
+      whileHover?: unknown;
+      whileTap?: unknown;
+      whileFocus?: unknown;
+      whileDrag?: unknown;
+      transition?: unknown; 
+      viewport?: unknown;
+      exit?: unknown;
+      variants?: unknown;
+      [key: string]: unknown 
+    }) => {
       return React.createElement(tag, props, children)
     }
     return Component
   }
   
   // Create motion object with common HTML and SVG elements
-  const motionElements = ['div', 'section', 'h1', 'h2', 'h3', 'p', 'span', 'a', 'button', 'ul', 'li', 'svg', 'path', 'text', 'g', 'circle', 'rect', 'line', 'polyline', 'polygon', 'ellipse']
+  const motionElements = ['div', 'section', 'h1', 'h2', 'h3', 'p', 'span', 'a', 'button', 'ul', 'li', 'svg', 'path', 'text', 'g', 'circle', 'rect', 'line', 'polyline', 'polygon', 'ellipse', 'foreignObject']
   const motion: Record<string, React.ComponentType<{ children?: React.ReactNode; [key: string]: unknown }>> = {}
   
   motionElements.forEach(tag => {
@@ -40,9 +68,28 @@ jest.mock('framer-motion', () => {
 
   return {
     motion,
+    AnimatePresence: ({ children }: { children?: React.ReactNode }) => children,
     useReducedMotion: () => false,
     useScroll: () => ({ scrollY: createMotionValue(0) }),
     useTransform: () => createMotionValue(0),
+  }
+})
+
+// Mock TestimonialCarousel
+jest.mock('../_components/TestimonialCarousel', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const React = require('react')
+  return {
+    TestimonialCarousel: () => React.createElement('div', { 'data-testid': 'testimonial-carousel' }, 'TestimonialCarousel'),
+  }
+})
+
+// Mock FlowchartSection
+jest.mock('@/components/Flowchart/FlowchartSection', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const React = require('react')
+  return {
+    FlowchartSection: () => React.createElement('div', { 'data-testid': 'flowchart-section' }, 'FlowchartSection'),
   }
 })
 
