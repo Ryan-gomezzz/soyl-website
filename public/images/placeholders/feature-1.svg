@@ -1,0 +1,7 @@
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="400" fill="#0f1113" stroke="#1fb6ff" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="300" y="200" font-family="Arial, sans-serif" font-size="24" fill="#1fb6ff" text-anchor="middle" opacity="0.5">
+    Feature Card (3:2)
+  </text>
+</svg>
+

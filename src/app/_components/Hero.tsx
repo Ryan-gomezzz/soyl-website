@@ -48,7 +48,7 @@ export function Hero() {
               transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
               className="flex flex-col sm:flex-row gap-4"
             >
-              <CTA href="#request-pilot" variant="primary" size="lg">
+              <CTA href="mailto:sales@soyl.ai?subject=Pilot%20Request" variant="primary" size="lg">
                 Request a pilot
               </CTA>
               <CTA href="/docs" variant="secondary" size="lg">
@@ -69,12 +69,23 @@ export function Hero() {
           >
             <div className="relative aspect-square rounded-2xl overflow-hidden glass border border-white/10">
               <Image
-                src="/images/hero-1.svg"
+                src="/images/placeholders/hero-1.svg"
                 alt="SOYL product visualization"
                 fill
                 className="object-cover"
                 priority
                 sizes="(max-width: 768px) 100vw, 50vw"
+                onError={(e) => {
+                  // Fallback to emoji if image fails to load
+                  const target = e.target as HTMLImageElement
+                  target.style.display = 'none'
+                  if (target.parentElement) {
+                    const fallback = document.createElement('div')
+                    fallback.className = 'flex items-center justify-center text-6xl h-full'
+                    fallback.textContent = '🤖'
+                    target.parentElement.appendChild(fallback)
+                  }
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-bg/80 via-transparent to-transparent" />
             </div>

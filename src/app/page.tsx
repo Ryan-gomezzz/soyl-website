@@ -250,6 +250,77 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Use Cases */}
+      <section className="py-24 lg:py-32 bg-panel/30">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+              Use Cases
+            </h2>
+            <p className="text-lg text-muted max-w-2xl mx-auto">
+              Emotion-aware AI for modern commerce across industries
+            </p>
+          </motion.div>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={{
+              visible: {
+                transition: {
+                  staggerChildren: 0.15,
+                },
+              },
+            }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          >
+            {[
+              {
+                title: 'Retail AR Commerce',
+                description: 'In-store AR assistants that adapt recommendations based on customer emotion',
+                icon: '🛍️',
+              },
+              {
+                title: 'Kiosk Systems',
+                description: 'Interactive kiosks with emotion-aware product suggestions and support',
+                icon: '🖥️',
+              },
+              {
+                title: 'Remote Sales',
+                description: 'Virtual sales assistants that read cues and personalize the conversation',
+                icon: '💼',
+              },
+              {
+                title: 'Support Triage',
+                description: 'Customer support that prioritizes and routes based on emotional state',
+                icon: '🎧',
+              },
+            ].map((usecase) => (
+              <motion.div
+                key={usecase.title}
+                variants={{
+                  hidden: { opacity: 0, y: 30, scale: 0.9 },
+                  visible: { opacity: 1, y: 0, scale: 1 },
+                }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                whileHover={{ y: -8, scale: 1.03 }}
+                className="glass rounded-xl p-6 border border-white/10 hover:border-accent/30 transition-all text-center"
+              >
+                <div className="text-4xl mb-4">{usecase.icon}</div>
+                <h3 className="text-xl font-semibold mb-2">{usecase.title}</h3>
+                <p className="text-sm text-muted">{usecase.description}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
       {/* SOYL R&D Snapshot */}
       <section className="py-24 lg:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
