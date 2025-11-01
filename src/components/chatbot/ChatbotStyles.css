@@ -2,10 +2,25 @@
 
 .chatbot-launcher {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
+  bottom: 32px;
+  right: 32px;
   z-index: 999;
   box-shadow: 0 4px 20px rgba(77, 216, 255, 0.3);
+}
+
+@media (max-width: 768px) {
+  .chatbot-launcher {
+    /* Add safe area padding for devices with notches */
+    bottom: max(24px, env(safe-area-inset-bottom, 24px));
+    right: max(24px, env(safe-area-inset-right, 24px));
+  }
+}
+
+@media (min-width: 1024px) {
+  .chatbot-launcher {
+    bottom: 48px;
+    right: 48px;
+  }
 }
 
 .chatbot-launcher:hover {
