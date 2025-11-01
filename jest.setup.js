@@ -33,5 +33,17 @@ if (typeof window !== 'undefined') {
       // Disconnect stub
     }
   }
+
+  // Mock matchMedia for prefers-reduced-motion
+  window.matchMedia = (query) => ({
+    matches: false, // Default to no reduced motion
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // deprecated
+    removeListener: jest.fn(), // deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })
 }
 

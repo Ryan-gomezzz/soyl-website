@@ -43,6 +43,7 @@ interface MCQEngineProps {
   flow: FlowJson
   consent: boolean
   onConsentChange: (consent: boolean) => void
+  requestModalModeForFlow?: (enable: boolean) => void
 }
 
 interface ConversationHistory {
@@ -87,7 +88,7 @@ async function sendClientLog(data: {
   }, LOG_DEBOUNCE_MS)
 }
 
-export function MCQEngine({ flow, consent, onConsentChange }: MCQEngineProps) {
+export function MCQEngine({ flow, consent, onConsentChange, requestModalModeForFlow }: MCQEngineProps) {
   const sessionId = useSessionId()
   const [currentNodeId, setCurrentNodeId] = useState<string>(flow.startNode)
   const [history, setHistory] = useState<ConversationHistory[]>([])
@@ -283,7 +284,35 @@ export function MCQEngine({ flow, consent, onConsentChange }: MCQEngineProps) {
     }
   }
 
+  // Expose requestModalModeForFlow API via window for flows to call
+  useEffect(() => {
+    if (typeof window === 'undefined' || !requestModalModeForFlow) return
+
+    ;(window as Window & { __SOYL_CHAT_REQUEST_MODAL?: (enable: boolean) => void }).__SOYL_CHAT_REQUEST_MODAL = requestModalModeForFlow
+
+    return () => {
+      delete (window as Window & { __SOYL_CHAT_REQUEST_MODAL?: (enable: boolean) => void }).__SOYL_CHAT_REQUEST_MODAL
+    }
+  }, [requestModalModeForFlow])
+
   const currentNode = flow.nodes[currentNodeId]
+  
+  // Check if we're on the feedback node (must be before early return)
+  const hasFeedbackAction = currentNode?.actions?.some((a) => a.type === 'feedback')
+  const isFeedbackNode = currentNodeId === 'n_pilot_contact' || hasFeedbackAction
+
+  // Optionally enable modal mode for feedback nodes (if needed)
+  useEffect(() => {
+    if (requestModalModeForFlow && isFeedbackNode) {
+      // Enable modal mode for feedback nodes to ensure form completion
+      requestModalModeForFlow(true)
+      // Disable when leaving feedback node
+      return () => {
+        requestModalModeForFlow(false)
+      }
+    }
+  }, [isFeedbackNode, requestModalModeForFlow])
+
   if (!currentNode) {
     return (
       <div className="text-center p-8">
@@ -299,10 +328,6 @@ export function MCQEngine({ flow, consent, onConsentChange }: MCQEngineProps) {
   }
 
   const isEndNode = currentNode.type === 'end'
-  const hasFeedbackAction = currentNode.actions?.some((a) => a.type === 'feedback')
-  
-  // Check if we're on the feedback node
-  const isFeedbackNode = currentNodeId === 'n_pilot_contact' || hasFeedbackAction
 
   return (
     <div className="flex flex-col h-full">

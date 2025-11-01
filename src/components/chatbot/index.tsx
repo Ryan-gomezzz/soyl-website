@@ -1,16 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useChatbotState } from './hooks/useChatbotState'
 import { ChatbotLauncher } from './ChatbotLauncher'
-import { ChatbotModal } from './ChatbotModal'
+import { ChatbotPanel } from './ChatbotPanel'
 
 export function Chatbot() {
-  const [isOpen, setIsOpen] = useState(false)
+  const { setOpen, requestModalModeForFlow } = useChatbotState()
 
   return (
     <>
-      <ChatbotLauncher onClick={() => setIsOpen(true)} />
-      <ChatbotModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <ChatbotLauncher onClick={() => setOpen(true)} />
+      <ChatbotPanel requestModalModeForFlow={requestModalModeForFlow} />
     </>
   )
 }

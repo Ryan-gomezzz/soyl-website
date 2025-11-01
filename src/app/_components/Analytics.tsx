@@ -1,3 +1,5 @@
+'use client'
+
 // Placeholder for analytics integration
 // To enable:
 // 1. Install your analytics provider (e.g., @vercel/analytics, gtag)
