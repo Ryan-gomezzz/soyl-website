@@ -1,6 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { ChatbotPanel } from '../ChatbotPanel'
-import type { ReactNode } from 'react'
 
 // Mock the useChatbotState hook
 const mockSetOpen = jest.fn()
@@ -43,12 +42,14 @@ jest.mock('framer-motion', () => {
     return domProps
   }
   const createMotionComponent = (tag: string) => {
-    return React.forwardRef<HTMLElement, { children?: React.ReactNode; [key: string]: unknown }>(
+    const Component = React.forwardRef<HTMLElement, { children?: React.ReactNode; [key: string]: unknown }>(
       (props, ref) => {
         const { children, ...rest } = props
         return React.createElement(tag, { ...filterProps(rest), ref }, children)
       }
     )
+    Component.displayName = `motion.${tag}`
+    return Component
   }
   return {
     motion: {
