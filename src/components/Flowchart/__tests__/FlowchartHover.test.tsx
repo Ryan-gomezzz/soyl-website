@@ -108,15 +108,45 @@ jest.mock('../FlowEdge', () => ({
 }))
 
 // Mock FlowNodePopup
-jest.mock('../FlowNodePopup', () => ({
-  FlowNodePopup: ({ node, onClose }: { node: typeof flow.nodes[0]; onClose: () => void }) => (
-    <div role="tooltip" data-testid="flow-node-popup">
-      <h4>{node.title}</h4>
-      {node.description && <p>{node.description}</p>}
-      <button onClick={onClose} aria-label="Close popup">Close</button>
-    </div>
-  ),
-}))
+jest.mock('../FlowNodePopup', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const React = require('react')
+  return {
+    FlowNodePopup: ({ node, anchorRef, onClose }: { 
+      node: typeof flow.nodes[0]
+      anchorRef: React.RefObject<HTMLElement>
+      onClose: () => void 
+    }) => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      React.useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+          const target = event.target as HTMLElement | null
+          const popupElement = document.querySelector('[data-testid="flow-node-popup"]') as HTMLElement | null
+          if (
+            popupElement &&
+            anchorRef.current &&
+            target &&
+            !popupElement.contains(target) &&
+            !anchorRef.current.contains(target)
+          ) {
+            onClose()
+          }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [onClose])
+
+      return (
+        <div role="tooltip" data-testid="flow-node-popup">
+          <h4>{node.title}</h4>
+          {node.description && <p>{node.description}</p>}
+          <button onClick={onClose} aria-label="Close popup">Close</button>
+        </div>
+      )
+    },
+  }
+})
 
 // Mock canvas getContext globally
 Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
@@ -162,8 +192,9 @@ describe('Flowchart Hover/Focus/Tap Behavior', () => {
     fireEvent.mouseEnter(button)
     
     await waitFor(() => {
-      expect(screen.getByRole('tooltip')).toBeInTheDocument()
-      expect(screen.getByText(mockNode.title)).toBeInTheDocument()
+      const popup = screen.getByTestId('flow-node-popup')
+      expect(popup).toBeInTheDocument()
+      expect(popup).toHaveTextContent(mockNode.title)
     })
 
     expect(mockOnHover).toHaveBeenCalledWith(mockNode)
@@ -204,8 +235,9 @@ describe('Flowchart Hover/Focus/Tap Behavior', () => {
     fireEvent.focus(button)
     
     await waitFor(() => {
-      expect(screen.getByRole('tooltip')).toBeInTheDocument()
-      expect(screen.getByText(mockNode.title)).toBeInTheDocument()
+      const popup = screen.getByTestId('flow-node-popup')
+      expect(popup).toBeInTheDocument()
+      expect(popup).toHaveTextContent(mockNode.title)
     })
 
     expect(mockOnHover).toHaveBeenCalledWith(mockNode)
