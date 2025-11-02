@@ -156,7 +156,7 @@ const defaultWorkflow: WorkflowData = {
 }
 
 export function WorkflowBuilder({ initialWorkflow, readonly = false }: WorkflowBuilderProps) {
-  const [workflow, setWorkflow] = useState<WorkflowData>(initialWorkflow || defaultWorkflow)
+  const [workflow] = useState<WorkflowData>(initialWorkflow || defaultWorkflow)
   const [selectedNodeId, setSelectedNodeId] = useState<string | undefined>()
 
   const handleNodeClick = (node: WorkflowNode) => {

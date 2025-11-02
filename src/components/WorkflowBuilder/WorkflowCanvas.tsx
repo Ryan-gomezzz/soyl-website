@@ -1,10 +1,8 @@
 'use client'
 
 import React, { useState, useRef, useCallback } from 'react'
-import { motion } from 'framer-motion'
 import { WorkflowNode } from './WorkflowNode'
-import { ConnectionLine } from './ConnectionLine'
-import type { WorkflowNode as WorkflowNodeType, Connection, WorkflowData } from './types'
+import type { WorkflowNode as WorkflowNodeType, WorkflowData } from './types'
 
 interface WorkflowCanvasProps {
   workflow: WorkflowData
@@ -15,22 +13,17 @@ interface WorkflowCanvasProps {
 export function WorkflowCanvas({ workflow, onNodeClick, selectedNodeId }: WorkflowCanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null)
   const [isDragging, setIsDragging] = useState(false)
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (e.target === canvasRef.current || (e.target as HTMLElement).closest('.canvas-bg')) {
-      setIsDragging(true)
-      setDragStart({ x: e.clientX, y: e.clientY })
-    }
+  const handleMouseDown = useCallback((_e: React.MouseEvent) => {
+    // Canvas panning can be implemented here if needed
+    setIsDragging(true)
   }, [])
 
   const handleMouseMove = useCallback(
-    (e: React.MouseEvent) => {
-      if (isDragging && canvasRef.current) {
-        // Handle canvas panning here if needed
-      }
+    (_e: React.MouseEvent) => {
+      // Handle canvas panning here if needed
     },
-    [isDragging]
+    []
   )
 
   const handleMouseUp = useCallback(() => {
