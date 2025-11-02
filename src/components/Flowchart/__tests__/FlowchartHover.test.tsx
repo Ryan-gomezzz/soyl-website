@@ -117,28 +117,31 @@ jest.mock('../FlowNodePopup', () => {
       anchorRef: React.RefObject<HTMLElement>
       onClose: () => void 
     }) => {
+      const popupRef = React.useRef<HTMLDivElement>(null)
+      
       // eslint-disable-next-line react-hooks/rules-of-hooks
       React.useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
           const target = event.target as HTMLElement | null
-          const popupElement = document.querySelector('[data-testid="flow-node-popup"]') as HTMLElement | null
           if (
-            popupElement &&
+            popupRef.current &&
             anchorRef.current &&
             target &&
-            !popupElement.contains(target) &&
+            !popupRef.current.contains(target) &&
             !anchorRef.current.contains(target)
           ) {
             onClose()
           }
         }
         document.addEventListener('mousedown', handleClickOutside)
-        return () => document.removeEventListener('mousedown', handleClickOutside)
+        return () => {
+          document.removeEventListener('mousedown', handleClickOutside)
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [onClose])
 
       return (
-        <div role="tooltip" data-testid="flow-node-popup">
+        <div ref={popupRef} role="tooltip" data-testid="flow-node-popup">
           <h4>{node.title}</h4>
           {node.description && <p>{node.description}</p>}
           <button onClick={onClose} aria-label="Close popup">Close</button>
@@ -374,10 +377,16 @@ describe('Flowchart Hover/Focus/Tap Behavior', () => {
     })
 
     const outside = screen.getByTestId('outside')
-    fireEvent.mouseDown(outside)
+    
+    // Wait a bit for the event listener to be set up
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 10))
+      fireEvent.mouseDown(outside)
+      await new Promise((resolve) => setTimeout(resolve, 10))
+    })
     
     await waitFor(() => {
-      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('flow-node-popup')).not.toBeInTheDocument()
     })
   })
 })
