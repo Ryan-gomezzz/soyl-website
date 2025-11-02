@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useCallback } from 'react'
+import React, { useRef, useCallback } from 'react'
 import { WorkflowNode } from './WorkflowNode'
 import type { WorkflowNode as WorkflowNodeType, WorkflowData } from './types'
 
@@ -12,11 +12,9 @@ interface WorkflowCanvasProps {
 
 export function WorkflowCanvas({ workflow, onNodeClick, selectedNodeId }: WorkflowCanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null)
-  const [isDragging, setIsDragging] = useState(false)
 
   const handleMouseDown = useCallback((_e: React.MouseEvent) => {
     // Canvas panning can be implemented here if needed
-    setIsDragging(true)
   }, [])
 
   const handleMouseMove = useCallback(
@@ -27,7 +25,7 @@ export function WorkflowCanvas({ workflow, onNodeClick, selectedNodeId }: Workfl
   )
 
   const handleMouseUp = useCallback(() => {
-    setIsDragging(false)
+    // Handle mouse up for canvas panning
   }, [])
 
   // Create node map for efficient lookup
