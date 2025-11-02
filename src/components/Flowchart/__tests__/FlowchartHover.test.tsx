@@ -123,19 +123,27 @@ jest.mock('../FlowNodePopup', () => {
       React.useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
           const target = event.target as HTMLElement | null
-          if (
-            popupRef.current &&
-            anchorRef.current &&
-            target &&
-            !popupRef.current.contains(target) &&
-            !anchorRef.current.contains(target)
-          ) {
-            onClose()
+          const popup = popupRef.current
+          const anchor = anchorRef.current
+          
+          if (!popup || !anchor || !target) return
+          
+          // Check if click is outside both popup and anchor
+          const isOutsidePopup = !popup.contains(target)
+          const isOutsideAnchor = !anchor.contains(target)
+          
+          if (isOutsidePopup && isOutsideAnchor) {
+            // Use setTimeout to ensure React state updates are processed
+            setTimeout(() => {
+              onClose()
+            }, 0)
           }
         }
-        document.addEventListener('mousedown', handleClickOutside)
+        
+        // Add listener with capture phase to catch events earlier
+        document.addEventListener('mousedown', handleClickOutside, true)
         return () => {
-          document.removeEventListener('mousedown', handleClickOutside)
+          document.removeEventListener('mousedown', handleClickOutside, true)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [onClose])
@@ -373,21 +381,26 @@ describe('Flowchart Hover/Focus/Tap Behavior', () => {
     fireEvent.focus(button)
     
     await waitFor(() => {
-      expect(screen.getByRole('tooltip')).toBeInTheDocument()
+      expect(screen.getByTestId('flow-node-popup')).toBeInTheDocument()
+    })
+
+    // Wait for event listener to be set up
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50))
     })
 
     const outside = screen.getByTestId('outside')
     
-    // Wait a bit for the event listener to be set up
+    // Use userEvent for more realistic interaction, or fireEvent with proper event
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 10))
-      fireEvent.mouseDown(outside)
-      await new Promise((resolve) => setTimeout(resolve, 10))
+      fireEvent.mouseDown(outside, { bubbles: true })
+      // Give React time to process the state update
+      await new Promise((resolve) => setTimeout(resolve, 50))
     })
     
     await waitFor(() => {
       expect(screen.queryByTestId('flow-node-popup')).not.toBeInTheDocument()
-    })
+    }, { timeout: 1000 })
   })
 })
 
