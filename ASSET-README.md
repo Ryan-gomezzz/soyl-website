@@ -78,6 +78,45 @@ import Image from 'next/image';
 />
 ```
 
+### Flowchart Node Illustrations
+
+**Path:** `public/images/placeholders/product.png` (used as placeholder)
+
+**Recommended Specifications:**
+- **Aspect Ratio:** 1:1 (400×400px recommended for node illustrations)
+- **Format:** WebP or AVIF
+- **Style:** Icon-style illustrations representing each phase (MVP, Cognitive Signal, Agentic Layer, SDK/API)
+
+**Replacement:**
+1. Create individual node illustrations for each phase
+2. Replace or update placeholder as needed
+3. Node visuals are optional — the flowchart works without them
+
+**Note:** Flowchart nodes can display without images. Images are optional enhancements.
+
+### Assistant Promo Visual
+
+**Path:** `public/images/placeholders/second.png` (currently used)
+
+**Recommended Specifications:**
+- **Aspect Ratio:** 4:3 (800×600px recommended)
+- **Format:** WebP or AVIF
+- **Style:** Visual representing the SOYL Assistant (AI assistant, chatbot interface, etc.)
+
+**Replacement:**
+1. Replace `public/images/placeholders/second.png` with your assistant visual
+2. Update the `src` prop in `src/components/AssistantPromo.tsx` if using a different path:
+   ```tsx
+   <Image
+     src="/images/placeholders/assistant-promo.webp"
+     alt="SOYL Assistant visualization"
+     fill
+     className="object-cover"
+     sizes="(max-width: 768px) 100vw, 50vw"
+     priority={false}
+   />
+   ```
+
 ### Blog Banner Images
 
 **Recommended Specifications:**
@@ -110,6 +149,8 @@ import Image from 'next/image';
    - Hero: 1600×900 (desktop), 1200×675 (tablet), 800×450 (mobile)
    - Features: 600×400 (all sizes)
    - Avatars: 160×160 (all sizes)
+   - Flowchart nodes: 400×400 (all sizes, optional)
+   - Assistant promo: 800×600 (all sizes)
 
 ## File Naming Convention
 
