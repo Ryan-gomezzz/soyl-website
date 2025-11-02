@@ -34,22 +34,28 @@ jest.mock('../MCQEngine', () => ({
 
 // Mock framer-motion
 jest.mock('framer-motion', () => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const React = require('react')
   // Filter out framer-motion specific props that shouldn't be passed to DOM
   const filterProps = (props: { [key: string]: unknown }) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { initial: _initial, animate: _animate, exit: _exit, whileHover: _whileHover, whileTap: _whileTap, transition: _transition, ...domProps } = props
     return domProps
   }
+  const createMotionComponent = (tag: string) => {
+    return React.forwardRef<HTMLElement, { children?: React.ReactNode; [key: string]: unknown }>(
+      (props, ref) => {
+        const { children, ...rest } = props
+        return React.createElement(tag, { ...filterProps(rest), ref }, children)
+      }
+    )
+  }
   return {
     motion: {
-      aside: ({ children, ...props }: { children?: ReactNode; [key: string]: unknown }) => (
-        <aside {...filterProps(props)}>{children}</aside>
-      ),
-      div: ({ children, ...props }: { children?: ReactNode; [key: string]: unknown }) => (
-        <div {...filterProps(props)}>{children}</div>
-      ),
+      aside: createMotionComponent('aside'),
+      div: createMotionComponent('div'),
     },
-    AnimatePresence: ({ children }: { children?: ReactNode }) => <>{children}</>,
+    AnimatePresence: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
   }
 })
 

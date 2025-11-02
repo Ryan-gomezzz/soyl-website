@@ -8,21 +8,7 @@ jest.mock('framer-motion', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const React = require('react')
   const createMotionComponent = (tag: string) => {
-    const Component = ({
-      children,
-      animate: _animate,
-      initial: _initial,
-      whileInView: _whileInView,
-      whileHover: _whileHover,
-      whileTap: _whileTap,
-      whileFocus: _whileFocus,
-      whileDrag: _whileDrag,
-      transition: _transition,
-      viewport: _viewport,
-      exit: _exit,
-      variants: _variants,
-      ...props
-    }: {
+    const Component = React.forwardRef<HTMLElement, {
       children?: React.ReactNode
       animate?: unknown
       initial?: unknown
@@ -36,9 +22,24 @@ jest.mock('framer-motion', () => {
       exit?: unknown
       variants?: unknown
       [key: string]: unknown
-    }) => {
-      return React.createElement(tag, props, children)
-    }
+    }>(({
+      children,
+      animate: _animate,
+      initial: _initial,
+      whileInView: _whileInView,
+      whileHover: _whileHover,
+      whileTap: _whileTap,
+      whileFocus: _whileFocus,
+      whileDrag: _whileDrag,
+      transition: _transition,
+      viewport: _viewport,
+      exit: _exit,
+      variants: _variants,
+      ...props
+    }, ref) => {
+      return React.createElement(tag, { ...props, ref }, children)
+    })
+    Component.displayName = `motion.${tag}`
     return Component
   }
 
