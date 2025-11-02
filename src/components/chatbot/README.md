@@ -263,6 +263,83 @@ Logs are written to `var/chatbot-logs.json` (newline-delimited JSON) or console.
 - Server logs do not contain user-identifiable information
 - Contact `privacy@soyl.ai` for deletion requests (as noted in UI)
 
+## Integration with AssistantPromo
+
+The `AssistantPromo` component on the landing page integrates with the chatbot using `ChatbotController`:
+
+### ChatbotController API
+
+Located in `src/components/chatbot/controller.ts`, this controller provides a programmatic API to control the chatbot panel:
+
+```typescript
+import { ChatbotController } from '@/components/chatbot/controller'
+
+// Open the panel
+ChatbotController.open()
+
+// Close the panel
+ChatbotController.close()
+
+// Toggle panel (open if closed, close if open)
+ChatbotController.toggle()
+```
+
+### AssistantPromo Integration
+
+The `AssistantPromo` component (located at `src/components/AssistantPromo.tsx`) provides a hero-adjacent promo card with two CTAs:
+
+1. **"Try the Assistant"** (Primary CTA):
+   - Calls `ChatbotController.open()` to open the chatbot panel
+   - Moves focus to the panel (no focus trap by default)
+   - Dispatches `soyl-chatbot-open` custom event
+
+2. **"How it works"** (Secondary CTA):
+   - Smooth-scrolls to `#how-it-works` section on the same page
+   - Falls back to `/docs#how-it-works` if section not found
+   - Respects `prefers-reduced-motion` for scroll behavior
+
+### Event-Based Integration
+
+The chatbot listens for custom events dispatched by `ChatbotController`:
+
+- `soyl-chatbot-open`: Opens the panel
+- `soyl-chatbot-close`: Closes the panel
+- `soyl-chatbot-toggle`: Toggles panel state
+
+These events are handled by `ChatbotPanel.tsx` and `ChatbotLauncher.tsx`.
+
+### Implementation Details
+
+```typescript
+// In AssistantPromo.tsx
+import { ChatbotController } from './chatbot/controller'
+
+const handleTryAssistant = () => {
+  ChatbotController.open()
+}
+
+// In ChatbotPanel.tsx
+useEffect(() => {
+  const handleOpen = () => setOpen(true)
+  const handleClose = () => setOpen(false)
+  const handleToggle = () => setOpen((prev) => !prev)
+
+  window.addEventListener('soyl-chatbot-open', handleOpen)
+  window.addEventListener('soyl-chatbot-close', handleClose)
+  window.addEventListener('soyl-chatbot-toggle', handleToggle)
+
+  return () => {
+    window.removeEventListener('soyl-chatbot-open', handleOpen)
+    window.removeEventListener('soyl-chatbot-close', handleClose)
+    window.removeEventListener('soyl-chatbot-toggle', handleToggle)
+  }
+}, [])
+```
+
+### Privacy Note
+
+The AssistantPromo component does not collect any data. It simply opens the chatbot panel, which has its own consent flow. See the Privacy & Security section above for chatbot privacy details.
+
 ## Support
 
 For questions or issues:
