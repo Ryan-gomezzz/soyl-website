@@ -3,6 +3,7 @@
 import { Hero } from './_components/Hero'
 import { FeatureGrid } from '@/components/FeatureGrid/FeatureGrid'
 import { FlowchartSection } from '@/components/Flowchart/FlowchartSection'
+import { WorkflowBuilderSection } from '@/components/WorkflowBuilder/WorkflowBuilderSection'
 import { WhyChooseUs } from '@/components/WhyChoose/WhyChooseUs'
 import { TestimonialCarousel } from './_components/TestimonialCarousel'
 import { CTA } from './_components/CTA'
