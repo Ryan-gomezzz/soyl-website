@@ -1,12 +1,12 @@
 'use client'
 
 import React from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion, useReducedMotion, type HTMLMotionProps } from 'framer-motion'
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost'
 export type ButtonSize = 'sm' | 'md' | 'lg'
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onDrag' | 'onDragStart' | 'onDragEnd'> {
   variant?: ButtonVariant
   size?: ButtonSize
   children: React.ReactNode
@@ -40,6 +40,9 @@ export function Button({
   const baseStyles = 'transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
   const combinedClassName = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`
 
+  // Filter out conflicting drag props and pass only safe props to motion.button
+  const { onDrag, onDragStart, onDragEnd, ...safeProps } = props as HTMLMotionProps<'button'>
+
   return (
     <motion.button
       onClick={onClick}
@@ -48,7 +51,7 @@ export function Button({
       whileTap={!disabled && !reduced ? { scale: 0.95 } : {}}
       className={combinedClassName}
       aria-disabled={disabled}
-      {...props}
+      {...safeProps}
     >
       {children}
     </motion.button>
