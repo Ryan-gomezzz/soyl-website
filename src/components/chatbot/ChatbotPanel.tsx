@@ -95,6 +95,7 @@ export function ChatbotPanel({ flow: flowProp, requestModalModeForFlow }: Chatbo
         if (prevOpen) {
           return false
         } else {
+          // Clear minimized state when opening
           setMinimized(false)
           return true
         }
@@ -185,6 +186,7 @@ export function ChatbotPanel({ flow: flowProp, requestModalModeForFlow }: Chatbo
   const handleClose = () => {
     if (pinned) {
       setMinimized(true)
+      setOpen(false)
     } else {
       setOpen(false)
     }

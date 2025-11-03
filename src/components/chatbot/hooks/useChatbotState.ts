@@ -76,21 +76,24 @@ export function useChatbotState() {
     saveState(state)
   }, [state])
 
-  const setOpen = useCallback((open: boolean) => {
+  const setOpen = useCallback((open: boolean | ((prev: boolean) => boolean)) => {
     setState((prev) => {
+      // Handle functional update
+      const newOpen = typeof open === 'function' ? open(prev.open) : open
+      
       // If opening and minimized, clear minimized state
-      if (open && prev.minimized) {
+      if (newOpen && prev.minimized) {
         return { ...prev, open: true, minimized: false }
       }
       // If closing and not pinned, close
-      if (!open && !prev.pinned) {
+      if (!newOpen && !prev.pinned) {
         return { ...prev, open: false, minimized: false }
       }
       // If closing but pinned, minimize instead
-      if (!open && prev.pinned) {
+      if (!newOpen && prev.pinned) {
         return { ...prev, open: false, minimized: true }
       }
-      return { ...prev, open }
+      return { ...prev, open: newOpen }
     })
   }, [])
 
