@@ -91,12 +91,14 @@ export function ChatbotPanel({ flow: flowProp, requestModalModeForFlow }: Chatbo
       setOpen(false)
     }
     const handleToggle = () => {
-      if (open) {
-        setOpen(false)
-      } else {
-        setOpen(true)
-        setMinimized(false)
-      }
+      setOpen((prevOpen) => {
+        if (prevOpen) {
+          return false
+        } else {
+          setMinimized(false)
+          return true
+        }
+      })
     }
 
     window.addEventListener('soyl-chatbot-open', handleOpen)
@@ -108,7 +110,7 @@ export function ChatbotPanel({ flow: flowProp, requestModalModeForFlow }: Chatbo
       window.removeEventListener('soyl-chatbot-close', handleClose)
       window.removeEventListener('soyl-chatbot-toggle', handleToggle)
     }
-  }, [open, setOpen, setMinimized])
+  }, [setOpen, setMinimized])
 
   // Handle ESC key - close if not pinned, minimize if pinned
   useEffect(() => {
@@ -151,7 +153,7 @@ export function ChatbotPanel({ flow: flowProp, requestModalModeForFlow }: Chatbo
     if (savedConsent === 'true') {
       setConsent(true)
     }
-  }, [setConsent])
+  }, [])
 
   // Track analytics
   useEffect(() => {
