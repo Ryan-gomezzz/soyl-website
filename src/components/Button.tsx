@@ -41,7 +41,8 @@ export function Button({
   const combinedClassName = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`
 
   // Filter out conflicting drag props and pass only safe props to motion.button
-  const { onDrag, onDragStart, onDragEnd, ...safeProps } = props as HTMLMotionProps<'button'>
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { onDrag: _onDrag, onDragStart: _onDragStart, onDragEnd: _onDragEnd, ...safeProps } = props as HTMLMotionProps<'button'>
 
   return (
     <motion.button
