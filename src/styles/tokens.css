@@ -30,6 +30,8 @@
   --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.3);
   --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.4);
   --shadow-accent: 0 4px 12px rgba(31, 182, 255, 0.2);
+  --shadow-accent-lg: 0 8px 24px rgba(31, 182, 255, 0.3);
+  --shadow-accent-xl: 0 12px 36px rgba(31, 182, 255, 0.4);
   
   /* Spacing scale */
   --space-xs: 0.5rem;

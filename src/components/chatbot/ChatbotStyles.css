@@ -1,36 +1,48 @@
 /* Chatbot-specific styles that require absolute positioning or fine-tuning */
 
 .chatbot-launcher {
-  box-shadow: 0 4px 20px rgba(77, 216, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(31, 182, 255, 0.3);
+  z-index: 9999 !important;
+  position: fixed !important;
+  animation: pulse-glow 2s ease-in-out infinite;
 }
 
 @media (max-width: 768px) {
   .chatbot-launcher {
     /* Add safe area padding for devices with notches */
     right: max(24px, env(safe-area-inset-right, 24px)) !important;
+    bottom: 24px !important;
   }
 }
 
 @media (min-width: 1024px) {
   .chatbot-launcher {
     right: 48px !important;
+    bottom: 32px !important;
   }
 }
 
 .chatbot-launcher:hover {
-  box-shadow: 0 6px 30px rgba(77, 216, 255, 0.5);
+  box-shadow: 0 6px 30px rgba(31, 182, 255, 0.5);
+  transform: scale(1.05);
+}
+
+.chatbot-launcher:active {
+  transform: scale(0.95);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .chatbot-launcher,
   .chatbot-launcher:hover {
     transition: none;
+    animation: none;
   }
 }
 
 /* Panel overlay - non-blocking by default */
 .chat-overlay {
   pointer-events: none;
+  z-index: 60 !important;
   /* Overlay becomes blocking only when modal mode is enabled via class */
 }
 
@@ -40,8 +52,10 @@
 
 /* Panel styles */
 .chat-panel {
+  z-index: 70 !important;
   /* Panel is always pointer-events: auto via inline style or class */
   /* Most styles handled by Tailwind classes */
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
 /* Focus trap container */

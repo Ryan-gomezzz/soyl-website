@@ -8,6 +8,7 @@ import { CustomCursor } from './_components/CustomCursor'
 import { SEO } from './_components/SEO'
 import { Analytics } from './_components/Analytics'
 import { Chatbot } from '@/components/chatbot'
+import { AnimatedGrid } from '@/components/AnimatedGrid'
 import { siteConfig } from '@/lib/siteConfig'
 
 const inter = Inter({
@@ -85,7 +86,8 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body className="antialiased bg-bg text-text">
+      <body className="antialiased bg-bg text-text relative">
+        <AnimatedGrid />
         <SEO />
         <Analytics />
         <CustomCursor />
@@ -95,9 +97,11 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
-        <Header />
-        <main id="main-content">{children}</main>
-        <Footer />
+        <div className="relative z-10">
+          <Header />
+          <main id="main-content">{children}</main>
+          <Footer />
+        </div>
         <Chatbot />
       </body>
     </html>

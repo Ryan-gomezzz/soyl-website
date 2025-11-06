@@ -36,17 +36,6 @@ export function CTA({
     lg: 'px-8 py-4 text-lg',
   }
 
-  const content = (
-    <motion.span
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
-      className="inline-block"
-    >
-      {children}
-    </motion.span>
-  )
-
   return (
     <Link
       href={href}
@@ -55,10 +44,27 @@ export function CTA({
         baseStyles,
         variants[variant],
         sizes[size],
-        className
+        className,
+        'relative overflow-hidden group'
       )}
     >
-      {content}
+      <motion.span
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        className="relative z-10 inline-block"
+      >
+        {children}
+      </motion.span>
+      {variant === 'primary' && (
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-accent/20 via-accent/10 to-accent/20"
+          initial={{ x: '-100%' }}
+          whileHover={{ x: '100%' }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
+          style={{ opacity: 0.5 }}
+        />
+      )}
     </Link>
   )
 }
