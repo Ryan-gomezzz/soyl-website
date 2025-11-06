@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 import { MCQEngine, FlowJson } from './MCQEngine'
-import { useChatbotState } from './hooks/useChatbotState'
+import { useChatbotContext } from './ChatbotProvider'
 import defaultFlow from './mcq-flows/default-flow.json'
 import './ChatbotStyles.css'
 import clsx from 'clsx'
@@ -68,7 +68,7 @@ export function ChatbotPanel({ flow: flowProp, requestModalModeForFlow }: Chatbo
     prefersModal,
     setPrefersModal,
     requestModalModeForFlow: requestModalMode,
-  } = useChatbotState()
+  } = useChatbotContext()
   const [consent, setConsent] = useState(false)
 
   const containerRef = useFocusTrap(prefersModal && open)

@@ -1,12 +1,19 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useChatbotState } from './hooks/useChatbotState'
+import { ChatbotProvider, useChatbotContext } from './ChatbotProvider'
 import { ChatbotLauncher } from './ChatbotLauncher'
 import { ChatbotPanel } from './ChatbotPanel'
 
-export function Chatbot() {
-  const { setOpen, requestModalModeForFlow } = useChatbotState()
+function ChatbotContent() {
+  const { 
+    setOpen, 
+    requestModalModeForFlow,
+    minimized,
+    setMinimized,
+    lastY,
+    setLastY
+  } = useChatbotContext()
 
   // Ensure chatbot is properly initialized
   useEffect(() => {
@@ -18,9 +25,23 @@ export function Chatbot() {
 
   return (
     <>
-      <ChatbotLauncher onClick={() => setOpen(true)} />
+      <ChatbotLauncher 
+        onClick={() => setOpen(true)} 
+        minimized={minimized}
+        onMinimizeChange={setMinimized}
+        lastY={lastY}
+        onLastYChange={setLastY}
+      />
       <ChatbotPanel requestModalModeForFlow={requestModalModeForFlow} />
     </>
+  )
+}
+
+export function Chatbot() {
+  return (
+    <ChatbotProvider>
+      <ChatbotContent />
+    </ChatbotProvider>
   )
 }
 

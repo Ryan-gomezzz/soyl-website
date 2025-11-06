@@ -2,15 +2,23 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, useMotionValue } from 'framer-motion'
-import { useChatbotState } from './hooks/useChatbotState'
 import './ChatbotStyles.css'
 
 interface ChatbotLauncherProps {
   onClick: () => void
+  minimized?: boolean
+  onMinimizeChange?: (minimized: boolean) => void
+  lastY?: number
+  onLastYChange?: (y: number) => void
 }
 
-export function ChatbotLauncher({ onClick }: ChatbotLauncherProps) {
-  const { minimized, setMinimized, setOpen, lastY, setLastY } = useChatbotState()
+export function ChatbotLauncher({ 
+  onClick, 
+  minimized = false, 
+  onMinimizeChange,
+  lastY = 0,
+  onLastYChange
+}: ChatbotLauncherProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [isTouchDevice, setIsTouchDevice] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -26,12 +34,14 @@ export function ChatbotLauncher({ onClick }: ChatbotLauncherProps) {
   
   // Constrain Y to viewport bounds and save on change
   useEffect(() => {
-    const unsubscribe = y.on('change', (latestY) => {
-      // Save the y offset (latestY is transform offset)
-      setLastY(latestY)
-    })
-    return unsubscribe
-  }, [y, setLastY])
+    if (onLastYChange) {
+      const unsubscribe = y.on('change', (latestY) => {
+        // Save the y offset (latestY is transform offset)
+        onLastYChange(latestY)
+      })
+      return unsubscribe
+    }
+  }, [y, onLastYChange])
 
   // Load initial position if saved
   useEffect(() => {
@@ -50,8 +60,8 @@ export function ChatbotLauncher({ onClick }: ChatbotLauncherProps) {
     }
     
     if (minimized) {
-      setMinimized(false)
-      setOpen(true)
+      onMinimizeChange?.(false)
+      onClick()
     } else {
       onClick()
     }
