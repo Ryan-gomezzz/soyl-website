@@ -36,6 +36,99 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - `npm run test` - Run Jest tests
 - `npm run format` - Format code with Prettier
 
+## 🧑‍💼 Careers & Applications System
+
+### Environment Variables
+
+Copy `.env.example` to `.env.local` and set:
+
+| Variable | Notes |
+| --- | --- |
+| `DATABASE_URL` | Postgres connection string (RDS, Render, or Supabase) |
+| `AWS_REGION` | Region for S3/Secrets (e.g. `us-east-1`) |
+| `RESUME_BUCKET` | Private S3 bucket for resumes |
+| `S3_UPLOAD_ACCESS_KEY_ID` / `S3_UPLOAD_SECRET_ACCESS_KEY` | IAM user keys limited to the resume bucket |
+| `UPLOAD_API_SECRET` | Shared secret for `/api/upload-url` |
+| `ADMIN_API_TOKEN` | Secret token for admin API/UI access |
+| `SENDGRID_API_KEY` / `SENDGRID_FROM_EMAIL` / `HIRING_INBOX` | Email notifications |
+| `SLACK_WEBHOOK_URL` | Slack channel webhook (optional) |
+| `RECAPTCHA_SECRET_KEY` / `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | Google reCAPTCHA v3 keys |
+| `NEXT_PUBLIC_UPLOAD_PUBLIC_HINT` | Client-side hint that must match server secret (e.g. hashed) |
+| `NEXT_PUBLIC_ADMIN_HINT` | Token forwarded from admin UI to API |
+
+#### Sample `.env.local`
+
+```bash
+DATABASE_URL="postgresql://username:password@host:5432/soyl_applicants?schema=public"
+
+AWS_REGION="us-east-1"
+RESUME_BUCKET="soyl-careers-resumes"
+S3_UPLOAD_ACCESS_KEY_ID="aws_access_key_id"
+S3_UPLOAD_SECRET_ACCESS_KEY="aws_secret_access_key"
+UPLOAD_API_SECRET="super-shared-secret"
+
+ADMIN_API_TOKEN="admin-dashboard-token"
+
+SENDGRID_API_KEY="SG.xxxxxx"
+SENDGRID_FROM_EMAIL="careers@soyl.ai"
+HIRING_INBOX="hiring@soyl.ai"
+
+SLACK_WEBHOOK_URL="https://hooks.slack.com/services/..."
+
+RECAPTCHA_SECRET_KEY="recaptcha-secret-key"
+NEXT_PUBLIC_RECAPTCHA_SITE_KEY="recaptcha-site-key"
+
+NEXT_PUBLIC_UPLOAD_PUBLIC_HINT="public-hint"
+NEXT_PUBLIC_ADMIN_HINT="preview-admin-token"
+```
+
+### Local Development
+
+1. Install dependencies (`npm install`) and copy env file.
+2. Run database migrations:
+   ```bash
+   npx prisma migrate dev --name init
+   ```
+3. Start local dev server:
+   ```bash
+   npm run dev
+   ```
+4. Visit `http://localhost:3000/careers` for the public page and `http://localhost:3000/admin/applicants` (requires `NEXT_PUBLIC_ADMIN_HINT` matching `ADMIN_API_TOKEN`).
+
+### Deployment Checklist (Vercel + AWS RDS)
+
+- Provision AWS resources with Terraform in `terraform/` (S3 bucket, Secrets Manager, RDS, IAM role).
+- Store DB credentials, SendGrid key, and other secrets in AWS Secrets Manager or Vercel environment variables (never commit).
+- Run `npx prisma migrate deploy` against the production database.
+- Set environment variables in Vercel (or ECS task definition) matching `.env.example`.
+- Configure reCAPTCHA keys and verify SendGrid sender identity.
+- Rotate `ADMIN_API_TOKEN` regularly and distribute via secure vault.
+- Add monitoring (Sentry/Log drains) and enable CloudWatch alarms for RDS.
+
+### Deployment Checklist (Supabase Alternative)
+
+- Create Supabase project and copy the Postgres connection string into `DATABASE_URL`.
+- Use Supabase Storage instead of S3 by swapping the upload API (Supabase supports signed uploads natively).
+- Supabase Auth can replace the `ADMIN_API_TOKEN` check for the admin dashboard.
+- Costs remain minimal while preserving Prisma compatibility.
+
+### Security & Compliance Notes
+
+- The public form enforces reCAPTCHA v3, PDF-only uploads (≤5 MB), and shared-secret protection for presigned URLs.
+- Resumes live in a private S3 bucket; only signed PUT/GET URLs are exposed and expire quickly.
+- Admin API requires `ADMIN_API_TOKEN`; upgrade to JWT/SSO when ready.
+- Use `DELETE /api/admin/:id` for GDPR deletion requests and remove the corresponding S3 object (future enhancement).
+- Integrate Sentry (`@sentry/nextjs`) and ship structured logs to CloudWatch/Datadog.
+- Replace in-memory rate limiting with Redis/Upstash for distributed environments.
+- For automated resume parsing, hook `scoreResumeKeywords` into Textract + Bedrock or a lightweight LLM service.
+
+### Automations
+
+- **Email**: SendGrid notification per applicant (`utils/sendgrid.ts`).
+- **Slack**: Webhook payload for `#hiring` announcements (`utils/slack.ts`).
+- **n8n**: Trigger on status change to `INTERVIEW` -> create calendar invite or move to ATS.
+- **Scoring**: `scoreResumeKeywords` stub ready for integration with keyword/LLM parsing pipelines.
+
 ## 🤖 Chatbot (MCQ) — How to Edit
 
 The SOYL website includes a MCQ-driven chatbot that helps visitors explore products, request pilots, and learn about careers. The conversation flow is defined in JSON format.
