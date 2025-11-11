@@ -90,10 +90,20 @@ export default function ApplyForm({ roles }: ApplyFormProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const onInputChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value, type, checked } = event.target;
+    const target = event.target;
+    const name = target.name as keyof FormValues;
+
+    if (target instanceof HTMLInputElement && target.type === 'checkbox' && name === 'consent') {
+      setFormValues((prev) => ({
+        ...prev,
+        consent: target.checked
+      }));
+      return;
+    }
+
     setFormValues((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: target.value
     }));
   };
 
