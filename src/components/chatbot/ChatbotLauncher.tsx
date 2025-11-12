@@ -52,19 +52,18 @@ export function ChatbotLauncher({
 
   // Handle minimize/restore
   const handleClick = (e: React.MouseEvent) => {
-    // Prevent click if we just dragged
+    e.preventDefault()
+    e.stopPropagation()
+    
+    // Only prevent click if we actually dragged significantly
     if (isDragging) {
-      e.preventDefault()
-      e.stopPropagation()
       return
     }
     
     if (minimized) {
       onMinimizeChange?.(false)
-      onClick()
-    } else {
-      onClick()
     }
+    onClick()
   }
 
   const handleDragStart = () => {
@@ -74,10 +73,17 @@ export function ChatbotLauncher({
   }
 
   const handleDragEnd = () => {
-    // Reset dragging after a short delay to allow click to fire if no drag happened
+    // Reset dragging after a short delay
     setTimeout(() => {
       setIsDragging(false)
-    }, 100)
+    }, 150)
+  }
+  
+  const handlePointerDown = () => {
+    // Reset dragging state on new pointer interaction
+    if (!isTouchDevice) {
+      setIsDragging(false)
+    }
   }
 
   const prefersReducedMotion =
@@ -106,14 +112,7 @@ export function ChatbotLauncher({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onClick={handleClick}
-      onPointerDown={() => {
-        // Track if this was a click vs drag start
-        // Note: actual drag detection is handled by framer-motion drag handlers
-        if (!isTouchDevice) {
-          // Reset dragging state on new pointer down
-          setIsDragging(false)
-        }
-      }}
+      onPointerDown={handlePointerDown}
       className="chatbot-launcher w-14 h-14 md:w-16 md:h-16 rounded-full bg-accent text-bg flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent cursor-pointer select-none"
       style={{
         bottom: '32px',

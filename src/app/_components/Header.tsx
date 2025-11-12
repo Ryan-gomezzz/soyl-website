@@ -88,10 +88,7 @@ export function Header() {
                 className="text-sm font-medium text-text/80 transition-colors hover:text-accent relative group"
               >
                 {item.name}
-                <motion.span
-                  className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"
-                  whileHover={{ width: '100%' }}
-                />
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300 ease-in-out" />
               </Link>
             </motion.div>
           ))}

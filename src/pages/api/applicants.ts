@@ -13,8 +13,14 @@ const bodySchema = z.object({
   location: z.string().trim().max(120).optional(),
   roleApplied: z.string().trim().min(1),
   seniority: z.string().trim().min(1),
-  linkedin: z.string().trim().url('LinkedIn URL must be valid'),
-  github: z.string().trim().url().optional(),
+  linkedin: z.string().trim().min(1, 'LinkedIn URL is required').refine(
+    (val) => {
+      const lower = val.toLowerCase();
+      return lower.includes('linkedin.com') || lower.startsWith('http');
+    },
+    { message: 'LinkedIn URL must contain linkedin.com' }
+  ),
+  github: z.string().trim().url().optional().or(z.literal('')),
   resumeUrl: z.string().trim().regex(/^s3:\/\//, 'Resume must be stored in S3'),
   coverLetter: z.string().trim().max(1600).optional(),
   workEligibility: z.string().trim().min(1),
@@ -124,4 +130,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: 'Internal server error.' });
   }
 }
+
 

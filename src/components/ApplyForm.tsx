@@ -235,7 +235,7 @@ export default function ApplyForm({ roles }: ApplyFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 rounded-2xl border border-slate-800 bg-slate-950/80 p-6 shadow-xl backdrop-blur"
+      className="space-y-6 rounded-xl border border-white/10 bg-panel/50 p-6 shadow-lg glass"
     >
       <div className="grid gap-4 md:grid-cols-2">
         <label className="flex flex-col text-sm">
@@ -245,7 +245,7 @@ export default function ApplyForm({ roles }: ApplyFormProps) {
             name="fullName"
             value={formValues.fullName}
             onChange={onInputChange}
-            className="mt-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-sky-400 focus:outline-none"
+            className="mt-1 rounded-md border border-white/10 bg-bg px-3 py-2 text-text focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/50"
           />
         </label>
         <label className="flex flex-col text-sm">
@@ -256,7 +256,7 @@ export default function ApplyForm({ roles }: ApplyFormProps) {
             name="email"
             value={formValues.email}
             onChange={onInputChange}
-            className="mt-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-sky-400 focus:outline-none"
+            className="mt-1 rounded-md border border-white/10 bg-bg px-3 py-2 text-text focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/50"
           />
         </label>
         <label className="flex flex-col text-sm">
@@ -265,7 +265,7 @@ export default function ApplyForm({ roles }: ApplyFormProps) {
             name="phone"
             value={formValues.phone}
             onChange={onInputChange}
-            className="mt-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-sky-400 focus:outline-none"
+            className="mt-1 rounded-md border border-white/10 bg-bg px-3 py-2 text-text focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/50"
           />
         </label>
         <label className="flex flex-col text-sm">
@@ -274,7 +274,7 @@ export default function ApplyForm({ roles }: ApplyFormProps) {
             name="location"
             value={formValues.location}
             onChange={onInputChange}
-            className="mt-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-sky-400 focus:outline-none"
+            className="mt-1 rounded-md border border-white/10 bg-bg px-3 py-2 text-text focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/50"
           />
         </label>
         <label className="flex flex-col text-sm">
@@ -283,7 +283,7 @@ export default function ApplyForm({ roles }: ApplyFormProps) {
             name="roleApplied"
             value={formValues.roleApplied}
             onChange={onInputChange}
-            className="mt-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-sky-400 focus:outline-none"
+            className="mt-1 rounded-md border border-white/10 bg-bg px-3 py-2 text-text focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/50"
           >
             {orderedRoles.map((role) => (
               <option key={role} value={role}>
@@ -298,7 +298,7 @@ export default function ApplyForm({ roles }: ApplyFormProps) {
             name="seniority"
             value={formValues.seniority}
             onChange={onInputChange}
-            className="mt-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-sky-400 focus:outline-none"
+            className="mt-1 rounded-md border border-white/10 bg-bg px-3 py-2 text-text focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/50"
           >
             {['Intern', 'Junior', 'Mid', 'Senior', 'Staff'].map((level) => (
               <option key={level} value={level}>
@@ -311,11 +311,13 @@ export default function ApplyForm({ roles }: ApplyFormProps) {
           LinkedIn *
           <input
             required
-            type="url"
+            type="text"
             name="linkedin"
             value={formValues.linkedin}
             onChange={onInputChange}
-            className="mt-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-sky-400 focus:outline-none"
+            placeholder="https://linkedin.com/in/yourprofile"
+            pattern="https?://.*linkedin\.com.*"
+            className="mt-1 rounded-md border border-white/10 bg-panel px-3 py-2 text-text focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/50"
           />
         </label>
         <label className="flex flex-col text-sm">
@@ -325,7 +327,7 @@ export default function ApplyForm({ roles }: ApplyFormProps) {
             name="github"
             value={formValues.github}
             onChange={onInputChange}
-            className="mt-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-sky-400 focus:outline-none"
+            className="mt-1 rounded-md border border-white/10 bg-bg px-3 py-2 text-text focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/50"
           />
         </label>
         <label className="flex flex-col text-sm md:col-span-2">
@@ -334,7 +336,7 @@ export default function ApplyForm({ roles }: ApplyFormProps) {
             name="workEligibility"
             value={formValues.workEligibility}
             onChange={onInputChange}
-            className="mt-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-sky-400 focus:outline-none"
+            className="mt-1 rounded-md border border-white/10 bg-bg px-3 py-2 text-text focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/50"
           />
         </label>
         <label className="flex flex-col text-sm">
@@ -343,7 +345,7 @@ export default function ApplyForm({ roles }: ApplyFormProps) {
             name="noticePeriod"
             value={formValues.noticePeriod}
             onChange={onInputChange}
-            className="mt-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-sky-400 focus:outline-none"
+            className="mt-1 rounded-md border border-white/10 bg-bg px-3 py-2 text-text focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/50"
           />
         </label>
         <label className="flex flex-col text-sm">
@@ -352,7 +354,7 @@ export default function ApplyForm({ roles }: ApplyFormProps) {
             name="salaryExpectation"
             value={formValues.salaryExpectation}
             onChange={onInputChange}
-            className="mt-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-sky-400 focus:outline-none"
+            className="mt-1 rounded-md border border-white/10 bg-bg px-3 py-2 text-text focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/50"
           />
         </label>
         <label className="flex flex-col text-sm md:col-span-2">
@@ -362,7 +364,7 @@ export default function ApplyForm({ roles }: ApplyFormProps) {
             value={formValues.coverLetter}
             onChange={onInputChange}
             rows={4}
-            className="mt-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-sky-400 focus:outline-none"
+            className="mt-1 rounded-md border border-white/10 bg-bg px-3 py-2 text-text focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/50"
           />
         </label>
         <label className="flex flex-col text-sm md:col-span-2">
@@ -371,7 +373,7 @@ export default function ApplyForm({ roles }: ApplyFormProps) {
             name="utmSource"
             value={formValues.utmSource}
             onChange={onInputChange}
-            className="mt-1 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-sky-400 focus:outline-none"
+            className="mt-1 rounded-md border border-white/10 bg-bg px-3 py-2 text-text focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/50"
           />
         </label>
         <label className="flex flex-col text-sm md:col-span-2">

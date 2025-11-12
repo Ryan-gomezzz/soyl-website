@@ -22,7 +22,7 @@ export default function Home() {
       <FlowchartSection />
 
       {/* What SOYL Does */}
-      <section className="py-24 lg:py-32">
+      <section className="py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -46,7 +46,7 @@ export default function Home() {
       <WhyChooseUs />
 
       {/* How it works */}
-      <section id="how-it-works" className="py-24 lg:py-32 bg-panel/30">
+      <section id="how-it-works" className="py-16 lg:py-20 bg-panel/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -170,7 +170,7 @@ export default function Home() {
       </section>
 
       {/* Product/Features */}
-      <section className="py-24 lg:py-32">
+      <section className="py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -223,7 +223,7 @@ export default function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-24 lg:py-32 bg-panel/30">
+      <section className="py-16 lg:py-20 bg-panel/30">
         <div className="mx-auto max-w-4xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -241,7 +241,7 @@ export default function Home() {
       </section>
 
       {/* Use Cases */}
-      <section className="py-24 lg:py-32 bg-panel/30">
+      <section className="py-12 lg:py-16">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -312,7 +312,7 @@ export default function Home() {
       </section>
 
       {/* SOYL R&D Snapshot */}
-      <section className="py-24 lg:py-32">
+      <section className="py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -364,7 +364,7 @@ export default function Home() {
       </section>
 
       {/* Trust & Compliance */}
-      <section className="py-24 lg:py-32 bg-panel/30">
+      <section className="py-16 lg:py-20 bg-panel/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

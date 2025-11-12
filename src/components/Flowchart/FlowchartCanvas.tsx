@@ -4,8 +4,6 @@ import { useRef, useState, useEffect, useCallback } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { flow } from './flow-data'
 import { FlowNode } from './FlowNode'
-import { FlowEdge } from './FlowEdge'
-import { AmbientLayer } from './AmbientLayer'
 
 interface FlowchartCanvasProps {
   onNodeClick?: (node: typeof flow.nodes[0]) => void
@@ -20,18 +18,17 @@ export function FlowchartCanvas({ onNodeClick }: FlowchartCanvasProps) {
   const measure = useCallback(() => {
     if (canvasRef.current) {
       const rect = canvasRef.current.getBoundingClientRect()
-      setSize({ w: rect.width, h: rect.height })
+      setSize({ w: Math.max(rect.width, 800), h: Math.max(rect.height, 500) })
     }
   }, [])
 
   useEffect(() => {
     measure()
     
-    // Throttle resize events
     let timeoutId: NodeJS.Timeout
     function handleResize() {
       clearTimeout(timeoutId)
-      timeoutId = setTimeout(measure, 100)
+      timeoutId = setTimeout(measure, 150)
     }
 
     window.addEventListener('resize', handleResize)
@@ -47,7 +44,7 @@ export function FlowchartCanvas({ onNodeClick }: FlowchartCanvasProps) {
 
   const handleNodeClick = useCallback((node: typeof flow.nodes[0]) => {
     if (node.cta?.href) {
-      if (node.cta.action === 'pilot' || node.cta.action === 'contact') {
+      if (node.cta.href.startsWith('mailto:')) {
         window.location.href = node.cta.href
       } else {
         window.location.href = node.cta.href
@@ -56,93 +53,113 @@ export function FlowchartCanvas({ onNodeClick }: FlowchartCanvasProps) {
     onNodeClick?.(node)
   }, [onNodeClick])
 
-  // Check for reduced motion preference for ambient layer
-  const prefersReducedMotion = 
-    typeof window !== 'undefined' &&
-    window.matchMedia &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const getNodeSize = (nodeSize?: 'sm' | 'md' | 'lg') => {
+    switch (nodeSize) {
+      case 'lg': return { w: 256, h: 96 }
+      case 'sm': return { w: 192, h: 72 }
+      default: return { w: 224, h: 84 }
+    }
+  }
 
   return (
-    <div ref={canvasRef} className="relative w-full h-[520px] md:h-[640px] overflow-hidden">
-      {/* Ambient animation layer */}
-      <AmbientLayer enabled={!prefersReducedMotion && !reduced} width={size.w} height={size.h} />
-
-      <svg width={size.w} height={size.h} className="absolute inset-0 z-20">
+    <div 
+      ref={canvasRef} 
+      className="relative w-full h-[520px] md:h-[640px] min-h-[500px] overflow-visible"
+      style={{ minWidth: '100%' }}
+    >
+      {/* Background SVG for edges */}
+      <svg 
+        width={size.w} 
+        height={size.h} 
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{ overflow: 'visible' }}
+      >
         <defs>
-          {/* Arrow marker with glow */}
           <marker
             id="arrowhead"
-            markerWidth="12"
-            markerHeight="12"
-            refX="10"
-            refY="6"
+            markerWidth="10"
+            markerHeight="10"
+            refX="9"
+            refY="5"
             orient="auto"
-            markerUnits="strokeWidth"
           >
             <polygon
-              points="0 0, 12 6, 0 12"
+              points="0 0, 10 5, 0 10"
               fill="var(--accent)"
-              opacity={hoveredNode ? 0.9 : 0.5}
+              opacity={0.6}
             />
           </marker>
-
-          {/* Enhanced glow filter */}
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="4" result="coloredBlur" />
-            <feMerge>
-              <feMergeNode in="coloredBlur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-
-          {/* Radial gradient for particles */}
-          <radialGradient id="particle-gradient">
-            <stop offset="0%" stopColor="var(--dot-1)" stopOpacity="1" />
-            <stop offset="100%" stopColor="var(--dot-1)" stopOpacity="0" />
-          </radialGradient>
         </defs>
-
+        
         {/* Render edges */}
-        {flow.edges.map((edge, i) => (
-          <FlowEdge
-            key={`${edge.from}-${edge.to}-${i}`}
-            edge={edge}
-            nodes={flow.nodes}
-            canvas={size}
-            highlighted={edge.from === hoveredNode || edge.to === hoveredNode}
-          />
-        ))}
+        {flow.edges.map((edge, i) => {
+          const fromNode = flow.nodes.find(n => n.id === edge.from)
+          const toNode = flow.nodes.find(n => n.id === edge.to)
+          if (!fromNode || !toNode) return null
+          
+          const fromX = fromNode.x * size.w
+          const fromY = fromNode.y * size.h
+          const toX = toNode.x * size.w
+          const toY = toNode.y * size.h
+          
+          // Calculate edge start/end points (center of nodes)
+          const startX = fromX
+          const startY = fromY
+          const endX = toX
+          const endY = toY
+          
+          const isHighlighted = edge.from === hoveredNode || edge.to === hoveredNode
+          
+          return (
+            <line
+              key={`${edge.from}-${edge.to}-${i}`}
+              x1={startX}
+              y1={startY}
+              x2={endX}
+              y2={endY}
+              stroke="var(--accent)"
+              strokeWidth={isHighlighted ? 3 : 2}
+              strokeOpacity={isHighlighted ? 0.8 : 0.4}
+              markerEnd="url(#arrowhead)"
+              className="transition-all duration-300"
+            />
+          )
+        })}
+      </svg>
 
-        {/* Render nodes with stagger animation */}
+      {/* Render nodes with absolute positioning */}
+      <div className="relative w-full h-full z-10">
         {flow.nodes.map((node, index) => {
-          const nodeX = node.x * size.w - (node.size === 'lg' ? 128 : node.size === 'sm' ? 96 : 112)
-          const nodeY = node.y * size.h - (node.size === 'lg' ? 48 : node.size === 'sm' ? 32 : 40)
+          const nodeSize = getNodeSize(node.size)
 
           return (
-            <motion.foreignObject
+            <motion.div
               key={node.id}
-              x={nodeX}
-              y={nodeY}
-              width={node.size === 'lg' ? 256 : node.size === 'sm' ? 192 : 224}
-              height={node.size === 'lg' ? 64 : node.size === 'sm' ? 48 : 56}
+              className="absolute"
+              style={{
+                left: `${(node.x * 100)}%`,
+                top: `${(node.y * 100)}%`,
+                transform: 'translate(-50%, -50%)',
+                width: `${nodeSize.w}px`,
+                height: `${nodeSize.h}px`,
+              }}
               initial={reduced ? { opacity: 1 } : { opacity: 0, scale: 0.8, y: 20 }}
               animate={reduced ? {} : { opacity: 1, scale: 1, y: 0 }}
               transition={
                 reduced
                   ? {}
                   : {
-                      duration: 0.6,
+                      duration: 0.5,
                       delay: index * 0.15,
                       ease: [0.22, 1, 0.36, 1],
                     }
               }
             >
               <FlowNode node={node} onHover={handleNodeHover} onClick={handleNodeClick} />
-            </motion.foreignObject>
+            </motion.div>
           )
         })}
-      </svg>
+      </div>
     </div>
   )
 }
-

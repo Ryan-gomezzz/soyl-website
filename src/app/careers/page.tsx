@@ -187,12 +187,12 @@ const roles: Role[] = [
 
 export default function CareersPage() {
   return (
-    <main className="bg-slate-950 text-slate-100">
+    <main className="bg-bg text-text">
       <section className="mx-auto max-w-6xl px-6 pb-16 pt-24 md:pt-32">
         <header className="mx-auto max-w-3xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-sky-400">Open Roles</p>
-          <h1 className="mt-4 text-4xl font-bold sm:text-5xl">Build Production-Ready Cognitive Agents</h1>
-          <p className="mt-4 text-lg text-slate-300">
+          <p className="text-sm font-medium uppercase tracking-wider text-accent/80 mb-2">Open Roles</p>
+          <h1 className="mt-2 text-4xl font-bold sm:text-5xl text-text">Build Production-Ready Cognitive Agents</h1>
+          <p className="mt-4 text-lg text-muted">
             We are assembling a multidisciplinary team to ship trustworthy, high-impact AI agents. Explore the roles below and
             apply to build with us.
           </p>
@@ -201,40 +201,40 @@ export default function CareersPage() {
           {roles.map((role) => (
             <article
               key={role.title}
-              className="flex flex-col rounded-2xl border border-slate-800 bg-slate-900/60 p-6 shadow-lg transition hover:border-sky-500/60"
+              className="flex flex-col rounded-xl border border-white/10 bg-panel/50 p-6 shadow-lg transition hover:border-accent/50 glass"
             >
               <header>
-                <h2 className="text-2xl font-semibold text-white">{role.title}</h2>
-                <p className="mt-1 text-sm font-medium text-sky-400">{role.seniority}</p>
+                <h2 className="text-2xl font-semibold text-text">{role.title}</h2>
+                <p className="mt-1 text-sm font-medium text-accent">{role.seniority}</p>
               </header>
-              <div className="mt-4 space-y-4 text-sm text-slate-200">
-                <div>
-                  <h3 className="font-semibold uppercase tracking-wide text-slate-400">Responsibilities</h3>
+              <div className="mt-4 space-y-4 text-sm text-muted">
+                    <div>
+                  <h3 className="font-semibold uppercase tracking-wide text-text/70">Responsibilities</h3>
                   <ul className="mt-2 space-y-2">
                     {role.responsibilities.map((item) => (
                       <li key={item} className="flex gap-2">
-                        <span className="text-sky-400">•</span>
+                        <span className="text-accent">•</span>
                         <span>{item}</span>
                       </li>
                     ))}
                   </ul>
-                </div>
-                <div>
-                  <h3 className="font-semibold uppercase tracking-wide text-slate-400">Required skills</h3>
+                  </div>
+                  <div>
+                  <h3 className="font-semibold uppercase tracking-wide text-text/70">Required skills</h3>
                   <ul className="mt-2 space-y-2">
                     {role.skills.map((item) => (
                       <li key={item} className="flex gap-2">
-                        <span className="text-sky-400">•</span>
+                        <span className="text-accent">•</span>
                         <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
-              </div>
-              <p className="mt-4 text-sm text-slate-300">{role.culture}</p>
+              <p className="mt-4 text-sm text-muted">{role.culture}</p>
               <a
                 href="#apply"
-                className="mt-6 inline-flex items-center justify-center rounded-md bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2 focus:ring-offset-slate-900"
+                className="mt-6 inline-flex items-center justify-center rounded-md bg-accent px-4 py-2 text-sm font-semibold text-bg transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg"
               >
                 Apply for this role
               </a>
@@ -242,16 +242,16 @@ export default function CareersPage() {
           ))}
         </div>
       </section>
-      <section id="apply" className="bg-slate-900 py-16">
+      <section id="apply" className="bg-panel/30 py-16">
         <div className="mx-auto max-w-3xl px-6">
-          <h2 className="text-center text-3xl font-semibold text-white">Ready to apply?</h2>
-          <p className="mt-3 text-center text-slate-300">
+          <h2 className="text-center text-3xl font-semibold text-text">Ready to apply?</h2>
+          <p className="mt-3 text-center text-muted">
             Submit your application below. We review every submission and will reach out within 72 hours.
           </p>
           <div className="mt-8">
             <ApplyForm roles={roles.map((role) => role.title)} />
-          </div>
-        </div>
+      </div>
+    </div>
       </section>
     </main>
   );
