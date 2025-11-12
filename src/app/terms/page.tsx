@@ -2,208 +2,146 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Terms of Service — SOYL',
-  description:
-    'SOYL Terms of Service: Read our terms and conditions for using our emotion-aware AI services and platform.'
+  description: 'SOYL Terms of Service: Legal terms and conditions for using our services.'
 };
 
 export default function TermsPage() {
   return (
     <div className="pt-32 pb-24">
       <div className="mx-auto max-w-4xl px-6 lg:px-8">
-        <header className="mb-12">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">Terms of Service</h1>
-          <p className="text-lg text-muted">
-            Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-          </p>
-        </header>
+        <h1 className="text-4xl md:text-5xl font-bold mb-8">Terms of Service</h1>
+        <p className="text-muted mb-8">Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
 
-        <div className="prose prose-invert max-w-none space-y-8">
+        <div className="prose prose-invert max-w-none space-y-6">
           <section>
             <h2 className="text-2xl font-semibold mb-4">1. Acceptance of Terms</h2>
-            <p className="text-muted mb-4">
-              By accessing or using the services, website, or products provided by SOYL (&quot;we,&quot; &quot;our,&quot;
-              or &quot;us&quot;), you agree to be bound by these Terms of Service (&quot;Terms&quot;). If you do not
-              agree to these Terms, you may not use our Services.
+            <p className="text-muted">
+              By accessing or using SOYL&apos;s website, services, or applications, you agree to be bound by these Terms of Service (&quot;Terms&quot;). If you do not agree to these Terms, please do not use our services.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-semibold mb-4">2. Description of Services</h2>
-            <p className="text-muted mb-4">
-              SOYL provides emotion-aware AI services, including but not limited to:
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-muted ml-4">
-              <li>Multimodal emotion detection APIs and SDKs</li>
-              <li>Adaptive AI sales agents and conversational interfaces</li>
-              <li>Enterprise AI solutions and custom agent development</li>
-              <li>Research and development tools for emotion intelligence</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">3. User Accounts and Registration</h2>
-            <div className="space-y-4">
-              <p className="text-muted">
-                Some Services may require you to create an account. You agree to:
-              </p>
-              <ul className="list-disc list-inside space-y-2 text-muted ml-4">
-                <li>Provide accurate, current, and complete information during registration</li>
-                <li>Maintain and update your account information to keep it accurate</li>
-                <li>Maintain the security of your account credentials</li>
-                <li>Accept responsibility for all activities under your account</li>
-                <li>Notify us immediately of any unauthorized access or security breach</li>
-              </ul>
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">4. Acceptable Use</h2>
-            <p className="text-muted mb-4">You agree not to:</p>
-            <ul className="list-disc list-inside space-y-2 text-muted ml-4">
-              <li>Use the Services for any illegal purpose or in violation of any laws</li>
-              <li>Transmit any harmful code, viruses, or malicious software</li>
-              <li>Attempt to gain unauthorized access to our systems or networks</li>
-              <li>Interfere with or disrupt the Services or servers</li>
-              <li>Use the Services to harass, abuse, or harm others</li>
-              <li>Impersonate any person or entity or misrepresent your affiliation</li>
-              <li>Reverse engineer, decompile, or disassemble any part of our Services</li>
-              <li>Use automated systems (bots, scrapers) to access the Services without permission</li>
-              <li>Collect or harvest personal information from other users</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">5. Intellectual Property</h2>
-            <div className="space-y-4">
-              <p className="text-muted">
-                The Services, including all content, features, software, and technology, are owned by SOYL and protected
-                by intellectual property laws. You are granted a limited, non-exclusive, non-transferable license to
-                use the Services in accordance with these Terms.
-              </p>
-              <p className="text-muted">
-                You retain ownership of any content you submit through the Services. By submitting content, you grant us
-                a worldwide, royalty-free license to use, reproduce, modify, and distribute such content for the purpose
-                of providing and improving our Services.
-              </p>
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">6. API Usage and Rate Limits</h2>
-            <p className="text-muted mb-4">
-              If you use our APIs or SDKs, you agree to:
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-muted ml-4">
-              <li>Comply with any rate limits, usage quotas, or restrictions we impose</li>
-              <li>Use API keys securely and not share them with unauthorized parties</li>
-              <li>Not attempt to circumvent rate limits or usage restrictions</li>
-              <li>Respect our fair use policies and terms of your subscription tier</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">7. Payment and Billing</h2>
-            <p className="text-muted mb-4">
-              For paid Services:
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-muted ml-4">
-              <li>You agree to pay all fees associated with your subscription or usage</li>
-              <li>Fees are charged in advance on a recurring basis (monthly or annual)</li>
-              <li>All fees are non-refundable unless required by law or stated otherwise</li>
-              <li>We reserve the right to change pricing with 30 days&apos; notice</li>
-              <li>Failure to pay may result in suspension or termination of your account</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">8. Privacy and Data Protection</h2>
             <p className="text-muted">
-              Your use of the Services is also governed by our{' '}
-              <a href="/privacy" className="text-accent hover:underline">
-                Privacy Policy
-              </a>
-              . By using the Services, you consent to the collection and use of your information as described in the
-              Privacy Policy.
+              SOYL provides emotion-aware AI solutions, including but not limited to:
             </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">9. Disclaimers and Limitations of Liability</h2>
-            <div className="space-y-4">
-              <p className="text-muted">
-                <strong>THE SERVICES ARE PROVIDED &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; WITHOUT WARRANTIES OF
-                ANY KIND, EXPRESS OR IMPLIED.</strong> We disclaim all warranties, including but not limited to
-                merchantability, fitness for a particular purpose, and non-infringement.
-              </p>
-              <p className="text-muted">
-                To the maximum extent permitted by law, SOYL shall not be liable for any indirect, incidental, special,
-                consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or
-                indirectly, or any loss of data, use, goodwill, or other intangible losses resulting from your use of
-                the Services.
-              </p>
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">10. Indemnification</h2>
-            <p className="text-muted">
-              You agree to indemnify, defend, and hold harmless SOYL and its officers, directors, employees, and agents
-              from any claims, damages, losses, liabilities, and expenses (including legal fees) arising from your use
-              of the Services, violation of these Terms, or infringement of any rights of another party.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">11. Termination</h2>
-            <p className="text-muted mb-4">
-              We may terminate or suspend your access to the Services at any time, with or without cause or notice, for
-              any reason, including if you breach these Terms. Upon termination:
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-muted ml-4">
-              <li>Your right to use the Services will immediately cease</li>
-              <li>We may delete your account and associated data</li>
-              <li>All provisions of these Terms that by their nature should survive will survive</li>
+            <ul className="list-disc list-inside space-y-2 text-muted">
+              <li>AI-powered cognitive agents and chatbots</li>
+              <li>Emotion detection APIs and SDKs</li>
+              <li>Enterprise AI solutions and integrations</li>
+              <li>Documentation, resources, and support services</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">12. Governing Law and Dispute Resolution</h2>
+            <h2 className="text-2xl font-semibold mb-4">3. Use of Services</h2>
+            <h3 className="text-xl font-semibold mb-3 mt-6">3.1 Permitted Use</h3>
             <p className="text-muted">
-              These Terms shall be governed by and construed in accordance with the laws of [Your Jurisdiction],
-              without regard to its conflict of law provisions. Any disputes arising from these Terms or the Services
-              shall be resolved through binding arbitration in accordance with the rules of [Arbitration Organization],
-              except where prohibited by law.
+              You may use our services only for lawful purposes and in accordance with these Terms. You agree not to:
+            </p>
+            <ul className="list-disc list-inside space-y-2 text-muted">
+              <li>Violate any applicable laws or regulations</li>
+              <li>Infringe upon the rights of others</li>
+              <li>Transmit harmful, offensive, or illegal content</li>
+              <li>Attempt to gain unauthorized access to our systems</li>
+              <li>Interfere with or disrupt our services</li>
+              <li>Use automated systems to scrape or extract data without permission</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">4. Intellectual Property</h2>
+            <p className="text-muted">
+              All content, features, and functionality of our services, including but not limited to text, graphics, logos, software, and AI models, are owned by SOYL or its licensors and are protected by copyright, trademark, and other intellectual property laws.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-4">13. Changes to Terms</h2>
+            <h2 className="text-2xl font-semibold mb-4">5. User Accounts and Job Applications</h2>
+            <p className="text-muted mb-4">
+              When you submit a job application or create an account:
+            </p>
+            <ul className="list-disc list-inside space-y-2 text-muted">
+              <li>You must provide accurate and complete information</li>
+              <li>You are responsible for maintaining the confidentiality of your account</li>
+              <li>You consent to our processing of your application data as described in our Privacy Policy</li>
+              <li>You grant us permission to contact you regarding your application</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">6. API and SDK Usage</h2>
             <p className="text-muted">
-              We reserve the right to modify these Terms at any time. We will notify you of material changes by posting
-              the updated Terms on this page and updating the &quot;Last updated&quot; date. Your continued use of the
-              Services after such changes constitutes acceptance of the updated Terms.
+              If you use our APIs or SDKs, you agree to comply with any applicable usage limits, rate limits, and terms specified in your service agreement or API documentation. Unauthorized use or abuse of our APIs may result in suspension or termination of access.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">7. Disclaimers</h2>
+            <p className="text-muted">
+              Our services are provided &quot;as is&quot; and &quot;as available&quot; without warranties of any kind, either express or implied. We do not guarantee that our services will be uninterrupted, error-free, or secure. AI-generated content may contain inaccuracies and should be verified independently.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">8. Limitation of Liability</h2>
+            <p className="text-muted">
+              To the maximum extent permitted by law, SOYL shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible losses resulting from your use of our services.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">9. Indemnification</h2>
+            <p className="text-muted">
+              You agree to indemnify and hold harmless SOYL, its officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including legal fees) arising out of your use of our services or violation of these Terms.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">10. Termination</h2>
+            <p className="text-muted">
+              We reserve the right to suspend or terminate your access to our services at any time, with or without cause or notice, for any reason, including violation of these Terms.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">11. Governing Law</h2>
+            <p className="text-muted">
+              These Terms shall be governed by and construed in accordance with the laws of the jurisdiction in which SOYL operates, without regard to its conflict of law provisions.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">12. Changes to Terms</h2>
+            <p className="text-muted">
+              We reserve the right to modify these Terms at any time. We will notify users of material changes by posting the updated Terms on this page and updating the &quot;Last updated&quot; date. Your continued use of our services after such changes constitutes acceptance of the modified Terms.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">13. Severability</h2>
+            <p className="text-muted">
+              If any provision of these Terms is found to be unenforceable or invalid, that provision shall be limited or eliminated to the minimum extent necessary, and the remaining provisions shall remain in full force and effect.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-semibold mb-4">14. Contact Information</h2>
-            <p className="text-muted mb-4">
-              If you have questions about these Terms, please contact us:
+            <p className="text-muted">
+              If you have questions about these Terms, please contact us at:
             </p>
-            <div className="bg-bg rounded-lg p-6 border border-white/10">
-              <p className="text-muted mb-2">
-                <strong>Email:</strong>{' '}
-                <a href="mailto:legal@soyl.ai" className="text-accent hover:underline">
-                  legal@soyl.ai
-                </a>
-              </p>
-              <p className="text-muted">
-                <strong>General Inquiries:</strong>{' '}
-                <a href="mailto:hello@soyl.ai" className="text-accent hover:underline">
-                  hello@soyl.ai
-                </a>
-              </p>
-            </div>
+            <p className="text-muted mt-4">
+              <strong>Email:</strong>{' '}
+              <a href="mailto:legal@soyl.ai" className="text-accent hover:underline">
+                legal@soyl.ai
+              </a>
+            </p>
+            <p className="text-muted mt-2">
+              <strong>General Inquiries:</strong>{' '}
+              <a href="mailto:hello@soyl.ai" className="text-accent hover:underline">
+                hello@soyl.ai
+              </a>
+            </p>
           </section>
         </div>
       </div>
