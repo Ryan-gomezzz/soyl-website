@@ -188,25 +188,53 @@ soyl-site/
 │   ├── images/         # Hero images, product visuals
 │   ├── og/             # OpenGraph images
 │   └── patterns/       # SVG patterns
+├── prisma/             # Database schema
+│   └── schema.prisma
 ├── src/
 │   ├── app/            # Next.js app router pages
-│   │   ├── _components/ # Shared components
-│   │   ├── pricing/    # Pricing page
-│   │   ├── docs/       # Documentation
-│   │   ├── resources/  # Resources & blog
+│   │   ├── _components/ # Shared page components
+│   │   ├── api/        # API routes (chatbot logging)
 │   │   ├── careers/    # Careers page
-│   │   ├── enterprise/ # Enterprise page
 │   │   ├── custom-agents/ # Custom Agents page
+│   │   ├── docs/       # Documentation
+│   │   ├── enterprise/ # Enterprise page
 │   │   ├── open-dashboard/ # Dashboard
-│   │   └── soyl-rd/    # R&D page
+│   │   ├── pricing/    # Pricing page
+│   │   ├── privacy/    # Privacy policy
+│   │   ├── resources/  # Resources & blog
+│   │   ├── soyl-rd/    # R&D page
+│   │   └── terms/      # Terms of service
+│   ├── components/     # Reusable React components
+│   │   ├── chatbot/    # MCQ chatbot system
+│   │   ├── FeatureGrid/ # Feature grid components
+│   │   ├── Flowchart/  # R&D flowchart visualization
+│   │   └── ...
 │   ├── lib/            # Utilities & config
-│   │   ├── data/       # Static data (features, careers)
+│   │   ├── data/       # Static data (features, careers, testimonials)
+│   │   ├── prisma.ts   # Prisma client
 │   │   └── siteConfig.ts
-│   └── styles/         # Global styles
-│       ├── tokens.css  # CSS variables
-│       └── animations.css
+│   ├── pages/          # Pages router (API routes & admin)
+│   │   ├── api/        # API endpoints (applicants, upload, admin)
+│   │   └── admin/      # Admin dashboard
+│   ├── styles/         # Global styles
+│   │   ├── tokens.css  # CSS variables
+│   │   ├── animations.css
+│   │   └── flowchart.css
+│   └── utils/          # Utility functions
+│       ├── adminAuth.ts
+│       ├── rateLimit.ts
+│       ├── resumeScorer.ts
+│       ├── sendgrid.ts
+│       └── slack.ts
+├── terraform/          # Infrastructure as code
+│   ├── main.tf
+│   ├── variables.tf
+│   └── outputs.tf
 ├── .github/workflows/  # CI/CD workflows
-└── jest.config.js      # Jest configuration
+├── jest.config.js      # Jest configuration
+├── next.config.js       # Next.js configuration
+├── tailwind.config.ts   # Tailwind CSS configuration
+└── tsconfig.json        # TypeScript configuration
 ```
 
 ## 🛠 Tech Stack
@@ -233,12 +261,7 @@ See `src/styles/tokens.css` for full CSS variables.
 
 ## 📝 Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on:
-
-- Branch naming conventions
-- Pull request process
-- Code style standards
-- Commit message format
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on branch naming, pull request process, code style standards, and commit message format.
 
 ## 🚢 Deployment
 

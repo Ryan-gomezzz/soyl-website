@@ -46,3 +46,4 @@ export default requireAdmin(async function handler(req: NextApiRequest, res: Nex
   return res.status(200).json({ signedUrl, expiresInSeconds: 60 });
 });
 
+

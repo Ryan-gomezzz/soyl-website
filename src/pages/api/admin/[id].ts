@@ -58,3 +58,4 @@ export default requireAdmin(async function handler(req: NextApiRequest, res: Nex
   return res.status(405).end('Method Not Allowed');
 });
 
+

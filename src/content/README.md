@@ -126,5 +126,5 @@ Edit:
 
 ---
 
-**Image replacement:** See `ASSET-README.md` in project root.
+**Image replacement:** See the main [README.md](../../README.md) for image guidelines.
 
