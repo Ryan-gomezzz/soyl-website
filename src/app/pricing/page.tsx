@@ -7,7 +7,7 @@ export default function PricingPage() {
   const tiers = [
     {
       name: 'Pilot',
-      price: '₹2,49,000',
+      price: '₹2,500',
       period: '/month',
       description: 'Perfect for early adopters and proof-of-concepts',
       features: [
@@ -22,7 +22,7 @@ export default function PricingPage() {
     },
     {
       name: 'Startup',
-      price: '₹8,29,000',
+      price: '₹8,200',
       period: '/month',
       description: 'For growing businesses ready to scale',
       features: [
