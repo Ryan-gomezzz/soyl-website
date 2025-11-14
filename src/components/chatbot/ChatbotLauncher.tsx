@@ -50,40 +50,42 @@ export function ChatbotLauncher({
     }
   }, [y, lastY])
 
-  // Handle minimize/restore
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    
-    // Only prevent click if we actually dragged significantly
-    if (isDragging) {
-      return
+  const wasDragging = useRef<boolean>(false)
+
+  // Handle minimize/restore - use onTap which fires after drag ends if no drag occurred
+  const handleTap = () => {
+    // Only open if we didn't drag
+    if (!wasDragging.current) {
+      if (minimized) {
+        onMinimizeChange?.(false)
+      }
+      onClick()
     }
-    
-    if (minimized) {
-      onMinimizeChange?.(false)
-    }
-    onClick()
+    wasDragging.current = false
   }
 
   const handleDragStart = () => {
     if (!isTouchDevice) {
+      wasDragging.current = false
       setIsDragging(true)
     }
   }
 
+  const handleDrag = () => {
+    // If drag actually happened, mark it
+    if (!isTouchDevice) {
+      wasDragging.current = true
+    }
+  }
+
   const handleDragEnd = () => {
-    // Reset dragging after a short delay
     setTimeout(() => {
       setIsDragging(false)
-    }, 150)
-  }
-  
-  const handlePointerDown = () => {
-    // Reset dragging state on new pointer interaction
-    if (!isTouchDevice) {
-      setIsDragging(false)
-    }
+      // Reset after a delay to allow tap to check
+      setTimeout(() => {
+        wasDragging.current = false
+      }, 50)
+    }, 50)
   }
 
   const prefersReducedMotion =
@@ -110,9 +112,10 @@ export function ChatbotLauncher({
       dragElastic={0.1}
       dragMomentum={false}
       onDragStart={handleDragStart}
+      onDrag={handleDrag}
       onDragEnd={handleDragEnd}
-      onClick={handleClick}
-      onPointerDown={handlePointerDown}
+      onTap={handleTap}
+      onClick={handleTap}
       className="chatbot-launcher w-14 h-14 md:w-16 md:h-16 rounded-full bg-accent text-bg flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent cursor-pointer select-none"
       style={{
         bottom: '32px',
