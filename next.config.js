@@ -3,6 +3,17 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     formats: ['image/avif', 'image/webp'],
+    remotePatterns: [],
+  },
+  // Ensure Prisma client is available during build
+  experimental: {
+    serverComponentsExternalPackages: ['@prisma/client'],
+  },
+  // Optimize for production
+  swcMinify: true,
+  // Handle environment variables gracefully
+  env: {
+    // Public env vars are automatically available
   },
 }
 

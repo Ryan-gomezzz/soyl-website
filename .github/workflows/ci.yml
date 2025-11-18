@@ -35,6 +35,8 @@ jobs:
       - name: Generate Prisma client
         env:
           PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING: 1
+          # DATABASE_URL not required for generation, but set a dummy to avoid warnings
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
         run: |
           echo "Generating Prisma client..."
           MAX_RETRIES=3
@@ -74,9 +76,21 @@ jobs:
         run: npm run lint
 
       - name: Run tests
+        env:
+          # Set dummy env vars for tests that don't require real values
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+          NEXT_PUBLIC_RECAPTCHA_SITE_KEY: "dummy"
+          NEXT_PUBLIC_UPLOAD_PUBLIC_HINT: "dummy"
+          NEXT_PUBLIC_ADMIN_HINT: "dummy"
         run: npm test -- --coverage --watchAll=false
 
       - name: Build project
+        env:
+          # Set dummy env vars for build (Next.js will use these during build)
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+          NEXT_PUBLIC_RECAPTCHA_SITE_KEY: "dummy"
+          NEXT_PUBLIC_UPLOAD_PUBLIC_HINT: "dummy"
+          NEXT_PUBLIC_ADMIN_HINT: "dummy"
         run: npm run build
 
       - name: Check build output
