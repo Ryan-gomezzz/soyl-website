@@ -82,35 +82,108 @@ export default function PricingPage() {
           {tiers.map((tier, index) => (
             <motion.div
               key={tier.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ 
+                duration: 0.6, 
+                delay: index * 0.15,
+                ease: [0.22, 1, 0.36, 1]
+              }}
+              whileHover={{ 
+                y: -8, 
+                scale: 1.02,
+                transition: { duration: 0.3 }
+              }}
               className={`glass rounded-xl p-8 border ${
                 tier.highlighted
-                  ? 'border-accent/50 bg-panel/50'
+                  ? 'border-accent/50 bg-panel/50 animate-border-glow'
                   : 'border-white/10'
-              } relative`}
+              } relative overflow-hidden group`}
             >
               {tier.highlighted && (
-                <div className="absolute top-4 right-4 px-3 py-1 bg-accent text-bg rounded-full text-xs font-semibold">
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 200, 
+                    damping: 15,
+                    delay: index * 0.15 + 0.3
+                  }}
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  className="absolute top-4 right-4 px-3 py-1 bg-accent text-bg rounded-full text-xs font-semibold z-10"
+                >
                   Popular
-                </div>
+                </motion.div>
               )}
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold mb-2">{tier.name}</h2>
-                <div className="flex items-baseline gap-1 mb-2">
-                  <span className="text-4xl font-bold">{tier.price}</span>
+              {/* Animated background gradient */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-accent-2/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                initial={false}
+              />
+              {/* Shimmer effect on hover */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"
+                initial={false}
+              />
+              <div className="mb-6 relative z-10">
+                <motion.h2
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.15 + 0.2 }}
+                  className="text-2xl font-bold mb-2"
+                >
+                  {tier.name}
+                </motion.h2>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.15 + 0.3 }}
+                  className="flex items-baseline gap-1 mb-2"
+                >
+                  <motion.span
+                    whileHover={{ scale: 1.1 }}
+                    className="text-4xl font-bold"
+                  >
+                    {tier.price}
+                  </motion.span>
                   <span className="text-muted">{tier.period}</span>
-                </div>
+                </motion.div>
                 <p className="text-sm text-muted">{tier.description}</p>
               </div>
-              <ul className="space-y-3 mb-8">
-                {tier.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2">
-                    <span className="text-accent mt-1">✓</span>
+              <ul className="space-y-3 mb-8 relative z-10">
+                {tier.features.map((feature, featureIndex) => (
+                  <motion.li
+                    key={feature}
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ 
+                      duration: 0.4, 
+                      delay: index * 0.15 + featureIndex * 0.05 + 0.4 
+                    }}
+                    whileHover={{ x: 5 }}
+                    className="flex items-start gap-2"
+                  >
+                    <motion.span
+                      animate={{ 
+                        scale: [1, 1.2, 1],
+                        rotate: [0, 10, 0]
+                      }}
+                      transition={{
+                        duration: 0.5,
+                        delay: index * 0.15 + featureIndex * 0.05 + 0.6,
+                        ease: "easeOut"
+                      }}
+                      className="text-accent mt-1"
+                    >
+                      ✓
+                    </motion.span>
                     <span className="text-muted text-sm">{feature}</span>
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
               <CTA
@@ -127,50 +200,68 @@ export default function PricingPage() {
 
         {/* Comparison Table */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 20, scale: 0.98 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="glass rounded-xl p-8 border border-white/10"
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          whileHover={{ y: -5 }}
+          className="glass rounded-xl p-8 border border-white/10 overflow-hidden group"
         >
-          <h2 className="text-2xl font-bold mb-6">Feature Comparison</h2>
-          <div className="overflow-x-auto">
+          {/* Animated background */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-accent-2/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            initial={false}
+          />
+          <h2 className="text-2xl font-bold mb-6 relative z-10">Feature Comparison</h2>
+          <div className="overflow-x-auto relative z-10">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/10">
+                <motion.tr
+                  initial={{ opacity: 0, y: -10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                  className="border-b border-white/10"
+                >
                   <th className="text-left py-4 px-4 font-semibold">Feature</th>
                   <th className="text-center py-4 px-4 font-semibold">Pilot</th>
                   <th className="text-center py-4 px-4 font-semibold">Startup</th>
                   <th className="text-center py-4 px-4 font-semibold">
                     Enterprise
                   </th>
-                </tr>
+                </motion.tr>
               </thead>
               <tbody>
-                <tr className="border-b border-white/5">
-                  <td className="py-4 px-4 text-muted">API Calls/month</td>
-                  <td className="py-4 px-4 text-center">10K</td>
-                  <td className="py-4 px-4 text-center">100K</td>
-                  <td className="py-4 px-4 text-center">Unlimited</td>
-                </tr>
-                <tr className="border-b border-white/5">
-                  <td className="py-4 px-4 text-muted">Support Level</td>
-                  <td className="py-4 px-4 text-center">Email</td>
-                  <td className="py-4 px-4 text-center">Priority</td>
-                  <td className="py-4 px-4 text-center">24/7</td>
-                </tr>
-                <tr className="border-b border-white/5">
-                  <td className="py-4 px-4 text-muted">SDK Access</td>
-                  <td className="py-4 px-4 text-center">Limited</td>
-                  <td className="py-4 px-4 text-center">Full</td>
-                  <td className="py-4 px-4 text-center">Full + Custom</td>
-                </tr>
-                <tr className="border-b border-white/5">
-                  <td className="py-4 px-4 text-muted">SLA</td>
-                  <td className="py-4 px-4 text-center">—</td>
-                  <td className="py-4 px-4 text-center">—</td>
-                  <td className="py-4 px-4 text-center">✓</td>
-                </tr>
+                {[
+                  { feature: 'API Calls/month', values: ['10K', '100K', 'Unlimited'] },
+                  { feature: 'Support Level', values: ['Email', 'Priority', '24/7'] },
+                  { feature: 'SDK Access', values: ['Limited', 'Full', 'Full + Custom'] },
+                  { feature: 'SLA', values: ['—', '—', '✓'] },
+                ].map((row, rowIndex) => (
+                  <motion.tr
+                    key={row.feature}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: rowIndex * 0.1 }}
+                    whileHover={{ backgroundColor: 'rgba(31, 182, 255, 0.05)' }}
+                    className="border-b border-white/5"
+                  >
+                    <td className="py-4 px-4 text-muted">{row.feature}</td>
+                    {row.values.map((value, colIndex) => (
+                      <motion.td
+                        key={colIndex}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.3, delay: rowIndex * 0.1 + colIndex * 0.05 }}
+                        className="py-4 px-4 text-center"
+                      >
+                        {value}
+                      </motion.td>
+                    ))}
+                  </motion.tr>
+                ))}
               </tbody>
             </table>
           </div>

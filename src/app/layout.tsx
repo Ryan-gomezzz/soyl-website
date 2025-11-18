@@ -9,6 +9,7 @@ import { SEO } from './_components/SEO'
 import { Analytics } from './_components/Analytics'
 import { Chatbot } from '@/components/chatbot'
 import { AnimatedGrid } from '@/components/AnimatedGrid'
+import { FloatingParticles, FloatingOrbs } from '@/components/FloatingParticles'
 import { siteConfig } from '@/lib/siteConfig'
 
 const inter = Inter({
@@ -88,6 +89,8 @@ export default function RootLayout({
       </head>
       <body className="antialiased bg-bg text-text relative">
         <AnimatedGrid />
+        <FloatingParticles count={60} />
+        <FloatingOrbs />
         <SEO />
         <Analytics />
         <CustomCursor />

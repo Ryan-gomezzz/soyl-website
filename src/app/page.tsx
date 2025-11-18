@@ -205,17 +205,30 @@ export default function Home() {
                 }}
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                 whileHover={{ y: -5, scale: 1.01 }}
-                className="glass rounded-xl p-8 border border-white/10 hover:border-accent/30 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center transition-all"
+                className="glass rounded-xl p-8 border border-white/10 hover:border-accent/30 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center transition-all relative overflow-hidden group"
               >
-                <div>
-                  <h3 className="text-2xl font-semibold mb-3">{feature.title}</h3>
+                {/* Animated background gradient */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-accent-2/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  initial={false}
+                />
+                <div className="relative z-10">
+                  <motion.h3
+                    whileHover={{ x: 5 }}
+                    className="text-2xl font-semibold mb-3"
+                  >
+                    {feature.title}
+                  </motion.h3>
                   <p className="text-muted mb-4">{feature.description}</p>
                 </div>
-                <div className="bg-bg rounded-lg p-4 overflow-x-auto">
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  className="bg-bg rounded-lg p-4 overflow-x-auto relative z-10"
+                >
                   <pre className="text-sm text-text/80">
                     <code>{feature.code}</code>
                   </pre>
-                </div>
+                </motion.div>
               </motion.div>
             ))}
           </motion.div>
@@ -300,11 +313,29 @@ export default function Home() {
                 }}
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                 whileHover={{ y: -8, scale: 1.03 }}
-                className="glass rounded-xl p-6 border border-white/10 hover:border-accent/30 transition-all text-center"
+                className="glass rounded-xl p-6 border border-white/10 hover:border-accent/30 transition-all text-center relative overflow-hidden group"
               >
-                <div className="text-4xl mb-4">{usecase.icon}</div>
-                <h3 className="text-xl font-semibold mb-2">{usecase.title}</h3>
-                <p className="text-sm text-muted">{usecase.description}</p>
+                {/* Animated background */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-accent-2/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  initial={false}
+                />
+                <motion.div
+                  animate={{
+                    scale: [1, 1.1, 1],
+                    rotate: [0, 5, -5, 0],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="text-4xl mb-4 relative z-10"
+                >
+                  {usecase.icon}
+                </motion.div>
+                <h3 className="text-xl font-semibold mb-2 relative z-10">{usecase.title}</h3>
+                <p className="text-sm text-muted relative z-10">{usecase.description}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -314,44 +345,79 @@ export default function Home() {
       {/* SOYL R&D Snapshot */}
       <section className="py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="glass rounded-2xl p-12 border border-white/10"
-          >
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.98 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -5 }}
+              className="glass rounded-2xl p-12 border border-white/10 relative overflow-hidden group"
+            >
+              {/* Animated background gradient */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-accent-2/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                initial={false}
+              />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
+              <div className="relative z-10">
+                <motion.h2
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6 }}
+                  className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6"
+                >
                   SOYL R&D Roadmap
-                </h2>
-                <p className="text-lg text-muted mb-6">
+                </motion.h2>
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.1 }}
+                  className="text-lg text-muted mb-6"
+                >
                   Our staged R&D roadmap moves from a feasibility MVP (real-time
                   emotion sensing + AR demo) to a unified affect foundation model
                   and commercial SDK for B2B licensing. Key milestone: functional
                   adaptive AI salesperson within 12 months; foundation model in
                   18–24 months.
-                </p>
+                </motion.p>
                 <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="text-accent font-bold">Phase 1</div>
-                    <p className="text-muted">Foundation MVP: Real-time emotion sensing + AR demo</p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="text-accent font-bold">Phase 2</div>
-                    <p className="text-muted">Cognitive Signal Layer: Unified Emotion State Vector</p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="text-accent font-bold">Phase 3</div>
-                    <p className="text-muted">Agentic Layer: Adaptive AI salesperson</p>
-                  </div>
+                  {[
+                    { phase: 'Phase 1', desc: 'Foundation MVP: Real-time emotion sensing + AR demo' },
+                    { phase: 'Phase 2', desc: 'Cognitive Signal Layer: Unified Emotion State Vector' },
+                    { phase: 'Phase 3', desc: 'Agentic Layer: Adaptive AI salesperson' },
+                  ].map((item, index) => (
+                    <motion.div
+                      key={item.phase}
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
+                      whileHover={{ x: 5 }}
+                      className="flex items-start gap-3"
+                    >
+                      <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        className="text-accent font-bold"
+                      >
+                        {item.phase}
+                      </motion.div>
+                      <p className="text-muted">{item.desc}</p>
+                    </motion.div>
+                  ))}
                 </div>
-                <div className="mt-8">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.5 }}
+                  className="mt-8"
+                >
                   <CTA href="/soyl-rd" variant="primary" size="md">
                     Explore R&D Details
                   </CTA>
-                </div>
+                </motion.div>
               </div>
               <div className="relative aspect-square rounded-xl overflow-hidden bg-panel">
                 <div className="absolute inset-0 flex items-center justify-center">

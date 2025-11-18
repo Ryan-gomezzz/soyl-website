@@ -62,6 +62,14 @@ export function CustomCursor() {
           translateY: cursorYSpring,
           scale: isPointer ? 1.5 : 1,
         }}
+        animate={{
+          scale: isPointer ? [1.5, 2, 1.5] : [1, 1.2, 1],
+        }}
+        transition={{
+          duration: 0.5,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
       />
       <motion.div
         className="fixed top-0 left-0 w-8 h-8 border border-accent/30 rounded-full pointer-events-none z-[9998]"
@@ -70,7 +78,29 @@ export function CustomCursor() {
           translateY: cursorYSpring,
           scale: isPointer ? 1.8 : 1,
         }}
+        animate={{
+          scale: isPointer ? [1.8, 2.2, 1.8] : [1, 1.1, 1],
+          opacity: [0.5, 0.8, 0.5],
+        }}
+        transition={{
+          duration: 1,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
       />
+      {isPointer && (
+        <motion.div
+          className="fixed top-0 left-0 w-16 h-16 border border-accent/20 rounded-full pointer-events-none z-[9997]"
+          style={{
+            translateX: cursorXSpring,
+            translateY: cursorYSpring,
+          }}
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0, opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        />
+      )}
     </>
   )
 }
