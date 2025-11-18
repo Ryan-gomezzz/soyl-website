@@ -24,10 +24,18 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install dependencies (without Prisma postinstall)
+        env:
+          PRISMA_SKIP_POSTINSTALL_GENERATE: 1
+        run: npm ci --ignore-scripts
+
+      - name: Clear Prisma cache
+        run: npx prisma generate --clear-cache || true
+
+      - name: Generate Prisma client
         env:
           PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING: 1
-        run: npm ci
+        run: npx prisma generate
 
       - name: Run linter
         run: npm run lint
