@@ -49,7 +49,7 @@ export function CTA({
       )}
     >
       <motion.span
-        whileHover={{ scale: 1.05 }}
+        whileHover={{ scale: 1.05, x: 2 }}
         whileTap={{ scale: 0.95 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
         className="relative z-10 inline-block"
@@ -57,12 +57,35 @@ export function CTA({
         {children}
       </motion.span>
       {variant === 'primary' && (
+        <>
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-accent/20 via-accent/10 to-accent/20"
+            initial={{ x: '-100%' }}
+            whileHover={{ x: '100%' }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+            style={{ opacity: 0.5 }}
+          />
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-accent-2/10 rounded-lg"
+            animate={{
+              opacity: [0.3, 0.6, 0.3],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        </>
+      )}
+      {variant === 'secondary' && (
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-accent/20 via-accent/10 to-accent/20"
-          initial={{ x: '-100%' }}
-          whileHover={{ x: '100%' }}
-          transition={{ duration: 0.6, ease: "easeInOut" }}
-          style={{ opacity: 0.5 }}
+          className="absolute inset-0 border-2 border-accent/0 rounded-lg"
+          whileHover={{
+            borderColor: 'rgba(31, 182, 255, 0.5)',
+            boxShadow: '0 0 20px rgba(31, 182, 255, 0.3)',
+          }}
+          transition={{ duration: 0.3 }}
         />
       )}
     </Link>
