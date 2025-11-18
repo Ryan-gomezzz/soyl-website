@@ -35,12 +35,40 @@ jobs:
       - name: Generate Prisma client
         env:
           PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING: 1
-          PRISMA_SKIP_POSTINSTALL_GENERATE: 1
         run: |
-          npx prisma generate || {
-            echo "Prisma generate failed, trying with skip download..."
-            PRISMA_SKIP_POSTINSTALL_GENERATE=1 npx prisma generate --skip-download || true
-          }
+          echo "Generating Prisma client..."
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            if npx prisma generate; then
+              echo "Prisma client generated successfully"
+              break
+            else
+              RETRY_COUNT=$((RETRY_COUNT + 1))
+              if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                echo "Prisma generate failed, retrying in $((RETRY_COUNT * 5)) seconds... (attempt $RETRY_COUNT/$MAX_RETRIES)"
+                sleep $((RETRY_COUNT * 5))
+              else
+                echo "Prisma generate failed after $MAX_RETRIES attempts"
+                echo "Checking if Prisma client exists..."
+                if [ -f "node_modules/.prisma/client/index.d.ts" ]; then
+                  echo "Prisma client exists, continuing..."
+                  exit 0
+                else
+                  echo "Error: Prisma client was not generated successfully"
+                  npx prisma --version
+                  exit 1
+                fi
+              fi
+            fi
+          done
+          
+          # Verify Prisma client was generated
+          if [ ! -f "node_modules/.prisma/client/index.d.ts" ]; then
+            echo "Error: Prisma client file not found after generation"
+            exit 1
+          fi
+          echo "Prisma client verified successfully"
 
       - name: Run linter
         run: npm run lint
