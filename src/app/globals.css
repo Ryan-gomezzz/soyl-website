@@ -92,21 +92,21 @@
   }
 
   .glass {
-    background: var(--glass);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--glass-border);
+    background: rgba(10, 10, 10, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     transition: all 0.3s ease;
   }
 
   .glass:hover {
-    background: var(--glass-hover);
-    border-color: rgba(31, 182, 255, 0.2);
-    box-shadow: 0 4px 20px rgba(31, 182, 255, 0.1);
+    background: rgba(10, 10, 10, 0.8);
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   }
 
   .glass-hover {
-    background: var(--glass-hover);
+    background: rgba(10, 10, 10, 0.8);
   }
   
   /* Enhanced glass effect with gradient */
@@ -114,29 +114,31 @@
     background: linear-gradient(
       135deg,
       rgba(255, 255, 255, 0.03) 0%,
-      rgba(31, 182, 255, 0.05) 50%,
+      rgba(59, 130, 246, 0.05) 50%,
       rgba(255, 255, 255, 0.03) 100%
     );
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
   
   /* Improved button styles */
   .btn-primary {
     background: var(--accent);
-    color: var(--bg);
+    color: #ffffff;
     padding: 0.75rem 1.5rem;
     border-radius: var(--radius-md);
     font-weight: 500;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(31, 182, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
   
   .btn-primary:hover {
-    background: var(--accent-hover);
-    box-shadow: 0 6px 20px rgba(31, 182, 255, 0.3);
+    background: #2563EB; /* Darker blue on hover */
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
     transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.2);
   }
   
   .btn-primary:active {

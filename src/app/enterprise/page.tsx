@@ -3,40 +3,43 @@
 import { CTA } from '../_components/CTA'
 import { motion } from 'framer-motion'
 
+import { Rocket, BarChart, Wrench, Lock, Users, TrendingUp } from 'lucide-react'
+import { Icon } from '@/components/Icon'
+
 export default function EnterprisePage() {
   const benefits = [
     {
-      icon: '🚀',
+      icon: Rocket,
       title: 'Pilot Programs',
       description:
         'Start with a pilot program tailored to your use case. Our team works closely with you to ensure success.',
     },
     {
-      icon: '📊',
+      icon: BarChart,
       title: 'SLA Guarantees',
       description:
         'Enterprise-grade SLAs with 99.9% uptime guarantees and dedicated support channels.',
     },
     {
-      icon: '🔧',
+      icon: Wrench,
       title: 'Integration Support',
       description:
         'Dedicated integration support to help you seamlessly integrate SOYL into your existing infrastructure.',
     },
     {
-      icon: '🔒',
+      icon: Lock,
       title: 'On-Premise Options',
       description:
         'On-premise deployment options available for maximum data security and compliance.',
     },
     {
-      icon: '👥',
+      icon: Users,
       title: 'Dedicated Support',
       description:
         '24/7 priority support with dedicated account managers and technical specialists.',
     },
     {
-      icon: '📈',
+      icon: TrendingUp,
       title: 'Custom Training',
       description:
         'Custom model training and fine-tuning for your specific industry and use case.',
@@ -73,7 +76,9 @@ export default function EnterprisePage() {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="glass rounded-xl p-6 border border-white/10"
             >
-              <div className="text-4xl mb-4">{benefit.icon}</div>
+              <div className="mb-4 text-accent">
+                <Icon icon={benefit.icon} className="w-10 h-10" />
+              </div>
               <h3 className="text-xl font-semibold mb-2">{benefit.title}</h3>
               <p className="text-muted text-sm">{benefit.description}</p>
             </motion.div>
@@ -228,4 +233,3 @@ export default function EnterprisePage() {
     </div>
   )
 }
-

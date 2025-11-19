@@ -9,6 +9,8 @@ import { CTA } from './_components/CTA'
 import { AssistantPromo } from '@/components/AssistantPromo'
 import { features, productFeatures } from '@/lib/data/features'
 import { motion } from 'framer-motion'
+import { Camera, Brain, Bot, ShoppingBag, Monitor, Briefcase, Headphones, Microscope, Lock, CheckCircle, Shield } from 'lucide-react'
+import { Icon } from '@/components/Icon'
 
 export default function Home() {
   return (
@@ -72,6 +74,7 @@ export default function Home() {
             }}
             className="grid grid-cols-1 md:grid-cols-3 gap-8"
           >
+
             <motion.div
               variants={{
                 hidden: { opacity: 0, y: 30, scale: 0.9 },
@@ -83,19 +86,19 @@ export default function Home() {
             >
               <div className="glass rounded-xl p-8 border border-white/10 mb-6 hover:border-accent/30 transition-all">
                 <motion.div
-                  animate={{ 
+                  animate={{
                     scale: [1, 1.2, 1],
                     rotate: [0, 10, -10, 0]
                   }}
-                  transition={{ 
+                  transition={{
                     duration: 3,
                     repeat: Infinity,
                     repeatDelay: 2,
                     ease: "easeInOut"
                   }}
-                  className="text-5xl mb-4 inline-block"
+                  className="mb-4 inline-block text-accent"
                 >
-                  📷
+                  <Icon icon={Camera} className="w-12 h-12" />
                 </motion.div>
                 <h3 className="text-2xl font-semibold mb-2">Detect</h3>
                 <p className="text-muted">
@@ -114,19 +117,19 @@ export default function Home() {
             >
               <div className="glass rounded-xl p-8 border border-white/10 mb-6 hover:border-accent/30 transition-all">
                 <motion.div
-                  animate={{ 
+                  animate={{
                     scale: [1, 1.2, 1],
                     rotate: [0, -10, 10, 0]
                   }}
-                  transition={{ 
+                  transition={{
                     duration: 3,
                     repeat: Infinity,
                     repeatDelay: 2,
                     ease: "easeInOut"
                   }}
-                  className="text-5xl mb-4 inline-block"
+                  className="mb-4 inline-block text-accent"
                 >
-                  🧠
+                  <Icon icon={Brain} className="w-12 h-12" />
                 </motion.div>
                 <h3 className="text-2xl font-semibold mb-2">Understand</h3>
                 <p className="text-muted">
@@ -145,19 +148,19 @@ export default function Home() {
             >
               <div className="glass rounded-xl p-8 border border-white/10 mb-6 hover:border-accent/30 transition-all">
                 <motion.div
-                  animate={{ 
+                  animate={{
                     scale: [1, 1.2, 1],
                     rotate: [0, 5, -5, 0]
                   }}
-                  transition={{ 
+                  transition={{
                     duration: 3,
                     repeat: Infinity,
                     repeatDelay: 2,
                     ease: "easeInOut"
                   }}
-                  className="text-5xl mb-4 inline-block"
+                  className="mb-4 inline-block text-accent"
                 >
-                  🤖
+                  <Icon icon={Bot} className="w-12 h-12" />
                 </motion.div>
                 <h3 className="text-2xl font-semibold mb-2">Act</h3>
                 <p className="text-muted">
@@ -287,22 +290,22 @@ export default function Home() {
               {
                 title: 'Retail AR Commerce',
                 description: 'In-store AR assistants that adapt recommendations based on customer emotion',
-                icon: '🛍️',
+                icon: ShoppingBag,
               },
               {
                 title: 'Kiosk Systems',
                 description: 'Interactive kiosks with emotion-aware product suggestions and support',
-                icon: '🖥️',
+                icon: Monitor,
               },
               {
                 title: 'Remote Sales',
                 description: 'Virtual sales assistants that read cues and personalize the conversation',
-                icon: '💼',
+                icon: Briefcase,
               },
               {
                 title: 'Support Triage',
                 description: 'Customer support that prioritizes and routes based on emotional state',
-                icon: '🎧',
+                icon: Headphones,
               },
             ].map((usecase) => (
               <motion.div
@@ -330,9 +333,9 @@ export default function Home() {
                     repeat: Infinity,
                     ease: "easeInOut",
                   }}
-                  className="text-4xl mb-4 relative z-10"
+                  className="mb-4 relative z-10 text-accent"
                 >
-                  {usecase.icon}
+                  <Icon icon={usecase.icon} className="w-10 h-10" />
                 </motion.div>
                 <h3 className="text-xl font-semibold mb-2 relative z-10">{usecase.title}</h3>
                 <p className="text-sm text-muted relative z-10">{usecase.description}</p>
@@ -345,19 +348,19 @@ export default function Home() {
       {/* SOYL R&D Snapshot */}
       <section className="py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.98 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ y: -5 }}
+            className="glass rounded-2xl p-12 border border-white/10 relative overflow-hidden group"
+          >
+            {/* Animated background gradient */}
             <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.98 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -5 }}
-              className="glass rounded-2xl p-12 border border-white/10 relative overflow-hidden group"
-            >
-              {/* Animated background gradient */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-accent-2/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                initial={false}
-              />
+              className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-accent-2/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              initial={false}
+            />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="relative z-10">
                 <motion.h2
@@ -420,8 +423,8 @@ export default function Home() {
                 </motion.div>
               </div>
               <div className="relative aspect-square rounded-xl overflow-hidden bg-panel">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-6xl">🔬</div>
+                <div className="absolute inset-0 flex items-center justify-center text-accent/20">
+                  <Icon icon={Microscope} className="w-32 h-32" />
                 </div>
               </div>
             </div>
@@ -444,21 +447,27 @@ export default function Home() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
               <div className="glass rounded-lg p-6 border border-white/10">
-                <div className="text-3xl mb-3">🔒</div>
+                <div className="mb-3 text-accent">
+                  <Icon icon={Lock} className="w-8 h-8" />
+                </div>
                 <h3 className="font-semibold mb-2">GDPR-Ready Pipeline</h3>
                 <p className="text-sm text-muted">
                   Compliant data processing and storage
                 </p>
               </div>
               <div className="glass rounded-lg p-6 border border-white/10">
-                <div className="text-3xl mb-3">✅</div>
+                <div className="mb-3 text-accent-2">
+                  <Icon icon={CheckCircle} className="w-8 h-8" />
+                </div>
                 <h3 className="font-semibold mb-2">Opt-in Consent</h3>
                 <p className="text-sm text-muted">
                   Clear consent flows before data capture
                 </p>
               </div>
               <div className="glass rounded-lg p-6 border border-white/10">
-                <div className="text-3xl mb-3">🛡️</div>
+                <div className="mb-3 text-accent">
+                  <Icon icon={Shield} className="w-8 h-8" />
+                </div>
                 <h3 className="font-semibold mb-2">Privacy-First</h3>
                 <p className="text-sm text-muted">
                   On-device inference options available

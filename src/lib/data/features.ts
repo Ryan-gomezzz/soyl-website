@@ -1,24 +1,26 @@
+import { Target, Brain, Bot, LucideIcon } from 'lucide-react'
+
 export interface Feature {
   title: string
   description: string
-  icon: string
+  icon: LucideIcon
 }
 
 export const features: Feature[] = [
   {
     title: 'Emotion Sensing',
     description: 'Real-time face, voice and text emotion detection for richer context.',
-    icon: '🎯',
+    icon: Target,
   },
   {
     title: 'Cognitive Signal Layer',
     description: 'Fuse multimodal signals into a unified Emotion State Vector.',
-    icon: '🧠',
+    icon: Brain,
   },
   {
     title: 'Adaptive Sales Agent',
     description: 'LLM-driven agents that adapt tone & suggestions based on affect.',
-    icon: '🤖',
+    icon: Bot,
   },
 ]
 

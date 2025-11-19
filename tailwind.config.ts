@@ -9,12 +9,13 @@ const config: Config = {
   theme: {
     extend: {
           colors: {
-            bg: '#08090b',
-            panel: '#0f1113',
-            muted: '#94a3b8',
-            accent: '#1fb6ff',
-            'accent-2': '#7ce7c5',
-            text: '#ffffff',
+            bg: '#050505', // Deep black
+            panel: '#0A0A0A', // Slightly lighter black for panels
+            muted: '#9CA3AF', // Neutral gray
+            accent: '#3B82F6', // Professional Blue
+            'accent-2': '#10B981', // Emerald Green for success/growth
+            text: '#F9FAFB', // Off-white for better readability
+            border: '#1F2937', // Dark gray border
           },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

@@ -3,11 +3,13 @@
 import { useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { DotCluster } from './DotCluster'
+import { Icon } from '@/components/Icon'
+import { LucideIcon } from 'lucide-react'
 
 interface FeatureCardProps {
   title: string
   description: string
-  icon: string
+  icon: LucideIcon
   slug?: string
   delay?: number
 }
@@ -94,22 +96,21 @@ export function FeatureCard({
           reduced
             ? {}
             : {
-                scale: [1, 1.1, 1],
-                rotate: [0, 5, -5, 0],
-              }
+              scale: [1, 1.1, 1],
+              rotate: [0, 5, -5, 0],
+            }
         }
         transition={{
           duration: 0.6,
           delay: delay + 0.2,
           ease: 'easeInOut',
         }}
-        className="text-4xl mb-4 inline-block relative z-10"
+        className="mb-4 inline-block relative z-10 text-accent"
       >
-        {icon}
+        <Icon icon={icon} className="w-10 h-10" />
       </motion.div>
       <h3 className="text-xl font-semibold mb-2 relative z-10">{title}</h3>
       <p className="text-muted relative z-10">{description}</p>
     </motion.div>
   )
 }
-
