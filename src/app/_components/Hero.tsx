@@ -1,11 +1,16 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { DotPattern } from './DotPattern'
 import { CTA } from './CTA'
+import { Bot } from 'lucide-react'
+import { Icon } from '@/components/Icon'
 
 export function Hero() {
+  const [imageError, setImageError] = useState(false)
+
   return (
     <section className="relative min-h-[72vh] lg:min-h-[72vh] md:min-h-[56vh] flex items-center overflow-hidden">
       <DotPattern className="absolute inset-0 opacity-30 animate-parallax-slow" />
@@ -59,35 +64,31 @@ export function Hero() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
             animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ 
-              duration: 1, 
+            transition={{
+              duration: 1,
               delay: 0.3,
               ease: [0.22, 1, 0.36, 1],
               scale: { type: "spring", stiffness: 100, damping: 15 }
             }}
             className="relative"
           >
-            <div className="relative aspect-square rounded-2xl overflow-hidden glass border border-white/10">
-              <Image
-                src="/images/placeholders/product.png"
-                alt="SOYL product visualization"
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 768px) 100vw, 50vw"
-                onError={(e) => {
-                  // Fallback to emoji if image fails to load
-                  const target = e.target as HTMLImageElement
-                  target.style.display = 'none'
-                  if (target.parentElement) {
-                    const fallback = document.createElement('div')
-                    fallback.className = 'flex items-center justify-center text-6xl h-full'
-                    fallback.textContent = '🤖'
-                    target.parentElement.appendChild(fallback)
-                  }
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-bg/80 via-transparent to-transparent" />
+            <div className="relative aspect-square rounded-2xl overflow-hidden glass border border-white/10 flex items-center justify-center bg-panel">
+              {!imageError ? (
+                <Image
+                  src="/images/placeholders/product.png"
+                  alt="SOYL product visualization"
+                  fill
+                  className="object-cover"
+                  priority
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                <div className="text-accent">
+                  <Icon icon={Bot} className="w-24 h-24" />
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-bg/80 via-transparent to-transparent pointer-events-none" />
             </div>
             {/* Multiple floating orbs for depth */}
             <motion.div
@@ -137,4 +138,3 @@ export function Hero() {
     </section>
   )
 }
-

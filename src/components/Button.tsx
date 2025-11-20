@@ -14,10 +14,12 @@ export interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonE
   onClick?: () => void
 }
 
+import { cn } from '@/utils/cn'
+
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: 'bg-accent text-bg font-semibold shadow-lg hover:shadow-xl focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg',
-  secondary: 'border-2 border-text/20 text-text font-semibold hover:border-accent hover:text-accent focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg',
-  ghost: 'text-text/80 hover:text-text hover:bg-white/5 focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg',
+  primary: 'bg-accent text-white font-semibold shadow-lg hover:shadow-accent/40 hover:bg-accent/90 border border-white/10',
+  secondary: 'border border-white/20 bg-white/5 text-white font-semibold hover:bg-white/10 hover:border-white/30 backdrop-blur-sm',
+  ghost: 'text-muted hover:text-white hover:bg-white/5',
 }
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -37,8 +39,8 @@ export function Button({
 }: ButtonProps) {
   const reduced = useReducedMotion()
 
-  const baseStyles = 'transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
-  const combinedClassName = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`
+  const baseStyles = 'inline-flex items-center justify-center transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent/50 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95'
+  const combinedClassName = cn(baseStyles, variantStyles[variant], sizeStyles[size], className)
 
   // Filter out conflicting drag props and pass only safe props to motion.button
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

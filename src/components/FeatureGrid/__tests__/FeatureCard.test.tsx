@@ -46,11 +46,15 @@ jest.mock('framer-motion', () => {
   }
 })
 
+import { Target } from 'lucide-react'
+
+// ... existing mocks ...
+
 describe('FeatureCard', () => {
   const mockFeature = {
     title: 'Test Feature',
     description: 'Test description',
-    icon: '🎯',
+    icon: Target,
     delay: 0,
   }
 
@@ -65,12 +69,12 @@ describe('FeatureCard', () => {
   it('shows dot cluster on hover', async () => {
     render(<FeatureCard {...mockFeature} />)
     const card = screen.getByText('Test Feature').closest('div')
-    
+
     expect(screen.queryByTestId('dot-cluster')).not.toBeInTheDocument()
-    
+
     if (card) {
       fireEvent.mouseEnter(card)
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('dot-cluster')).toBeInTheDocument()
       })
@@ -80,7 +84,13 @@ describe('FeatureCard', () => {
   it('renders icon', async () => {
     render(<FeatureCard {...mockFeature} />)
     await waitFor(() => {
-      expect(screen.getByText('🎯')).toBeInTheDocument()
+      // Lucide icons are rendered as SVGs. We can check for the SVG element or a class.
+      // The Icon component wrapper adds the class passed to it.
+      // In FeatureCard, it's <Icon icon={icon} className="w-10 h-10" />
+      // So we can check for an element with class "w-10 h-10" that is an SVG or contains one.
+      // A simpler way is to check if the container renders.
+      const icon = document.querySelector('.lucide-target')
+      expect(icon).toBeInTheDocument()
     })
   })
 })

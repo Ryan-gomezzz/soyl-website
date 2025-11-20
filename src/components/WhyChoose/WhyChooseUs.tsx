@@ -3,30 +3,33 @@
 import { motion } from 'framer-motion'
 import { DotPattern } from '@/app/_components/DotPattern'
 
+import { Lock, Zap, Brain, Target } from 'lucide-react'
+import { Icon } from '@/components/Icon'
+
 const reasons = [
   {
     title: 'Privacy-first emotion pipeline',
     description:
       'On-device inference options ensure sensitive emotion data never leaves user devices.',
-    icon: '🔒',
+    icon: Lock,
   },
   {
     title: 'SDK & API for integration',
     description:
       'Easy-to-integrate RESTful API and SDK for seamless emotion detection across platforms.',
-    icon: '⚡',
+    icon: Zap,
   },
   {
     title: 'Multimodal emotion fusion',
     description:
       'Combines face, voice, and text signals into a unified Emotion State Vector for richer context.',
-    icon: '🧠',
+    icon: Brain,
   },
   {
     title: 'Real-time adaptive responses',
     description:
       'AI agents that dynamically adjust tone and recommendations based on detected emotion states.',
-    icon: '🎯',
+    icon: Target,
   },
 ]
 
@@ -103,7 +106,9 @@ export function WhyChooseUs() {
               />
 
               <div className="ml-8 glass rounded-xl p-6 border border-white/10 hover:border-accent/30 transition-all">
-                <div className="text-4xl mb-4">{reason.icon}</div>
+                <div className="mb-4 text-accent">
+                  <Icon icon={reason.icon} className="w-10 h-10" />
+                </div>
                 <h3 className="text-xl font-semibold mb-2">{reason.title}</h3>
                 <p className="text-muted text-sm leading-relaxed">{reason.description}</p>
               </div>

@@ -3,6 +3,9 @@
 import { CTA } from '../_components/CTA'
 import { motion } from 'framer-motion'
 
+import { Palette, Settings, Rocket, ShoppingBag, Stethoscope, GraduationCap, Check } from 'lucide-react'
+import { Icon } from '@/components/Icon'
+
 export default function CustomAgentsPage() {
   const verticals = [
     {
@@ -15,6 +18,7 @@ export default function CustomAgentsPage() {
         'Shopping cart optimization',
         'Customer sentiment tracking',
       ],
+      icon: ShoppingBag,
     },
     {
       name: 'Healthcare',
@@ -26,6 +30,7 @@ export default function CustomAgentsPage() {
         'Appointment scheduling',
         'HIPAA-compliant interactions',
       ],
+      icon: Stethoscope,
     },
     {
       name: 'EdTech',
@@ -37,6 +42,7 @@ export default function CustomAgentsPage() {
         'Student engagement tracking',
         'Parent-teacher communication',
       ],
+      icon: GraduationCap,
     },
   ]
 
@@ -70,7 +76,9 @@ export default function CustomAgentsPage() {
           <h2 className="text-3xl font-bold mb-6">How Custom Agents Work</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
-              <div className="text-5xl mb-4">🎨</div>
+              <div className="mb-4 text-accent inline-block">
+                <Icon icon={Palette} className="w-12 h-12" />
+              </div>
               <h3 className="text-xl font-semibold mb-2">Choose Template</h3>
               <p className="text-muted text-sm">
                 Select from pre-built agent templates designed for your
@@ -78,7 +86,9 @@ export default function CustomAgentsPage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="text-5xl mb-4">⚙️</div>
+              <div className="mb-4 text-accent inline-block">
+                <Icon icon={Settings} className="w-12 h-12" />
+              </div>
               <h3 className="text-xl font-semibold mb-2">Customize</h3>
               <p className="text-muted text-sm">
                 Tailor the agent&apos;s personality, knowledge base, and response
@@ -86,7 +96,9 @@ export default function CustomAgentsPage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="text-5xl mb-4">🚀</div>
+              <div className="mb-4 text-accent inline-block">
+                <Icon icon={Rocket} className="w-12 h-12" />
+              </div>
               <h3 className="text-xl font-semibold mb-2">Deploy</h3>
               <p className="text-muted text-sm">
                 Deploy to your platform with a few clicks and start engaging
@@ -115,14 +127,18 @@ export default function CustomAgentsPage() {
                   <ul className="space-y-2">
                     {vertical.features.map((feature) => (
                       <li key={feature} className="flex items-start gap-2">
-                        <span className="text-accent mt-1">✓</span>
+                        <span className="text-accent mt-1">
+                          <Icon icon={Check} className="w-4 h-4" />
+                        </span>
                         <span className="text-muted text-sm">{feature}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
                 <div className="relative aspect-square rounded-xl overflow-hidden bg-panel flex items-center justify-center">
-                  <div className="text-6xl">{vertical.name === 'Retail' ? '🛍️' : vertical.name === 'Healthcare' ? '🏥' : '📚'}</div>
+                  <div className="text-accent/20">
+                    <Icon icon={vertical.icon} className="w-32 h-32" />
+                  </div>
                 </div>
               </div>
             </motion.div>
