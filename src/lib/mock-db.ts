@@ -42,24 +42,45 @@ const initialData: DBData = {
     inquiries: [],
 }
 
+// In-memory fallback for serverless environments where FS is read-only
+let memoryDb: DBData = { ...initialData }
+
 function ensureDbExists() {
-    if (!fs.existsSync(path.dirname(DB_PATH))) {
-        fs.mkdirSync(path.dirname(DB_PATH), { recursive: true })
-    }
-    if (!fs.existsSync(DB_PATH)) {
-        fs.writeFileSync(DB_PATH, JSON.stringify(initialData, null, 2))
+    try {
+        if (!fs.existsSync(path.dirname(DB_PATH))) {
+            fs.mkdirSync(path.dirname(DB_PATH), { recursive: true })
+        }
+        if (!fs.existsSync(DB_PATH)) {
+            fs.writeFileSync(DB_PATH, JSON.stringify(initialData, null, 2))
+        }
+    } catch (error) {
+        console.warn('Failed to initialize file-based DB, using in-memory fallback:', error)
     }
 }
 
 export function getDb(): DBData {
-    ensureDbExists()
-    const data = fs.readFileSync(DB_PATH, 'utf-8')
-    return JSON.parse(data)
+    try {
+        ensureDbExists()
+        if (fs.existsSync(DB_PATH)) {
+            const data = fs.readFileSync(DB_PATH, 'utf-8')
+            return JSON.parse(data)
+        }
+    } catch (error) {
+        console.warn('Failed to read file-based DB, returning in-memory data:', error)
+    }
+    return memoryDb
 }
 
 export function saveDb(data: DBData) {
-    ensureDbExists()
-    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2))
+    // Update in-memory first
+    memoryDb = data
+
+    try {
+        ensureDbExists()
+        fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2))
+    } catch (error) {
+        console.warn('Failed to save to file-based DB, data will only persist in memory:', error)
+    }
 }
 
 export function addPageVisit(path: string) {
