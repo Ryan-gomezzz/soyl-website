@@ -92,14 +92,20 @@ describe('AssistantPromo', () => {
     })
 
     // Mock window.location
+    let href = 'http://localhost/'
     Object.defineProperty(window, 'location', {
+      writable: true,
       value: {
         ...window.location,
         assign: jest.fn(),
         replace: jest.fn(),
-        href: '',
+        get href() {
+          return href
+        },
+        set href(val) {
+          href = val
+        },
       },
-      writable: true,
     })
   })
 
