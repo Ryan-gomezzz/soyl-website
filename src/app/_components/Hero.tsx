@@ -28,14 +28,14 @@ export function Hero() {
               transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
               className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-balance"
             >
-              SOYL —{' '}
+              AI and Automation{' '}
               <motion.span
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.3 }}
                 className="text-accent animate-text-shimmer"
               >
-                Story Of Your Life
+                tailored to your needs
               </motion.span>
             </motion.h1>
             <motion.p
@@ -44,8 +44,7 @@ export function Hero() {
               transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
               className="text-xl md:text-2xl text-muted max-w-2xl text-balance"
             >
-              Multimodal emotion intelligence and adaptive agents for modern
-              commerce.
+              Multimodal Emotion Intelligence and Adaptive Agents built for your specific business requirements.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 15 }}
@@ -53,11 +52,11 @@ export function Hero() {
               transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
               className="flex flex-col sm:flex-row gap-4"
             >
-              <CTA href="mailto:sales@soyl.ai?subject=Pilot%20Request" variant="primary" size="lg">
-                Request a pilot
+              <CTA href="/request-pilot" variant="primary" size="lg">
+                Request a Pilot
               </CTA>
-              <CTA href="/docs" variant="secondary" size="lg">
-                Read the docs
+              <CTA href="/under-development" variant="secondary" size="lg">
+                Try the Assistant
               </CTA>
             </motion.div>
           </motion.div>

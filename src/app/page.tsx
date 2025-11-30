@@ -9,7 +9,7 @@ import { CTA } from './_components/CTA'
 import { AssistantPromo } from '@/components/AssistantPromo'
 import { features, productFeatures } from '@/lib/data/features'
 import { motion } from 'framer-motion'
-import { Camera, Brain, Bot, ShoppingBag, Monitor, Briefcase, Headphones, Microscope, Lock, CheckCircle, Shield } from 'lucide-react'
+import { Camera, Brain, Bot, ShoppingBag, Monitor, Microscope, Lock, CheckCircle, Shield } from 'lucide-react'
 import { Icon } from '@/components/Icon'
 
 export default function Home() {
@@ -37,7 +37,7 @@ export default function Home() {
               What SOYL Does
             </h2>
             <p className="text-lg text-muted max-w-2xl mx-auto">
-              Emotion-aware AI that understands context and adapts in real-time
+              Building adaptive AI agents and intelligent automation solutions tailored to your business needs.
             </p>
           </motion.div>
           <FeatureGrid features={features} />
@@ -48,7 +48,7 @@ export default function Home() {
       <WhyChooseUs />
 
       {/* How it works */}
-      <section id="how-it-works" className="py-16 lg:py-20 bg-panel/30">
+      <section id="how-it-works" className="py-12 lg:py-16 bg-panel/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -72,7 +72,7 @@ export default function Home() {
                 },
               },
             }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
           >
 
             <motion.div
@@ -288,24 +288,29 @@ export default function Home() {
           >
             {[
               {
-                title: 'Retail AR Commerce',
-                description: 'In-store AR assistants that adapt recommendations based on customer emotion',
-                icon: ShoppingBag,
-              },
-              {
-                title: 'Kiosk Systems',
-                description: 'Interactive kiosks with emotion-aware product suggestions and support',
+                title: 'Operations',
+                description: 'Streamline internal processes with intelligent automation agents.',
                 icon: Monitor,
               },
               {
-                title: 'Remote Sales',
-                description: 'Virtual sales assistants that read cues and personalize the conversation',
-                icon: Briefcase,
+                title: 'Marketing',
+                description: 'Personalized campaigns driven by emotion-aware customer insights.',
+                icon: ShoppingBag,
               },
               {
-                title: 'Support Triage',
-                description: 'Customer support that prioritizes and routes based on emotional state',
-                icon: Headphones,
+                title: 'Automation',
+                description: 'End-to-end workflow automation tailored to your specific needs.',
+                icon: Bot,
+              },
+              {
+                title: 'Healthcare',
+                description: 'Empathetic patient support and automated scheduling systems.',
+                icon: Microscope,
+              },
+              {
+                title: 'Banking',
+                description: 'Secure, intelligent financial assistants for personalized service.',
+                icon: Lock,
               },
             ].map((usecase) => (
               <motion.div
@@ -503,4 +508,3 @@ export default function Home() {
     </div>
   )
 }
-

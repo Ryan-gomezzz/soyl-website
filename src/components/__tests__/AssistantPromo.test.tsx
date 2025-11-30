@@ -1,15 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { AssistantPromo } from '../AssistantPromo'
-import { ChatbotController } from '../chatbot/controller'
 
-// Mock ChatbotController
-jest.mock('../chatbot/controller', () => ({
-  ChatbotController: {
-    open: jest.fn(),
-    close: jest.fn(),
-    toggle: jest.fn(),
-  },
-}))
 
 // Mock DotPattern
 jest.mock('@/app/_components/DotPattern', () => ({
@@ -24,53 +15,53 @@ jest.mock('framer-motion', () => {
   const React = require('react')
   // Create a component factory that strips animation props
   const createMotionComponent = (tag: string) => {
-    const Component = ({ 
-      children, 
-      animate: _animate, 
-      initial: _initial, 
-      whileInView: _whileInView, 
+    const Component = ({
+      children,
+      animate: _animate,
+      initial: _initial,
+      whileInView: _whileInView,
       whileHover: _whileHover,
       whileTap: _whileTap,
       whileFocus: _whileFocus,
       whileDrag: _whileDrag,
-      transition: _transition, 
-      viewport: _viewport, 
+      transition: _transition,
+      viewport: _viewport,
       exit: _exit,
       variants: _variants,
-      ...props 
-    }: { 
-      children?: React.ReactNode; 
-      animate?: unknown; 
-      initial?: unknown; 
+      ...props
+    }: {
+      children?: React.ReactNode;
+      animate?: unknown;
+      initial?: unknown;
       whileInView?: unknown;
       whileHover?: unknown;
       whileTap?: unknown;
       whileFocus?: unknown;
       whileDrag?: unknown;
-      transition?: unknown; 
+      transition?: unknown;
       viewport?: unknown;
       exit?: unknown;
       variants?: unknown;
-      [key: string]: unknown 
+      [key: string]: unknown
     }) => {
       return React.createElement(tag, props, children)
     }
     return Component
   }
-  
+
   // Create motion object with common HTML and SVG elements
   const motionElements = ['div', 'section', 'h1', 'h2', 'h3', 'p', 'span', 'a', 'button', 'ul', 'li', 'svg', 'path', 'text', 'g', 'circle', 'rect', 'line', 'polyline', 'polygon', 'ellipse', 'foreignObject']
-  const motion: Record<string, React.ComponentType<{ children?: React.ReactNode; [key: string]: unknown }>> = {}
-  
+  const motion: Record<string, React.ComponentType<{ children?: React.ReactNode;[key: string]: unknown }>> = {}
+
   motionElements.forEach(tag => {
     motion[tag] = createMotionComponent(tag)
   })
-  
+
   // Create mock MotionValue
   const createMotionValue = (value: number) => ({
     get: () => value,
-    set: () => {},
-    subscribe: () => () => {},
+    set: () => { },
+    subscribe: () => () => { },
   })
 
   return {
@@ -99,6 +90,17 @@ describe('AssistantPromo', () => {
         dispatchEvent: jest.fn(),
       })),
     })
+
+    // Mock window.location
+    Object.defineProperty(window, 'location', {
+      value: {
+        ...window.location,
+        assign: jest.fn(),
+        replace: jest.fn(),
+        href: '',
+      },
+      writable: true,
+    })
   })
 
   it('renders the promo section with correct heading', async () => {
@@ -118,20 +120,18 @@ describe('AssistantPromo', () => {
     })
   })
 
-  it('renders primary CTA button that opens chatbot panel', async () => {
+  it('renders primary CTA button that redirects to under development page', async () => {
     render(<AssistantPromo />)
-    
+
     await waitFor(() => {
       expect(screen.getByText('Try the Assistant')).toBeInTheDocument()
     })
-    
+
     const tryButton = screen.getByText('Try the Assistant').closest('button')
     expect(tryButton).toBeInTheDocument()
-    expect(tryButton).toHaveAttribute('aria-controls', 'soyl-assistant-panel')
-    expect(tryButton).toHaveAttribute('aria-label', 'Open SOYL Assistant chatbot panel')
 
     fireEvent.click(tryButton!)
-    expect(ChatbotController.open).toHaveBeenCalledTimes(1)
+    expect(window.location.href).toBe('/under-development')
   })
 
   it('renders secondary CTA link to how it works', async () => {
@@ -163,7 +163,7 @@ describe('AssistantPromo', () => {
     const mockElement = {
       scrollIntoView: mockScrollIntoView,
     }
-    jest.spyOn(document, 'getElementById').mockReturnValue(mockElement as HTMLElement)
+    jest.spyOn(document, 'getElementById').mockReturnValue(mockElement as unknown as HTMLElement)
 
     render(<AssistantPromo />)
     await waitFor(() => {
@@ -196,7 +196,7 @@ describe('AssistantPromo', () => {
     const mockElement = {
       scrollIntoView: mockScrollIntoView,
     }
-    jest.spyOn(document, 'getElementById').mockReturnValue(mockElement as HTMLElement)
+    jest.spyOn(document, 'getElementById').mockReturnValue(mockElement as unknown as HTMLElement)
 
     render(<AssistantPromo />)
     await waitFor(() => {
