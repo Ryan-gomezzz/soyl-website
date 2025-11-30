@@ -1,15 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { AssistantPromo } from '../AssistantPromo'
-import { ChatbotController } from '../chatbot/controller'
 
-// Mock ChatbotController
-jest.mock('../chatbot/controller', () => ({
-  ChatbotController: {
-    open: jest.fn(),
-    close: jest.fn(),
-    toggle: jest.fn(),
-  },
-}))
 
 // Mock DotPattern
 jest.mock('@/app/_components/DotPattern', () => ({
