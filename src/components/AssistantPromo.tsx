@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { DotPattern } from '@/app/_components/DotPattern'
-import { ChatbotController } from './chatbot/controller'
 
 export function AssistantPromo() {
   const [mounted, setMounted] = useState(false)
@@ -159,4 +158,3 @@ export function AssistantPromo() {
     </section>
   )
 }
-

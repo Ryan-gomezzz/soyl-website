@@ -123,7 +123,7 @@ export default function RequestPilotPage() {
                     </button>
 
                     {status === 'success' && (
-                        <p className="text-green-400 text-center">Request submitted successfully! We'll be in touch shortly.</p>
+                        <p className="text-green-400 text-center">Request submitted successfully! We&apos;ll be in touch shortly.</p>
                     )}
                     {status === 'error' && (
                         <p className="text-red-400 text-center">Something went wrong. Please try again.</p>

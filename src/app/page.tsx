@@ -9,7 +9,7 @@ import { CTA } from './_components/CTA'
 import { AssistantPromo } from '@/components/AssistantPromo'
 import { features, productFeatures } from '@/lib/data/features'
 import { motion } from 'framer-motion'
-import { Camera, Brain, Bot, ShoppingBag, Monitor, Briefcase, Headphones, Microscope, Lock, CheckCircle, Shield } from 'lucide-react'
+import { Camera, Brain, Bot, ShoppingBag, Monitor, Microscope, Lock, CheckCircle, Shield } from 'lucide-react'
 import { Icon } from '@/components/Icon'
 
 export default function Home() {
@@ -508,4 +508,3 @@ export default function Home() {
     </div>
   )
 }
-

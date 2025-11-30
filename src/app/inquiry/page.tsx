@@ -113,7 +113,7 @@ export default function InquiryPage() {
                     </button>
 
                     {status === 'success' && (
-                        <p className="text-green-400 text-center">Message sent successfully! We'll get back to you soon.</p>
+                        <p className="text-green-400 text-center">Message sent successfully! We&apos;ll get back to you soon.</p>
                     )}
                     {status === 'error' && (
                         <p className="text-red-400 text-center">Something went wrong. Please try again.</p>

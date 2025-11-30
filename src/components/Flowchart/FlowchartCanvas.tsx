@@ -105,16 +105,10 @@ export function FlowchartCanvas({ onNodeClick }: FlowchartCanvasProps) {
           const isHighlighted = edge.from === hoveredNode || edge.to === hoveredNode
 
           // Calculate control points for a smooth curve
-          const dist = Math.sqrt(Math.pow(toX - fromX, 2) + Math.pow(toY - fromY, 2))
           const cp1x = fromX + (toX - fromX) * 0.5
           const cp1y = fromY
           const cp2x = fromX + (toX - fromX) * 0.5
           const cp2y = toY
-
-          // Or use a simpler curve based on distance
-          // Let's try a curve that bulges out slightly
-          const midX = (fromX + toX) / 2
-          const midY = (fromY + toY) / 2
 
           // Path definition
           const pathD = `M ${fromX} ${fromY} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${toX} ${toY}`
