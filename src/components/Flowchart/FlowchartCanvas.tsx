@@ -24,7 +24,7 @@ export function FlowchartCanvas({ onNodeClick }: FlowchartCanvasProps) {
 
   useEffect(() => {
     measure()
-    
+
     let timeoutId: NodeJS.Timeout
     function handleResize() {
       clearTimeout(timeoutId)
@@ -62,15 +62,15 @@ export function FlowchartCanvas({ onNodeClick }: FlowchartCanvasProps) {
   }
 
   return (
-    <div 
-      ref={canvasRef} 
+    <div
+      ref={canvasRef}
       className="relative w-full h-[520px] md:h-[640px] min-h-[500px] overflow-visible"
       style={{ minWidth: '100%' }}
     >
       {/* Background SVG for edges */}
-      <svg 
-        width={size.w} 
-        height={size.h} 
+      <svg
+        width={size.w}
+        height={size.h}
         className="absolute inset-0 z-0 pointer-events-none"
         style={{ overflow: 'visible' }}
       >
@@ -90,33 +90,40 @@ export function FlowchartCanvas({ onNodeClick }: FlowchartCanvasProps) {
             />
           </marker>
         </defs>
-        
+
         {/* Render edges */}
         {flow.edges.map((edge, i) => {
           const fromNode = flow.nodes.find(n => n.id === edge.from)
           const toNode = flow.nodes.find(n => n.id === edge.to)
           if (!fromNode || !toNode) return null
-          
+
           const fromX = fromNode.x * size.w
           const fromY = fromNode.y * size.h
           const toX = toNode.x * size.w
           const toY = toNode.y * size.h
-          
-          // Calculate edge start/end points (center of nodes)
-          const startX = fromX
-          const startY = fromY
-          const endX = toX
-          const endY = toY
-          
+
           const isHighlighted = edge.from === hoveredNode || edge.to === hoveredNode
-          
+
+          // Calculate control points for a smooth curve
+          const dist = Math.sqrt(Math.pow(toX - fromX, 2) + Math.pow(toY - fromY, 2))
+          const cp1x = fromX + (toX - fromX) * 0.5
+          const cp1y = fromY
+          const cp2x = fromX + (toX - fromX) * 0.5
+          const cp2y = toY
+
+          // Or use a simpler curve based on distance
+          // Let's try a curve that bulges out slightly
+          const midX = (fromX + toX) / 2
+          const midY = (fromY + toY) / 2
+
+          // Path definition
+          const pathD = `M ${fromX} ${fromY} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${toX} ${toY}`
+
           return (
-            <line
+            <path
               key={`${edge.from}-${edge.to}-${i}`}
-              x1={startX}
-              y1={startY}
-              x2={endX}
-              y2={endY}
+              d={pathD}
+              fill="none"
               stroke="var(--accent)"
               strokeWidth={isHighlighted ? 3 : 2}
               strokeOpacity={isHighlighted ? 0.8 : 0.4}
@@ -149,10 +156,10 @@ export function FlowchartCanvas({ onNodeClick }: FlowchartCanvasProps) {
                 reduced
                   ? {}
                   : {
-                      duration: 0.5,
-                      delay: index * 0.15,
-                      ease: [0.22, 1, 0.36, 1],
-                    }
+                    duration: 0.5,
+                    delay: index * 0.15,
+                    ease: [0.22, 1, 0.36, 1],
+                  }
               }
             >
               <FlowNode node={node} onHover={handleNodeHover} onClick={handleNodeClick} />

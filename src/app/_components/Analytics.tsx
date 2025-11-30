@@ -1,22 +1,19 @@
 'use client'
 
-// Placeholder for analytics integration
-// To enable:
-// 1. Install your analytics provider (e.g., @vercel/analytics, gtag)
-// 2. Initialize in this component
-// 3. Add tracking events throughout the app
+import { useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 
 export function Analytics() {
-  // Example with Vercel Analytics (uncomment when ready):
-  // import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
-  // return <VercelAnalytics />
+  const pathname = usePathname()
 
-  // Example with Google Analytics (uncomment when ready):
-  // useEffect(() => {
-  //   if (typeof window !== 'undefined' && window.gtag) {
-  //     window.gtag('config', 'G-XXXXXXXXXX')
-  //   }
-  // }, [])
+  useEffect(() => {
+    // Send page visit to analytics API
+    fetch('/api/analytics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: pathname }),
+    }).catch((err) => console.error('Analytics error:', err))
+  }, [pathname])
 
   return null
 }

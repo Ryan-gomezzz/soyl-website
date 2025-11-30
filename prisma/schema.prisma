@@ -43,3 +43,37 @@ model Applicant {
   @@index([email])
 }
 
+model PageVisit {
+  id        String   @id @default(uuid())
+  path      String
+  userAgent String?
+  ip        String?  // Optional, hash it for privacy
+  createdAt DateTime @default(now())
+
+  @@index([path])
+  @@index([createdAt])
+}
+
+model PilotRequest {
+  id          String   @id @default(uuid())
+  name        String
+  email       String
+  company     String
+  phone       String?
+  needs       String?
+  status      String   @default("NEW") // NEW, CONTACTED, SCHEDULED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Inquiry {
+  id          String   @id @default(uuid())
+  name        String
+  email       String
+  message     String
+  type        String   @default("GENERAL") // GENERAL, SALES, SUPPORT
+  status      String   @default("NEW")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+

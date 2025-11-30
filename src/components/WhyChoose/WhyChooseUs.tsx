@@ -8,27 +8,27 @@ import { Icon } from '@/components/Icon'
 
 const reasons = [
   {
-    title: 'Privacy-first emotion pipeline',
+    title: 'Privacy First',
     description:
-      'On-device inference options ensure sensitive emotion data never leaves user devices.',
+      'We prioritize data privacy with on-device inference options and secure processing pipelines.',
     icon: Lock,
   },
   {
-    title: 'SDK & API for integration',
+    title: 'Emotion Intelligent Agents',
     description:
-      'Easy-to-integrate RESTful API and SDK for seamless emotion detection across platforms.',
-    icon: Zap,
-  },
-  {
-    title: 'Multimodal emotion fusion',
-    description:
-      'Combines face, voice, and text signals into a unified Emotion State Vector for richer context.',
+      'Our agents go beyond text, understanding the emotional context of every interaction.',
     icon: Brain,
   },
   {
-    title: 'Real-time adaptive responses',
+    title: 'SDKs and Integration',
     description:
-      'AI agents that dynamically adjust tone and recommendations based on detected emotion states.',
+      'Seamlessly integrate our technology into your existing platforms with robust SDKs and APIs.',
+    icon: Zap,
+  },
+  {
+    title: 'Tailored to your Business Needs',
+    description:
+      'We build custom solutions designed specifically to address your unique business challenges.',
     icon: Target,
   },
 ]

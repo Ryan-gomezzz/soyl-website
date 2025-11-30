@@ -18,7 +18,7 @@ export function AssistantPromo() {
   }, [])
 
   const handleTryAssistant = () => {
-    ChatbotController.open()
+    window.location.href = '/under-development'
   }
 
   const handleHowItWorks = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -68,8 +68,8 @@ export function AssistantPromo() {
                   prefersReducedMotion
                     ? {}
                     : {
-                        backgroundPosition: ['0%', '100%', '0%'],
-                      }
+                      backgroundPosition: ['0%', '100%', '0%'],
+                    }
                 }
                 transition={{
                   duration: 5,

@@ -8,19 +8,19 @@ export interface Feature {
 
 export const features: Feature[] = [
   {
-    title: 'Emotion Sensing',
-    description: 'Real-time face, voice and text emotion detection for richer context.',
-    icon: Target,
+    title: 'Adaptive AI Agents',
+    description: 'AI agents that adapt to user emotions and context in real-time.',
+    icon: Bot,
   },
   {
     title: 'Cognitive Signal Layer',
-    description: 'Fuse multimodal signals into a unified Emotion State Vector.',
+    description: 'Deep understanding of emotions through multimodal signal processing.',
     icon: Brain,
   },
   {
-    title: 'Adaptive Sales Agent',
-    description: 'LLM-driven agents that adapt tone & suggestions based on affect.',
-    icon: Bot,
+    title: 'Intelligent Automation',
+    description: 'Streamline business processes with tailored automation solutions.',
+    icon: Target,
   },
 ]
 
