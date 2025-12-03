@@ -5,6 +5,7 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [],
   },
+  output: 'standalone',
   // Ensure Prisma client is available during build
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client'],
