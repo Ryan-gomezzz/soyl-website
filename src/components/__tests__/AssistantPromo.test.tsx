@@ -134,23 +134,25 @@ describe('AssistantPromo', () => {
     render(<AssistantPromo />)
     await waitFor(() => {
       expect(
-        screen.getByText(/Try our multimodal, emotion-aware AI assistant/)
+        screen.getByText(/Experience the next generation of conversational AI/)
       ).toBeInTheDocument()
     })
   })
 
-  it('renders primary CTA button that redirects to under development page', async () => {
+  it('renders primary CTA button that dispatch event', async () => {
+    const dispatchSpy = jest.spyOn(window, 'dispatchEvent')
     render(<AssistantPromo />)
 
     await waitFor(() => {
-      expect(screen.getByText('Try the Assistant')).toBeInTheDocument()
+      expect(screen.getByText('Try Live Demo')).toBeInTheDocument()
     })
 
-    const tryButton = screen.getByText('Try the Assistant').closest('button')
+    const tryButton = screen.getByText('Try Live Demo').closest('button')
     expect(tryButton).toBeInTheDocument()
 
     fireEvent.click(tryButton!)
-    expect(mockPush).toHaveBeenCalledWith('/under-development')
+    expect(dispatchSpy).toHaveBeenCalledWith(expect.any(CustomEvent))
+    expect(dispatchSpy.mock.calls[0][0].type).toBe('soyl-chatbot-open')
   })
 
   it('renders secondary CTA link to how it works', async () => {
