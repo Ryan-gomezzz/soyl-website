@@ -4,9 +4,9 @@ import { cookies } from 'next/headers'
 
 export const dynamic = 'force-dynamic'
 
-export default function AdminDashboard() {
-    const cookieStore = cookies()
-    const auth = cookieStore.get('admin_auth')
+export default async function AdminDashboard() {
+    const cookieStore = await cookies()
+    const auth = cookieStore.get('admin_session')
 
     if (!auth) {
         redirect('/admin/login')

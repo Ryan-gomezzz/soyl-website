@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { ChatbotProvider, useChatbotContext } from './ChatbotProvider'
 import { ChatbotLauncher } from './ChatbotLauncher'
-import { ChatbotPanel } from './ChatbotPanel'
+import { VoiceBotPanel } from './VoiceBotPanel'
 
 function ChatbotContent() {
   const { 
@@ -32,7 +32,7 @@ function ChatbotContent() {
         lastY={lastY}
         onLastYChange={setLastY}
       />
-      <ChatbotPanel requestModalModeForFlow={requestModalModeForFlow} />
+      <VoiceBotPanel requestModalModeForFlow={requestModalModeForFlow} />
     </>
   )
 }
