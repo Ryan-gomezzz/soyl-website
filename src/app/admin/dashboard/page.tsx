@@ -1,18 +1,29 @@
-import { getDb } from '@/lib/mock-db'
 import { redirect } from 'next/navigation'
-import { cookies } from 'next/headers'
+import prisma from '@/lib/prisma'
+import { requireAdminSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AdminDashboard() {
-    const cookieStore = await cookies()
-    const auth = cookieStore.get('admin_session')
-
-    if (!auth) {
+    // Verify admin session
+    try {
+        await requireAdminSession()
+    } catch {
         redirect('/admin/login')
     }
 
-    const db = getDb()
+    // Fetch data from database
+    const [pageVisits, pilotRequests, inquiries] = await Promise.all([
+        prisma.pageVisit.count(),
+        prisma.pilotRequest.findMany({
+            orderBy: { createdAt: 'desc' },
+            take: 100, // Limit for display
+        }),
+        prisma.inquiry.findMany({
+            orderBy: { createdAt: 'desc' },
+            take: 100, // Limit for display
+        }),
+    ])
 
     return (
         <div className="min-h-screen pt-24 px-6 pb-12">
@@ -23,15 +34,15 @@ export default async function AdminDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                     <div className="glass p-6 rounded-xl border border-white/10">
                         <h3 className="text-muted text-sm uppercase tracking-wider mb-2">Total Page Views</h3>
-                        <p className="text-4xl font-bold text-accent">{db.pageVisits.length}</p>
+                        <p className="text-4xl font-bold text-accent">{pageVisits}</p>
                     </div>
                     <div className="glass p-6 rounded-xl border border-white/10">
                         <h3 className="text-muted text-sm uppercase tracking-wider mb-2">Pilot Requests</h3>
-                        <p className="text-4xl font-bold text-accent">{db.pilotRequests.length}</p>
+                        <p className="text-4xl font-bold text-accent">{pilotRequests.length}</p>
                     </div>
                     <div className="glass p-6 rounded-xl border border-white/10">
                         <h3 className="text-muted text-sm uppercase tracking-wider mb-2">Inquiries</h3>
-                        <p className="text-4xl font-bold text-accent">{db.inquiries.length}</p>
+                        <p className="text-4xl font-bold text-accent">{inquiries.length}</p>
                     </div>
                 </div>
 
@@ -51,17 +62,17 @@ export default async function AdminDashboard() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/10">
-                                    {db.pilotRequests.length === 0 ? (
+                                    {pilotRequests.length === 0 ? (
                                         <tr>
                                             <td colSpan={5} className="p-4 text-center text-muted">No requests yet</td>
                                         </tr>
                                     ) : (
-                                        db.pilotRequests.map((req) => (
+                                        pilotRequests.map((req) => (
                                             <tr key={req.id} className="hover:bg-white/5">
                                                 <td className="p-4">{req.name}</td>
                                                 <td className="p-4">{req.company}</td>
                                                 <td className="p-4">{req.email}</td>
-                                                <td className="p-4">{new Date(req.createdAt).toLocaleDateString()}</td>
+                                                <td className="p-4">{req.createdAt.toLocaleDateString()}</td>
                                                 <td className="p-4">
                                                     <span className="px-2 py-1 rounded-full bg-accent/20 text-accent text-xs">
                                                         {req.status}
@@ -92,18 +103,18 @@ export default async function AdminDashboard() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/10">
-                                    {db.inquiries.length === 0 ? (
+                                    {inquiries.length === 0 ? (
                                         <tr>
                                             <td colSpan={5} className="p-4 text-center text-muted">No inquiries yet</td>
                                         </tr>
                                     ) : (
-                                        db.inquiries.map((inq) => (
+                                        inquiries.map((inq) => (
                                             <tr key={inq.id} className="hover:bg-white/5">
                                                 <td className="p-4">{inq.name}</td>
                                                 <td className="p-4">{inq.email}</td>
                                                 <td className="p-4">{inq.type}</td>
                                                 <td className="p-4 max-w-xs truncate">{inq.message}</td>
-                                                <td className="p-4">{new Date(inq.createdAt).toLocaleDateString()}</td>
+                                                <td className="p-4">{inq.createdAt.toLocaleDateString()}</td>
                                             </tr>
                                         ))
                                     )}

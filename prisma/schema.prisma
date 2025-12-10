@@ -77,3 +77,13 @@ model Inquiry {
   updatedAt   DateTime @updatedAt
 }
 
+model AdminSession {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([expiresAt])
+}
+

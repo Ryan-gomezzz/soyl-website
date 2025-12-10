@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
-import { addPilotRequest } from '@/lib/mock-db'
+import prisma from '@/lib/prisma'
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request) {
     try {
@@ -10,9 +12,18 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
         }
 
-        const newRequest = addPilotRequest({ name, email, company, phone, needs })
+        const newRequest = await prisma.pilotRequest.create({
+            data: {
+                name,
+                email,
+                company,
+                phone: phone || null,
+                needs: needs || null,
+            },
+        })
         return NextResponse.json({ success: true, data: newRequest })
     } catch (error) {
+        console.error('Error creating pilot request:', error)
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
     }
 }
