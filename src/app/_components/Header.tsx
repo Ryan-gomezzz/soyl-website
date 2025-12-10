@@ -110,7 +110,7 @@ export function Header() {
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center lg:gap-x-4">
           <Link
-            href="#"
+            href="/admin/login"
             className="text-sm font-medium text-text/60 hover:text-text transition-colors"
           >
             Sign In
@@ -141,7 +141,7 @@ export function Header() {
               ))}
               <div className="pt-4 space-y-3 border-t border-white/5">
                 <Link
-                  href="#"
+                  href="/admin/login"
                   className="block text-base font-medium text-text/60 hover:text-text transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
