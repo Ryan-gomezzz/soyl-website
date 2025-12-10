@@ -1,6 +1,18 @@
 import { render, screen } from '@testing-library/react'
 import Home from '../page'
 
+// Mock next/navigation
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    prefetch: jest.fn(),
+    back: jest.fn(),
+    forward: jest.fn(),
+    refresh: jest.fn(),
+  }),
+}))
+
 // Mock next/image
 jest.mock('next/image', () => ({
   __esModule: true,
