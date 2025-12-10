@@ -124,8 +124,35 @@ export function useConversation() {
 
       // Convert base64 audio to Blob URL for better browser compatibility
       let audioUrl: string
+      
+      // Validate base64 format first
+      if (!data.audio || typeof data.audio !== 'string') {
+        console.error('Invalid audio data received from API')
+        throw new Error('Invalid audio data format')
+      }
+      
+      // Clean the base64 string (remove any whitespace or data URI prefix if present)
+      let cleanBase64 = data.audio.trim()
+      if (cleanBase64.startsWith('data:audio')) {
+        // Extract base64 from data URI if present
+        const match = cleanBase64.match(/^data:audio\/[^;]+;base64,(.+)$/)
+        if (match) {
+          cleanBase64 = match[1]
+        }
+      }
+      
+      // Validate base64 format
+      const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/
+      if (!base64Regex.test(cleanBase64)) {
+        console.error('Invalid base64 format in audio data')
+        throw new Error('Invalid audio data: malformed base64')
+      }
+      
       try {
-        const binaryString = atob(data.audio)
+        const binaryString = atob(cleanBase64)
+        if (binaryString.length === 0) {
+          throw new Error('Decoded audio data is empty')
+        }
         const bytes = new Uint8Array(binaryString.length)
         for (let i = 0; i < binaryString.length; i++) {
           bytes[i] = binaryString.charCodeAt(i)
@@ -133,8 +160,9 @@ export function useConversation() {
         const blob = new Blob([bytes], { type: 'audio/mpeg' })
         audioUrl = URL.createObjectURL(blob)
       } catch (e) {
+        console.error('Failed to convert base64 to blob:', e)
         // Fallback to data URI if conversion fails
-        audioUrl = `data:audio/mpeg;base64,${data.audio}`
+        audioUrl = `data:audio/mpeg;base64,${cleanBase64}`
       }
 
       // Add assistant message with audio
