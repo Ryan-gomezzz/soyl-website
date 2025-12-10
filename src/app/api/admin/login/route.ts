@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import crypto from 'crypto'
-import prisma from '@/lib/prisma'
+import prisma, { isDatabaseConnectionError, safePrismaOperation } from '@/lib/prisma'
 
 // Force dynamic rendering since we use cookies()
 export const dynamic = 'force-dynamic'
@@ -76,10 +76,10 @@ export async function POST(req: NextRequest) {
     const adminPassword = process.env.ADMIN_PASSWORD
 
     if (!adminPassword) {
-      console.error('ADMIN_PASSWORD not configured. Please set ADMIN_PASSWORD environment variable.')
+      console.error('[Admin Login] ADMIN_PASSWORD not configured. Please set ADMIN_PASSWORD environment variable.')
       const errorMessage = process.env.NODE_ENV === 'development'
         ? 'Server configuration error: ADMIN_PASSWORD environment variable is not set. Please configure it in your .env.local file.'
-        : 'Server configuration error'
+        : 'Server configuration error: Admin authentication is not properly configured.'
       return NextResponse.json(
         { error: errorMessage },
         { status: 500 }
@@ -89,6 +89,7 @@ export async function POST(req: NextRequest) {
     // Verify credentials
     if (username !== adminUsername || password !== adminPassword) {
       recordFailedAttempt(ip)
+      console.warn(`[Admin Login] Failed login attempt from IP: ${ip}`)
       return NextResponse.json(
         { error: 'Invalid credentials' },
         { status: 401 }
@@ -99,27 +100,36 @@ export async function POST(req: NextRequest) {
     const sessionToken = crypto.randomBytes(32).toString('hex')
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
 
-    // Store session in database
-    try {
-      await prisma.adminSession.create({
-        data: {
-          token: sessionToken,
-          expiresAt,
-        },
-      })
-    } catch (dbError) {
-      console.error('Failed to create session in database:', dbError)
-      // If database is unavailable, still allow login but log the error
-      // In production, you might want to fail here
-      if (process.env.NODE_ENV === 'production') {
-        return NextResponse.json(
-          { error: 'Internal server error' },
-          { status: 500 }
-        )
+    // Store session in database (with graceful fallback)
+    const sessionResult = await safePrismaOperation(
+      async () => {
+        return await prisma.adminSession.create({
+          data: {
+            token: sessionToken,
+            expiresAt,
+          },
+        })
       }
+    )
+
+    if (!sessionResult.success) {
+      const isConnectionError = sessionResult.error?.includes('connection') || 
+                                sessionResult.error?.includes('Database')
+      
+      if (isConnectionError) {
+        console.warn('[Admin Login] Database unavailable, using cookie-only session. Error:', sessionResult.error)
+        // Continue with cookie-only authentication as fallback
+        // This allows login to work even if database is temporarily unavailable
+      } else {
+        console.error('[Admin Login] Failed to create session in database:', sessionResult.error)
+        // For non-connection errors, we might want to be more strict
+        // But for now, we'll allow cookie-only fallback for all database errors
+      }
+    } else {
+      console.log('[Admin Login] Session created successfully in database')
     }
 
-    // Set httpOnly cookie
+    // Set httpOnly cookie (always set cookie, even if database session creation failed)
     const cookieStore = await cookies()
     cookieStore.set('admin_session', sessionToken, {
       httpOnly: true,
@@ -132,11 +142,30 @@ export async function POST(req: NextRequest) {
     // Clear failed attempts on success
     loginAttempts.delete(ip)
 
-    return NextResponse.json({ success: true })
+    console.log(`[Admin Login] Successful login for user: ${username} from IP: ${ip}`)
+    return NextResponse.json({ 
+      success: true,
+      // Include warning if database session wasn't created
+      warning: !sessionResult.success ? 'Session stored in cookie only (database unavailable)' : undefined
+    })
   } catch (error) {
-    console.error('Login error:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('[Admin Login] Unexpected error:', errorMessage, error)
+    
+    // Provide more specific error messages
+    if (error instanceof SyntaxError) {
+      return NextResponse.json(
+        { error: 'Invalid request format' },
+        { status: 400 }
+      )
+    }
+    
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { 
+        error: process.env.NODE_ENV === 'development' 
+          ? `Internal server error: ${errorMessage}` 
+          : 'Internal server error. Please try again later.'
+      },
       { status: 500 }
     )
   }
