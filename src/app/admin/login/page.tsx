@@ -22,6 +22,7 @@ export default function AdminLogin() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ username, password }),
+                credentials: 'include', // Ensure cookies are sent and received
             })
 
             const data = await response.json()
@@ -32,10 +33,13 @@ export default function AdminLogin() {
                 return
             }
 
-            // Redirect on success
-            router.push('/admin/dashboard')
-            router.refresh()
+            // Small delay to ensure cookie is set before redirect
+            await new Promise(resolve => setTimeout(resolve, 100))
+            
+            // Use window.location for a full page reload to ensure cookie is read
+            window.location.href = '/admin/dashboard'
         } catch (err) {
+            console.error('Login error:', err)
             setError('An error occurred. Please try again.')
             setIsLoading(false)
         }

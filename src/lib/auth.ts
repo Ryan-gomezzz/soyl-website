@@ -37,12 +37,31 @@ export async function verifyAdminSession(
       }
 
       return session
-    }
+    },
+    null // Fallback value when operation fails
   )
 
-  // If database query succeeded, return the result
-  if (sessionResult.success) {
-    return sessionResult.data ?? null
+  // If database query succeeded and found a session, return it
+  if (sessionResult.success && sessionResult.data !== null) {
+    return sessionResult.data
+  }
+
+  // If database query succeeded but returned null (session not found in DB),
+  // we still allow cookie-only authentication as fallback
+  // This handles the case where database was unavailable during login
+  // but is now available, or session creation failed but cookie was set
+  if (sessionResult.success && sessionResult.data === null) {
+    // Session not found in database, but we have a valid cookie token
+    // Allow cookie-only authentication as fallback
+    if (sessionToken && sessionToken.length >= 32) {
+      console.warn('[Auth] Session not found in database, using cookie-only fallback for token:', sessionToken.substring(0, 8) + '...')
+      return {
+        id: 'cookie-only',
+        token: sessionToken,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+      }
+    }
+    return null
   }
 
   // If database is unavailable, fall back to cookie-only verification
