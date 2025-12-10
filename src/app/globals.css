@@ -6,8 +6,27 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --bg-rgb: 2, 4, 8;
+    --panel-rgb: 11, 16, 27;
+    --primary-rgb: 0, 212, 255;
+
+    --space-md: 1.5rem;
+    --space-xl: 3rem;
+    --space-2xl: 4rem;
+    --space-3xl: 6rem;
+
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
   body {
-    @apply bg-bg text-text font-sans;
+    @apply bg-bg text-text font-sans selection:bg-accent/30 selection:text-white;
     font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI',
       Roboto, 'Helvetica Neue', Arial, sans-serif;
     line-height: 1.6;
@@ -21,49 +40,54 @@
   h4,
   h5,
   h6 {
-    @apply font-semibold tracking-tight;
-    line-height: 1.2;
+    @apply font-bold tracking-tight text-white;
+    line-height: 1.1;
     margin-bottom: var(--space-md);
   }
 
   h1 {
-    @apply text-4xl md:text-5xl lg:text-6xl;
-    font-size: clamp(2.25rem, 5vw, 3.75rem);
+    @apply text-5xl md:text-6xl lg:text-7xl;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    letter-spacing: -0.02em;
+    background: linear-gradient(to bottom right, #ffffff, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   h2 {
-    @apply text-3xl md:text-4xl lg:text-5xl;
-    font-size: clamp(1.875rem, 4vw, 3rem);
+    @apply text-4xl md:text-5xl lg:text-6xl;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    letter-spacing: -0.01em;
   }
 
   h3 {
-    @apply text-2xl md:text-3xl lg:text-4xl;
-    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    @apply text-3xl md:text-4xl lg:text-5xl;
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
   }
 
   h4 {
-    @apply text-xl md:text-2xl lg:text-3xl;
-    font-size: clamp(1.25rem, 2.5vw, 1.875rem);
+    @apply text-2xl md:text-3xl lg:text-4xl;
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
   }
 
   p {
     max-width: 65ch;
     margin-bottom: var(--space-md);
+    @apply text-muted leading-relaxed;
   }
 
   a {
-    @apply transition-colors;
+    @apply transition-colors duration-200;
     color: var(--accent);
     text-decoration: none;
   }
 
   a:hover {
     color: var(--accent-hover);
-    text-decoration: underline;
   }
 
   button {
-    @apply transition-all;
+    @apply transition-all duration-200;
     cursor: pointer;
   }
 
@@ -92,55 +116,70 @@
   }
 
   .glass {
-    background: rgba(10, 10, 10, 0.6);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(11, 16, 27, 0.65);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
   }
 
   .glass:hover {
-    background: rgba(10, 10, 10, 0.8);
-    border-color: rgba(59, 130, 246, 0.3);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    background: rgba(11, 16, 27, 0.8);
+    border-color: rgba(0, 212, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 212, 255, 0.1);
   }
 
   .glass-hover {
-    background: rgba(10, 10, 10, 0.8);
+    background: rgba(11, 16, 27, 0.8);
   }
-  
+
   /* Enhanced glass effect with gradient */
   .glass-gradient {
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.03) 0%,
-      rgba(59, 130, 246, 0.05) 50%,
-      rgba(255, 255, 255, 0.03) 100%
-    );
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(145deg,
+        rgba(255, 255, 255, 0.05) 0%,
+        rgba(11, 16, 27, 0.4) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.02);
   }
-  
+
   /* Improved button styles */
   .btn-primary {
-    background: var(--accent);
-    color: #ffffff;
-    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, var(--accent) 0%, #0099cc 100%);
+    color: #020408;
+    padding: 0.75rem 1.75rem;
     border-radius: var(--radius-md);
-    font-weight: 500;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 14px rgba(0, 212, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
   }
-  
+
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: 0.5s;
+  }
+
   .btn-primary:hover {
-    background: #2563EB; /* Darker blue on hover */
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
     transform: translateY(-2px);
-    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.4);
   }
-  
+
+  .btn-primary:hover::before {
+    left: 100%;
+  }
+
   .btn-primary:active {
     transform: translateY(0);
   }
@@ -152,12 +191,13 @@
     border-radius: var(--radius-xl);
     padding: var(--space-xl);
     box-shadow: var(--shadow-md);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   }
 
   .card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg), 0 0 15px rgba(0, 212, 255, 0.1);
+    border-color: rgba(0, 212, 255, 0.2);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -167,7 +207,7 @@
   }
 
   /* Improved spacing utilities */
-  .space-y-section > * + * {
+  .space-y-section>*+* {
     margin-top: var(--space-2xl);
   }
 
@@ -181,4 +221,3 @@
     font-size: clamp(1rem, 2vw, 1.125rem);
   }
 }
-

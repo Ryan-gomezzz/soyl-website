@@ -4,7 +4,7 @@ import { PRODUCT_KNOWLEDGE_SYSTEM_PROMPT } from '@/lib/prompts/productKnowledge'
 import { rateLimitAppRouter } from '@/utils/rateLimitAppRouter'
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || 'dummy_key_for_build',
 })
 
 // Constants
@@ -159,7 +159,7 @@ export async function POST(req: NextRequest) {
         language: 'en',
       })
       transcription = sanitizeText(transcriptionResponse.text)
-      
+
       // Validate transcription length
       if (transcription.length > MAX_MESSAGE_LENGTH) {
         transcription = transcription.substring(0, MAX_MESSAGE_LENGTH)

@@ -6,10 +6,12 @@ import { usePathname } from 'next/navigation'
 import { useChatbotContext } from './ChatbotProvider'
 import './ChatbotStyles.css'
 import clsx from 'clsx'
-import { Mic, MicOff, Volume2, VolumeX, X, Minimize2, Pin, PinOff, Loader2 } from 'lucide-react'
+import { Mic, Volume2, VolumeX, X, Minimize2, Pin, PinOff, Loader2 } from 'lucide-react'
+import { AudioVisualizer } from './AudioVisualizer'
 
 interface VoiceBotPanelProps {
   requestModalModeForFlow?: (enable: boolean) => void
+  autoPlayAudio?: boolean
 }
 
 // Focus trap hook
@@ -52,7 +54,7 @@ function useFocusTrap(isActive: boolean) {
   return containerRef
 }
 
-export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlow }: VoiceBotPanelProps) {
+export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlow, autoPlayAudio = true }: VoiceBotPanelProps) {
   const {
     open,
     setOpen,
@@ -61,7 +63,6 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
     minimized,
     setMinimized,
     prefersModal,
-    setPrefersModal,
     conversation,
     recording,
     playback,
@@ -75,6 +76,16 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [conversation.messages])
+
+  // Auto-play latest assistant audio if enabled
+  useEffect(() => {
+    if (autoPlayAudio && conversation.messages.length > 0) {
+      const lastMsg = conversation.messages[conversation.messages.length - 1]
+      if (lastMsg.role === 'assistant' && lastMsg.audioUrl && playback.state !== 'playing') {
+        playback.play(lastMsg.audioUrl).catch(err => console.log('Auto-play blocked or failed:', err))
+      }
+    }
+  }, [conversation.messages, autoPlayAudio, playback])
 
   // Listen for programmatic open/close/toggle events from ChatbotController
   useEffect(() => {
@@ -241,7 +252,7 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
             transition={{ duration: prefersReducedMotion ? 0 : 0.18 }}
             aria-hidden={!open}
             className={clsx(
-              'chat-overlay fixed inset-0 z-[60] bg-black/20 backdrop-blur-sm',
+              'chat-overlay fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm',
               prefersModal ? 'pointer-events-auto' : 'pointer-events-none'
             )}
             onClick={prefersModal ? handleClose : undefined}
@@ -271,119 +282,127 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
         aria-modal={prefersModal ? 'true' : undefined}
         aria-label="SOYL Voice Assistant panel"
         className={clsx(
-          'chat-panel fixed right-4 top-7 z-[70] h-[calc(100vh-3.5rem)] w-[420px] max-w-[calc(100vw-2rem)] bg-[var(--panel)]/90 backdrop-blur-md shadow-2xl rounded-lg border border-white/10 flex flex-col overflow-hidden',
+          'chat-panel fixed right-4 top-20 z-[70] h-[calc(100vh-6rem)] w-[420px] max-w-[calc(100vw-2rem)] bg-[var(--panel)]/95 backdrop-blur-xl shadow-2xl rounded-2xl border border-white/10 flex flex-col overflow-hidden',
           'max-sm:w-full max-sm:right-0 max-sm:top-0 max-sm:h-full max-sm:rounded-none'
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 md:p-6 border-b border-white/10 flex-shrink-0">
-          <div>
-            <h2 id="chatbot-title" className="text-xl md:text-2xl font-bold text-text">
-              SOYL Voice Assistant
-            </h2>
-            <p className="text-xs md:text-sm text-muted mt-1">
-              Ask me anything about SOYL
-            </p>
+        <div className="flex items-center justify-between p-4 px-6 border-b border-white/10 flex-shrink-0 bg-white/5">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
+              <Mic className="w-4 h-4 text-accent" />
+            </div>
+            <div>
+              <h2 id="chatbot-title" className="text-lg font-bold text-white">
+                SOYL Assistant
+              </h2>
+              <p className="text-xs text-muted flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                Online
+              </p>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <button
               onClick={() => setMinimized(true)}
               className="p-2 rounded-lg hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-accent"
               aria-label="Minimize panel"
               title="Minimize"
             >
-              <Minimize2 className="w-5 h-5 text-text" />
+              <Minimize2 className="w-4 h-4 text-muted hover:text-white" />
             </button>
             <button
               onClick={() => setPinned(!pinned)}
               className={clsx(
                 'p-2 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-accent',
-                pinned ? 'bg-accent/20 text-accent' : 'hover:bg-white/10 text-text'
+                pinned ? 'bg-accent/20 text-accent' : 'hover:bg-white/10 text-muted hover:text-white'
               )}
               aria-label={pinned ? 'Unpin panel' : 'Pin panel'}
               title={pinned ? 'Unpin' : 'Pin'}
             >
-              {pinned ? <Pin className="w-5 h-5" /> : <PinOff className="w-5 h-5" />}
+              {pinned ? <Pin className="w-4 h-4" /> : <PinOff className="w-4 h-4" />}
             </button>
             <button
               onClick={handleClose}
               className="p-2 rounded-lg hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-accent"
               aria-label="Close panel"
             >
-              <X className="w-5 h-5 text-text" />
+              <X className="w-4 h-4 text-muted hover:text-white" />
             </button>
           </div>
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 min-h-0">
+        <div className="flex-1 overflow-y-auto p-4 px-6 space-y-6 min-h-0 custom-scrollbar">
           {conversation.messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: 'spring' }}
-                className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center"
-              >
-                <Mic className="w-8 h-8 text-accent" />
-              </motion.div>
-              <p className="text-muted text-sm max-w-xs">
-                Press and hold the microphone button to ask me about SOYL&apos;s products, features, or pricing.
+            <div className="flex flex-col items-center justify-center h-full text-center space-y-6 opacity-80">
+              <div className="relative">
+                <div className="absolute inset-0 bg-accent/20 blur-xl rounded-full"></div>
+                <Mic className="relative w-12 h-12 text-accent" />
+              </div>
+              <p className="text-muted text-sm max-w-[250px] leading-relaxed">
+                Hi! I&apos;m your AI sales assistant. Hold the mic button below to ask me anything about SOYL.
               </p>
             </div>
           )}
 
-          <AnimatePresence>
+          <AnimatePresence mode="popLayout">
             {conversation.messages.map((message) => (
               <motion.div
                 key={message.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
+                initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.3, type: "spring" }}
                 className={clsx(
-                  'flex',
+                  'flex w-full',
                   message.role === 'user' ? 'justify-end' : 'justify-start'
                 )}
               >
                 <div
                   className={clsx(
-                    'max-w-[80%] rounded-lg p-3 space-y-1',
+                    'max-w-[85%] rounded-2xl p-4 shadow-sm relative',
                     message.role === 'user'
-                      ? 'bg-accent/20 text-text'
-                      : 'glass border border-white/10 text-text'
+                      ? 'bg-accent text-bg rounded-br-none'
+                      : 'bg-white/10 backdrop-blur-md border border-white/5 text-text rounded-bl-none'
                   )}
                 >
                   {message.transcription && message.role === 'user' && (
-                    <p className="text-xs text-muted italic">{message.transcription}</p>
+                    <p className="text-xs text-bg/70 italic mb-1">{message.transcription}</p>
                   )}
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                  <div className="flex items-center justify-between gap-2 mt-2">
-                    <span className="text-xs text-muted">{formatTime(message.timestamp)}</span>
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+
+                  {/* Audio Controls */}
+                  <div className="flex items-center justify-between gap-3 mt-3 pt-2 border-t border-black/5 dark:border-white/5">
+                    <span className={clsx("text-[10px]", message.role === 'user' ? "text-bg/60" : "text-muted")}>
+                      {formatTime(message.timestamp)}
+                    </span>
                     {message.role === 'assistant' && message.audioUrl && (
-                      <button
-                        onClick={() => {
-                          if (playback.state === 'playing') {
-                            playback.stop()
-                          } else {
-                            playback.play(message.audioUrl!).catch((err) => {
-                              console.error('Failed to play audio:', err)
-                              // Audio will still be available as text
-                            })
-                          }
-                        }}
-                        className="p-1 rounded hover:bg-white/10 transition-colors disabled:opacity-50"
-                        aria-label={playback.state === 'playing' ? 'Stop audio' : 'Play audio response'}
-                        disabled={playback.state === 'error'}
-                      >
+                      <div className="flex items-center gap-2">
                         {playback.state === 'playing' ? (
-                          <VolumeX className="w-4 h-4 text-text" />
-                        ) : playback.state === 'error' ? (
-                          <Volume2 className="w-4 h-4 text-muted" />
-                        ) : (
-                          <Volume2 className="w-4 h-4 text-text" />
-                        )}
-                      </button>
+                          <AudioVisualizer isActive={true} mode="speaking" barCount={5} />
+                        ) : null}
+                        <button
+                          onClick={() => {
+                            if (playback.state === 'playing') {
+                              playback.stop()
+                            } else {
+                              playback.play(message.audioUrl!).catch((err) => {
+                                console.error('Failed to play audio:', err)
+                              })
+                            }
+                          }}
+                          className="p-1.5 rounded-full hover:bg-white/10 transition-colors disabled:opacity-50"
+                          aria-label={playback.state === 'playing' ? 'Stop audio' : 'Play audio response'}
+                          disabled={playback.state === 'error'}
+                        >
+                          {playback.state === 'playing' ? (
+                            <VolumeX className="w-3.5 h-3.5" />
+                          ) : (
+                            <Volume2 className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -395,16 +414,11 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex justify-start"
+              className="flex justify-start w-full"
             >
-              <div className="glass border border-white/10 rounded-lg p-3 flex items-center gap-2">
-                <motion.div
-                  animate={{ opacity: [0.5, 1, 0.5] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-                >
-                  <Loader2 className="w-4 h-4 text-accent" />
-                </motion.div>
-                <span className="text-sm text-muted">Processing your request...</span>
+              <div className="bg-white/5 border border-white/10 rounded-2xl rounded-bl-none p-4 flex items-center gap-3">
+                <AudioVisualizer isActive={true} mode="processing" barCount={6} />
+                <span className="text-xs text-muted font-medium">Thinking...</span>
               </div>
             </motion.div>
           )}
@@ -413,9 +427,9 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-red-500/20 border border-red-500/50 rounded-lg p-3"
+              className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mx-auto w-full"
             >
-              <p className="text-sm text-red-400">{conversation.error}</p>
+              <p className="text-xs text-red-400 text-center">{conversation.error}</p>
             </motion.div>
           )}
 
@@ -423,21 +437,9 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-red-500/20 border border-red-500/50 rounded-lg p-3"
+              className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mx-auto w-full"
             >
-              <p className="text-sm text-red-400">{recording.error}</p>
-            </motion.div>
-          )}
-
-          {recording.hasPermission === false && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3"
-            >
-              <p className="text-sm text-yellow-400">
-                Microphone permission is required. Please allow microphone access to use the voice assistant.
-              </p>
+              <p className="text-xs text-red-400 text-center">{recording.error}</p>
             </motion.div>
           )}
 
@@ -445,9 +447,42 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
         </div>
 
         {/* Voice Control Area */}
-        <div className="p-4 md:p-6 border-t border-white/10 flex-shrink-0 space-y-4">
-          {/* Voice Button */}
-          <div className="flex justify-center">
+        <div className="p-6 border-t border-white/10 bg-[var(--panel)]/50 backdrop-blur-md relative z-10">
+          <div className="flex flex-col items-center justify-center gap-4">
+            {/* Dynamic Status Text */}
+            <div className="h-6 flex items-center justify-center">
+              <AnimatePresence mode="wait">
+                {recording.state === 'recording' ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="flex items-center gap-2"
+                  >
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                    <span className="text-sm font-medium text-white">Listening...</span>
+                  </motion.div>
+                ) : conversation.isLoading ? (
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-sm text-muted"
+                  >
+                    Processing logic...
+                  </motion.p>
+                ) : (
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-xs text-muted"
+                  >
+                    Hold to speak • Tap Spacebar
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Main Interactive Button */}
             <motion.button
               onMouseDown={handleVoiceButtonMouseDown}
               onMouseUp={handleVoiceButtonMouseUp}
@@ -459,13 +494,15 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
                 conversation.isLoading ||
                 recording.hasPermission === false
               }
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               className={clsx(
-                'w-16 h-16 rounded-full flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-accent',
+                'relative w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl focus:outline-none ring-offset-4 ring-offset-[var(--panel)] focus:ring-2 focus:ring-accent',
                 recording.state === 'recording' || isPressing
-                  ? 'bg-red-500 scale-110'
-                  : conversation.isLoading || recording.state === 'processing'
-                  ? 'bg-muted cursor-not-allowed'
-                  : 'bg-accent hover:bg-accent/90 cursor-pointer'
+                  ? 'bg-red-500 ring-4 ring-red-500/30'
+                  : conversation.isLoading
+                    ? 'bg-white/10 cursor-not-allowed'
+                    : 'bg-gradient-to-br from-accent to-[#0099cc] hover:shadow-accent/40'
               )}
               aria-label={
                 recording.state === 'recording'
@@ -473,72 +510,57 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
                   : 'Start recording'
               }
             >
+              {/* Outer Glow Ring */}
+              {(recording.state === 'recording' || isPressing) && (
+                <motion.div
+                  layoutId="recording-glow"
+                  className="absolute inset-0 rounded-full border-2 border-red-500 opacity-50"
+                  animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0, 0.5] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                />
+              )}
+
               <AnimatePresence mode="wait">
                 {recording.state === 'recording' || isPressing ? (
                   <motion.div
                     key="recording"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    exit={{ scale: 0 }}
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.5, opacity: 0 }}
                   >
-                    <MicOff className="w-8 h-8 text-white" />
+                    <AudioVisualizer isActive={true} mode="listening" barCount={4} />
                   </motion.div>
                 ) : conversation.isLoading || recording.state === 'processing' ? (
                   <motion.div
                     key="loading"
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
                   >
-                    <Loader2 className="w-8 h-8 text-white" />
+                    <Loader2 className="w-8 h-8 text-white/50" />
                   </motion.div>
                 ) : (
                   <motion.div
                     key="idle"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    exit={{ scale: 0 }}
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.5, opacity: 0 }}
                   >
                     <Mic className="w-8 h-8 text-white" />
                   </motion.div>
                 )}
               </AnimatePresence>
             </motion.button>
-          </div>
 
-          {/* Recording indicator */}
-          {recording.state === 'recording' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center"
-            >
-              <p className="text-sm text-muted">Recording... Release to send</p>
-            </motion.div>
-          )}
-
-          {/* Helper text */}
-          <div className="text-center text-xs text-muted space-y-1">
-            <p>Press and hold to speak, or press Spacebar</p>
+            {/* Clear Chat Option */}
             {conversation.messages.length > 0 && (
               <button
                 onClick={conversation.clearConversation}
-                className="text-accent hover:underline"
+                className="text-xs text-muted/50 hover:text-red-400 transition-colors mt-2"
               >
-                Clear conversation
+                Clear conversation history
               </button>
             )}
           </div>
-
-          {/* Modal mode toggle */}
-          <label className="flex items-center gap-2 cursor-pointer text-xs">
-            <input
-              type="checkbox"
-              checked={prefersModal}
-              onChange={(e) => setPrefersModal(e.target.checked)}
-              className="w-3 h-3 text-accent rounded focus:ring-accent"
-            />
-            <span className="text-muted">Modal Assist Mode (trap keyboard focus)</span>
-          </label>
         </div>
       </motion.aside>
     </>
