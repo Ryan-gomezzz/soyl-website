@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import crypto from 'crypto'
+import prisma from '@/lib/prisma'
 
 // Force dynamic rendering since we use cookies()
 export const dynamic = 'force-dynamic'
@@ -75,9 +76,12 @@ export async function POST(req: NextRequest) {
     const adminPassword = process.env.ADMIN_PASSWORD
 
     if (!adminPassword) {
-      console.error('ADMIN_PASSWORD not configured')
+      console.error('ADMIN_PASSWORD not configured. Please set ADMIN_PASSWORD environment variable.')
+      const errorMessage = process.env.NODE_ENV === 'development'
+        ? 'Server configuration error: ADMIN_PASSWORD environment variable is not set. Please configure it in your .env.local file.'
+        : 'Server configuration error'
       return NextResponse.json(
-        { error: 'Server configuration error' },
+        { error: errorMessage },
         { status: 500 }
       )
     }
@@ -94,6 +98,26 @@ export async function POST(req: NextRequest) {
     // Generate secure session token
     const sessionToken = crypto.randomBytes(32).toString('hex')
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+
+    // Store session in database
+    try {
+      await prisma.adminSession.create({
+        data: {
+          token: sessionToken,
+          expiresAt,
+        },
+      })
+    } catch (dbError) {
+      console.error('Failed to create session in database:', dbError)
+      // If database is unavailable, still allow login but log the error
+      // In production, you might want to fail here
+      if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json(
+          { error: 'Internal server error' },
+          { status: 500 }
+        )
+      }
+    }
 
     // Set httpOnly cookie
     const cookieStore = await cookies()

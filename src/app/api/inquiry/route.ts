@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
-import { addInquiry } from '@/lib/mock-db'
+import prisma from '@/lib/prisma'
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request) {
     try {
@@ -10,9 +12,17 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
         }
 
-        const newInquiry = addInquiry({ name, email, message, type: type || 'GENERAL' })
+        const newInquiry = await prisma.inquiry.create({
+            data: {
+                name,
+                email,
+                message,
+                type: type || 'GENERAL',
+            },
+        })
         return NextResponse.json({ success: true, data: newInquiry })
     } catch (error) {
+        console.error('Error creating inquiry:', error)
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
     }
 }
