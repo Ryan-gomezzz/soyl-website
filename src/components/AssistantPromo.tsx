@@ -1,11 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
+import { ArrowRight } from 'lucide-react'
 import { DotPattern } from '@/app/_components/DotPattern'
+import { Icon } from '@/components/Icon'
 
 export function AssistantPromo() {
+  const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const prefersReducedMotion =
     typeof window !== 'undefined' &&
@@ -16,9 +20,7 @@ export function AssistantPromo() {
     setMounted(true)
   }, [])
 
-  const handleTryAssistant = () => {
-    window.location.href = '/under-development'
-  }
+
 
   const handleHowItWorks = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
@@ -93,7 +95,7 @@ export function AssistantPromo() {
               <div className="flex flex-col sm:flex-row gap-4">
                 {/* Primary CTA */}
                 <motion.button
-                  onClick={handleTryAssistant}
+                  onClick={() => router.push('/under-development')}
                   aria-controls="soyl-assistant-panel"
                   aria-label="Open SOYL Assistant chatbot panel"
                   whileHover={!prefersReducedMotion ? { scale: 1.05 } : {}}
@@ -102,22 +104,7 @@ export function AssistantPromo() {
                 >
                   <span className="flex items-center justify-center gap-2">
                     Try the Assistant
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="inline-block"
-                    >
-                      <path
-                        d="M15 5L5 15M5 5L15 15"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                      />
-                      <circle cx="10" cy="10" r="8" stroke="currentColor" strokeWidth="1" fill="none" opacity="0.3" />
-                    </svg>
+                    <Icon icon={ArrowRight} className="w-5 h-5" />
                   </span>
                 </motion.button>
 

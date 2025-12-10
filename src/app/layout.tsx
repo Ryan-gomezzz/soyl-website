@@ -1,11 +1,11 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import '@/styles/flowchart.css'
 import { Header } from './_components/Header'
 import { Footer } from './_components/Footer'
 import { CustomCursor } from './_components/CustomCursor'
-import { SEO } from './_components/SEO'
+
 import { Analytics } from './_components/Analytics'
 import { Chatbot } from '@/components/chatbot'
 import { AnimatedGrid } from '@/components/AnimatedGrid'
@@ -17,6 +17,12 @@ const inter = Inter({
   display: 'swap',
   variable: '--font-inter',
 })
+
+export const viewport: Viewport = {
+  themeColor: '#0f1724',
+  width: 'device-width',
+  initialScale: 1,
+}
 
 export const metadata: Metadata = {
   title: {
@@ -35,6 +41,9 @@ export const metadata: Metadata = {
   authors: [{ name: siteConfig.name }],
   creator: siteConfig.name,
   metadataBase: new URL(siteConfig.url),
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -55,8 +64,11 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: siteConfig.fullName,
     description: siteConfig.description,
-        images: ['/og/soyl-og.svg'],
+    images: ['/og/soyl-og.svg'],
     creator: '@soyl_ai',
+  },
+  icons: {
+    icon: '/favicon.svg',
   },
   robots: {
     index: true,
@@ -78,20 +90,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
-      <head>
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-      </head>
       <body className="antialiased bg-bg text-text relative">
         <AnimatedGrid />
         <FloatingParticles count={60} />
         <FloatingOrbs />
-        <SEO />
         <Analytics />
         <CustomCursor />
         <a

@@ -7,16 +7,37 @@ export default function AdminLogin() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (username === 'admin' && password === 'soyladmin123') {
-            // Set a simple cookie or local storage
-            document.cookie = 'admin_auth=true; path=/'
+        setIsLoading(true)
+        setError('')
+
+        try {
+            const response = await fetch('/api/admin/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                setError(data.error || 'Invalid credentials')
+                setIsLoading(false)
+                return
+            }
+
+            // Redirect on success
             router.push('/admin/dashboard')
-        } else {
-            setError('Invalid credentials')
+            router.refresh()
+        } catch (err) {
+            setError('An error occurred. Please try again.')
+            setIsLoading(false)
         }
     }
 
@@ -46,9 +67,10 @@ export default function AdminLogin() {
                     {error && <p className="text-red-500 text-sm">{error}</p>}
                     <button
                         type="submit"
-                        className="w-full py-2 bg-accent text-bg font-bold rounded hover:bg-accent-2 transition-colors"
+                        disabled={isLoading}
+                        className="w-full py-2 bg-accent text-bg font-bold rounded hover:bg-accent-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Login
+                        {isLoading ? 'Logging in...' : 'Login'}
                     </button>
                 </form>
             </div>

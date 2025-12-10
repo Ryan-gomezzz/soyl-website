@@ -124,8 +124,8 @@ export function ChatbotLauncher({
         zIndex: 9999,
         ...(isTouchDevice ? {} : { y }),
       }}
-      aria-label={minimized ? 'Restore SOYL assistant' : 'Open SOYL assistant'}
-      title={minimized ? 'Restore assistant' : 'Ask SOYL'}
+      aria-label={minimized ? 'Restore SOYL voice assistant' : 'Open SOYL voice assistant'}
+      title={minimized ? 'Restore voice assistant' : 'Talk to SOYL'}
     >
       <motion.div
         animate={
@@ -151,12 +151,17 @@ export function ChatbotLauncher({
           className="text-bg w-6 h-6 md:w-7 md:h-7"
         >
           <path
-            d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2Z"
+            d="M12 14C13.1 14 14 13.1 14 12V6C14 4.9 13.1 4 12 4C10.9 4 10 4.9 10 6V12C10 13.1 10.9 14 12 14Z"
             fill="currentColor"
           />
-          <circle cx="7" cy="10" r="1" fill="#0f1724" />
-          <circle cx="12" cy="10" r="1" fill="#0f1724" />
-          <circle cx="17" cy="10" r="1" fill="#0f1724" />
+          <path
+            d="M19 10V12C19 15.9 15.9 19 12 19C8.1 19 5 15.9 5 12V10H7V12C7 14.8 9.2 17 12 17C14.8 17 17 14.8 17 12V10H19Z"
+            fill="currentColor"
+          />
+          <path
+            d="M11 22H13V20H11V22Z"
+            fill="currentColor"
+          />
         </svg>
       </motion.div>
     </motion.button>

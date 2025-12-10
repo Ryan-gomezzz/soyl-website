@@ -2,6 +2,9 @@
 
 import { createContext, useContext, ReactNode } from 'react'
 import { useChatbotState } from './hooks/useChatbotState'
+import { useConversation } from './hooks/useConversation'
+import { useVoiceRecording } from './hooks/useVoiceRecording'
+import { useAudioPlayback } from './hooks/useAudioPlayback'
 
 interface ChatbotContextType {
   open: boolean
@@ -15,6 +18,10 @@ interface ChatbotContextType {
   lastY: number
   setLastY: (lastY: number) => void
   requestModalModeForFlow: (enable: boolean) => void
+  // Voice bot functionality
+  conversation: ReturnType<typeof useConversation>
+  recording: ReturnType<typeof useVoiceRecording>
+  playback: ReturnType<typeof useAudioPlayback>
 }
 
 const ChatbotContextValue = createContext<ChatbotContextType | undefined>(undefined)
@@ -33,9 +40,37 @@ interface ChatbotProviderProps {
 
 export function ChatbotProvider({ children }: ChatbotProviderProps) {
   const state = useChatbotState()
+  const conversation = useConversation()
+  
+  const playback = useAudioPlayback({
+    onError: (error) => {
+      console.error('Playback error:', error)
+    },
+  })
+
+  const recording = useVoiceRecording({
+    onRecordingComplete: async (audioBlob) => {
+      try {
+        const message = await conversation.sendVoiceMessage(audioBlob)
+        if (message.audioUrl) {
+          playback.play(message.audioUrl)
+        }
+      } catch (error) {
+        console.error('Error sending voice message:', error)
+      }
+    },
+    onError: (error) => {
+      console.error('Recording error:', error)
+    },
+  })
 
   return (
-    <ChatbotContextValue.Provider value={state}>
+    <ChatbotContextValue.Provider value={{
+      ...state,
+      conversation,
+      recording,
+      playback,
+    }}>
       {children}
     </ChatbotContextValue.Provider>
   )
