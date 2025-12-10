@@ -62,8 +62,17 @@ export function useAudioPlayback(options: UseAudioPlaybackOptions = {}) {
           }
         } else {
           // Plain base64 string - convert to Blob
+          // First, validate it's actually base64
+          const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/
+          if (!base64Regex.test(audioData)) {
+            throw new Error('Invalid base64 format: contains invalid characters')
+          }
+          
           try {
             const binaryString = atob(audioData)
+            if (binaryString.length === 0) {
+              throw new Error('Invalid base64: decoded data is empty')
+            }
             const bytes = new Uint8Array(binaryString.length)
             for (let i = 0; i < binaryString.length; i++) {
               bytes[i] = binaryString.charCodeAt(i)
@@ -73,7 +82,8 @@ export function useAudioPlayback(options: UseAudioPlaybackOptions = {}) {
             audioUrl = URL.createObjectURL(blob)
             shouldRevokeUrl = true
           } catch (e) {
-            throw new Error('Invalid base64 audio data')
+            const errorMsg = e instanceof Error ? e.message : 'Unknown error'
+            throw new Error(`Invalid base64 audio data: ${errorMsg}`)
           }
         }
       } else if (audioData instanceof Blob) {

@@ -45,6 +45,8 @@ export function ChatbotProvider({ children }: ChatbotProviderProps) {
   const playback = useAudioPlayback({
     onError: (error) => {
       console.error('Playback error:', error)
+      // Audio playback failed, but text response is still available
+      // User can still read the response
     },
   })
 
@@ -53,7 +55,11 @@ export function ChatbotProvider({ children }: ChatbotProviderProps) {
       try {
         const message = await conversation.sendVoiceMessage(audioBlob)
         if (message.audioUrl) {
-          playback.play(message.audioUrl)
+          // Try to play audio, but don't fail if it doesn't work
+          playback.play(message.audioUrl).catch((err) => {
+            console.error('Failed to play audio response:', err)
+            // Audio failed but text response is still available
+          })
         }
       } catch (error) {
         console.error('Error sending voice message:', error)
