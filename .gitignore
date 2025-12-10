@@ -38,3 +38,7 @@ next-env.d.ts
 # husky
 .husky/_/
 
+# cursor IDE (but keep mcp.json for team config)
+.cursor/*
+!.cursor/mcp.json
+
