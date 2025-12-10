@@ -132,20 +132,37 @@ export function useConversation() {
       }
       
       // Clean the base64 string (remove any whitespace or data URI prefix if present)
-      let cleanBase64 = data.audio.trim()
+      let cleanBase64 = String(data.audio || '').trim()
+      
+      // Remove data URI prefix if present
       if (cleanBase64.startsWith('data:audio')) {
         // Extract base64 from data URI if present
         const match = cleanBase64.match(/^data:audio\/[^;]+;base64,(.+)$/)
-        if (match) {
-          cleanBase64 = match[1]
+        if (match && match[1]) {
+          cleanBase64 = match[1].trim()
+        } else {
+          // Try to extract just the base64 part after the comma
+          const commaIndex = cleanBase64.indexOf(',')
+          if (commaIndex !== -1) {
+            cleanBase64 = cleanBase64.substring(commaIndex + 1).trim()
+          }
         }
       }
       
-      // Validate base64 format
+      // Remove any remaining whitespace (newlines, spaces, etc.)
+      cleanBase64 = cleanBase64.replace(/\s/g, '')
+      
+      // Check if we have any data
+      if (!cleanBase64 || cleanBase64.length === 0) {
+        console.error('Empty audio data received from API')
+        throw new Error('Invalid audio data: empty base64 string')
+      }
+      
+      // Validate base64 format (more lenient - allows padding)
       const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/
       if (!base64Regex.test(cleanBase64)) {
-        console.error('Invalid base64 format in audio data')
-        throw new Error('Invalid audio data: malformed base64')
+        console.error('Invalid base64 format in audio data:', cleanBase64.substring(0, 50))
+        throw new Error('Invalid audio data: malformed base64 format')
       }
       
       try {

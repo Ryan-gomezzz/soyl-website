@@ -62,14 +62,22 @@ export function useAudioPlayback(options: UseAudioPlaybackOptions = {}) {
           }
         } else {
           // Plain base64 string - convert to Blob
-          // First, validate it's actually base64
+          // Clean the string first (remove whitespace)
+          const cleanBase64 = String(audioData).trim().replace(/\s/g, '')
+          
+          // Check if empty
+          if (!cleanBase64 || cleanBase64.length === 0) {
+            throw new Error('Invalid base64: empty string')
+          }
+          
+          // Validate it's actually base64 (more lenient)
           const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/
-          if (!base64Regex.test(audioData)) {
+          if (!base64Regex.test(cleanBase64)) {
             throw new Error('Invalid base64 format: contains invalid characters')
           }
           
           try {
-            const binaryString = atob(audioData)
+            const binaryString = atob(cleanBase64)
             if (binaryString.length === 0) {
               throw new Error('Invalid base64: decoded data is empty')
             }
@@ -83,7 +91,10 @@ export function useAudioPlayback(options: UseAudioPlaybackOptions = {}) {
             shouldRevokeUrl = true
           } catch (e) {
             const errorMsg = e instanceof Error ? e.message : 'Unknown error'
-            throw new Error(`Invalid base64 audio data: ${errorMsg}`)
+            // Don't throw - log and use fallback
+            console.error('Failed to decode base64 audio:', errorMsg)
+            // Try as data URI fallback
+            audioUrl = `data:audio/mpeg;base64,${cleanBase64}`
           }
         }
       } else if (audioData instanceof Blob) {
