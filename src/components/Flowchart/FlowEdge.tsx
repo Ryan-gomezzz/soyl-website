@@ -69,7 +69,7 @@ export function FlowEdge({ edge, nodes, canvas, highlighted = false }: FlowEdgeP
             stroke="none"
             visibility="hidden"
           />
-          <circle r="3" fill="var(--accent)" opacity="0.8">
+          <circle cx={x1} cy={y1} r="3" fill="var(--accent)" opacity="0.8">
             <animateMotion dur="2s" repeatCount="indefinite" calcMode="linear">
               <mpath href={`#edge-${edge.from}-${edge.to}`} />
             </animateMotion>

@@ -38,10 +38,10 @@ export const DotCluster = React.forwardRef<SVGSVGElement, DotClusterProps>(
             cy={baseY}
             r={3}
             fill={color}
-            initial={{ opacity: 0, r: 2 }}
+            initial={{ opacity: 0, r: 2, cx: baseX, cy: baseY }}
             animate={
               reduced
-                ? { opacity: 1 }
+                ? { opacity: 1, cx: baseX, cy: baseY }
                 : {
                     opacity: [0, 1, 0.8, 0],
                     r: [2, 6, 4, 2],
