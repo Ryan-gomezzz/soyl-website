@@ -45,7 +45,7 @@ export async function verifyAdminSession(
  * Returns the session if valid, null otherwise.
  */
 export async function getAdminSessionFromRequest(
-  req: NextRequest
+  _req: NextRequest
 ): Promise<{ id: string; token: string; expiresAt: Date } | null> {
   const cookieStore = await cookies()
   const sessionToken = cookieStore.get('admin_session')?.value
@@ -71,9 +71,9 @@ export async function getAdminSession(): Promise<{
  * Returns true if authenticated, false otherwise.
  */
 export async function isAdminAuthenticated(
-  req: NextRequest
+  _req: NextRequest
 ): Promise<boolean> {
-  const session = await getAdminSessionFromRequest(req)
+  const session = await getAdminSessionFromRequest(_req)
   return session !== null
 }
 
