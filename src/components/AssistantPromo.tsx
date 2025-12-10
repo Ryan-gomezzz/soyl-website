@@ -37,6 +37,8 @@ export function AssistantPromo() {
   return (
     <section
       id="assistant-promo"
+      aria-labelledby="assistant-promo-title"
+      role="region"
       className="relative py-24 md:py-32 overflow-hidden"
     >
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent/5 to-transparent opacity-40 pointer-events-none" />
@@ -67,11 +69,11 @@ export function AssistantPromo() {
                 Live Voice Assistant
               </motion.div>
 
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight text-white leading-[1.1]">
-                Talk to your data, <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-[#ffffff]">
-                  literally.
-                </span>
+              <h2
+                id="assistant-promo-title"
+                className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight text-white leading-[1.1]"
+              >
+                SOYL Assistant
               </h2>
 
               <p className="text-lg md:text-xl text-muted mb-10 max-w-lg leading-relaxed">
