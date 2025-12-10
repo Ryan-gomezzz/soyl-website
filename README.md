@@ -42,44 +42,58 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 Copy `.env.example` to `.env.local` and set:
 
-| Variable | Notes |
-| --- | --- |
-| `DATABASE_URL` | Postgres connection string (RDS, Render, or Supabase) |
-| `AWS_REGION` | Region for S3/Secrets (e.g. `us-east-1`) |
-| `RESUME_BUCKET` | Private S3 bucket for resumes |
-| `S3_UPLOAD_ACCESS_KEY_ID` / `S3_UPLOAD_SECRET_ACCESS_KEY` | IAM user keys limited to the resume bucket |
-| `UPLOAD_API_SECRET` | Shared secret for `/api/upload-url` |
-| `ADMIN_API_TOKEN` | Secret token for admin API/UI access |
-| `SENDGRID_API_KEY` / `SENDGRID_FROM_EMAIL` / `HIRING_INBOX` | Email notifications |
-| `SLACK_WEBHOOK_URL` | Slack channel webhook (optional) |
-| `RECAPTCHA_SECRET_KEY` / `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | Google reCAPTCHA v3 keys |
-| `NEXT_PUBLIC_UPLOAD_PUBLIC_HINT` | Client-side hint that must match server secret (e.g. hashed) |
-| `NEXT_PUBLIC_ADMIN_HINT` | Token forwarded from admin UI to API |
+| Variable | Required | Notes |
+| --- | --- | --- |
+| `DATABASE_URL` | Yes (Careers) | Postgres connection string (RDS, Render, or Supabase) |
+| `AWS_REGION` | Yes (Careers) | Region for S3/Secrets (e.g. `us-east-1`) |
+| `RESUME_BUCKET` | Yes (Careers) | Private S3 bucket for resumes |
+| `S3_UPLOAD_ACCESS_KEY_ID` / `S3_UPLOAD_SECRET_ACCESS_KEY` | Yes (Careers) | IAM user keys limited to the resume bucket |
+| `UPLOAD_API_SECRET` | Yes (Careers) | Shared secret for `/api/upload-url` |
+| `ADMIN_API_TOKEN` | Yes (Careers) | Secret token for admin API/UI access |
+| `SENDGRID_API_KEY` / `SENDGRID_FROM_EMAIL` / `HIRING_INBOX` | Yes (Careers) | Email notifications |
+| `SLACK_WEBHOOK_URL` | No | Slack channel webhook (optional) |
+| `RECAPTCHA_SECRET_KEY` / `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | Yes (Careers) | Google reCAPTCHA v3 keys |
+| `NEXT_PUBLIC_UPLOAD_PUBLIC_HINT` | Yes (Careers) | Client-side hint that must match server secret (e.g. hashed) |
+| `NEXT_PUBLIC_ADMIN_HINT` | Yes (Careers) | Token forwarded from admin UI to API |
+| `ADMIN_USERNAME` | No | Admin login username (defaults to 'admin') |
+| `ADMIN_PASSWORD` | No | Admin login password (required if admin login is enabled) |
 
 #### Sample `.env.local`
 
 ```bash
+# Database (Required for Careers System)
 DATABASE_URL="postgresql://username:password@host:5432/soyl_applicants?schema=public"
 
+# AWS S3 (Required for Careers System)
 AWS_REGION="us-east-1"
 RESUME_BUCKET="soyl-careers-resumes"
 S3_UPLOAD_ACCESS_KEY_ID="aws_access_key_id"
 S3_UPLOAD_SECRET_ACCESS_KEY="aws_secret_access_key"
 UPLOAD_API_SECRET="super-shared-secret"
 
+# Admin & Security (Required for Careers System)
 ADMIN_API_TOKEN="admin-dashboard-token"
+ADMIN_USERNAME="admin"
+ADMIN_PASSWORD="your-secure-password"
 
+# Email (Required for Careers System)
 SENDGRID_API_KEY="SG.xxxxxx"
 SENDGRID_FROM_EMAIL="careers@soyl.ai"
 HIRING_INBOX="hiring@soyl.ai"
 
+# Optional Integrations
 SLACK_WEBHOOK_URL="https://hooks.slack.com/services/..."
 
+# reCAPTCHA (Required for Careers System)
 RECAPTCHA_SECRET_KEY="recaptcha-secret-key"
 NEXT_PUBLIC_RECAPTCHA_SITE_KEY="recaptcha-site-key"
 
+# Public Hints (Required for Careers System)
 NEXT_PUBLIC_UPLOAD_PUBLIC_HINT="public-hint"
 NEXT_PUBLIC_ADMIN_HINT="preview-admin-token"
+
+# Voice Bot (Required for Voice Bot Feature)
+OPENAI_API_KEY="sk-..."
 ```
 
 ### Local Development
@@ -128,6 +142,38 @@ NEXT_PUBLIC_ADMIN_HINT="preview-admin-token"
 - **Slack**: Webhook payload for `#hiring` announcements (`utils/slack.ts`).
 - **n8n**: Trigger on status change to `INTERVIEW` -> create calendar invite or move to ATS.
 - **Scoring**: `scoreResumeKeywords` stub ready for integration with keyword/LLM parsing pipelines.
+
+## 🎤 Voice Bot Configuration
+
+The SOYL website includes an AI-powered voice assistant that uses OpenAI's APIs for speech-to-text, conversational AI, and text-to-speech.
+
+### Required Environment Variables
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `OPENAI_API_KEY` | **Yes** | Your OpenAI API key (starts with `sk-`) |
+
+### Features
+
+- **Speech-to-Text**: Transcribes audio using OpenAI Whisper API
+- **Conversational AI**: Generates responses using GPT-4
+- **Text-to-Speech**: Converts response to audio using OpenAI TTS API
+
+### Getting Your OpenAI API Key
+
+1. Sign up or log in to [OpenAI Platform](https://platform.openai.com/)
+2. Navigate to **API Keys** section
+3. Click **Create new secret key**
+4. Copy the key (starts with `sk-`) and add it to your environment variables
+
+### API Endpoint
+
+The voice bot API is available at `/api/voice/chat` and handles:
+- Audio transcription (Whisper)
+- AI conversation (GPT-4)
+- Speech synthesis (TTS)
+
+See `src/components/chatbot/README.md` for complete voice bot documentation.
 
 ## 🤖 Chatbot (MCQ) — How to Edit
 
@@ -265,12 +311,112 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on branch naming, pull r
 
 ## 🚢 Deployment
 
-### Vercel (Recommended)
+### Deployment on Vercel
 
-1. Push to GitHub
-2. Import project in Vercel
-3. Set production branch to `main`
-4. Deploy automatically on push
+Vercel is the recommended deployment platform for this Next.js application. Follow these steps to deploy:
+
+#### 1. Initial Setup
+
+1. Push your code to GitHub
+2. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+3. Click **Add New Project**
+4. Import your GitHub repository
+5. Set production branch to `main`
+6. Vercel will automatically detect Next.js and configure build settings
+
+#### 2. Adding Environment Variables
+
+**Critical**: You must add all required environment variables before deploying.
+
+1. In your Vercel project dashboard, navigate to **Settings** → **Environment Variables**
+2. Add each variable one by one using the **Add** button
+3. Select the appropriate environment scope:
+   - **Production**: For production deployments
+   - **Preview**: For preview deployments (pull requests)
+   - **Development**: For local development (optional)
+
+#### 3. Required Environment Variables
+
+**For Voice Bot:**
+- `OPENAI_API_KEY` - Your OpenAI API key (starts with `sk-`)
+
+**For Careers System:**
+- `DATABASE_URL` - PostgreSQL connection string
+- `AWS_REGION` - AWS region (e.g., `us-east-1`)
+- `RESUME_BUCKET` - S3 bucket name
+- `S3_UPLOAD_ACCESS_KEY_ID` - AWS access key
+- `S3_UPLOAD_SECRET_ACCESS_KEY` - AWS secret key
+- `UPLOAD_API_SECRET` - Shared secret for upload API
+- `ADMIN_API_TOKEN` - Admin dashboard token
+- `SENDGRID_API_KEY` - SendGrid API key
+- `SENDGRID_FROM_EMAIL` - Email sender address
+- `HIRING_INBOX` - Hiring email address
+- `RECAPTCHA_SECRET_KEY` - Google reCAPTCHA secret
+- `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` - Google reCAPTCHA site key
+- `NEXT_PUBLIC_UPLOAD_PUBLIC_HINT` - Public hint for upload
+- `NEXT_PUBLIC_ADMIN_HINT` - Admin hint token
+
+**Optional:**
+- `ADMIN_USERNAME` - Admin login username (defaults to 'admin')
+- `ADMIN_PASSWORD` - Admin login password
+- `SLACK_WEBHOOK_URL` - Slack webhook for notifications
+
+#### 4. Database Setup
+
+Before deploying, ensure your database is set up:
+
+```bash
+# Run migrations against production database
+npx prisma migrate deploy
+```
+
+**Note**: Make sure `DATABASE_URL` is set in Vercel before running migrations.
+
+#### 5. Build Configuration
+
+Vercel automatically detects Next.js and uses these build settings:
+- **Build Command**: `npm run build` (automatically set)
+- **Output Directory**: `.next` (automatically set)
+- **Install Command**: `npm install` (automatically set)
+
+#### 6. Deploy
+
+1. After adding all environment variables, go to **Deployments** tab
+2. Click **Redeploy** on the latest deployment, or
+3. Push a new commit to trigger automatic deployment
+
+#### 7. Post-Deployment Checklist
+
+- [ ] Verify all environment variables are set correctly
+- [ ] Test voice bot functionality (requires `OPENAI_API_KEY`)
+- [ ] Test careers form submission (requires all careers system variables)
+- [ ] Verify database connection
+- [ ] Check admin dashboard access
+- [ ] Test email notifications (SendGrid)
+- [ ] Verify reCAPTCHA is working
+
+#### Environment-Specific Configuration
+
+- **Production**: Set all required variables for production use
+- **Preview**: Can use dummy values for testing, or separate test credentials
+- **Development**: Use local `.env.local` file (never commit this)
+
+#### Troubleshooting
+
+**Build Failures:**
+- Ensure all required environment variables are set
+- Check that `DATABASE_URL` is valid and accessible
+- Verify Prisma client generation succeeds
+
+**Runtime Errors:**
+- Check Vercel function logs in the dashboard
+- Verify API keys are correct and have proper permissions
+- Ensure database is accessible from Vercel's IP ranges
+
+**Voice Bot Not Working:**
+- Verify `OPENAI_API_KEY` is set and valid
+- Check OpenAI API usage limits and billing
+- Review function logs for API errors
 
 The site is optimized for Vercel's edge network and serverless functions.
 

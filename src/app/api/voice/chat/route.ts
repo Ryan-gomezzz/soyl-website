@@ -154,7 +154,7 @@ export async function POST(req: NextRequest) {
     let transcription: string
     try {
       const transcriptionResponse = await openai.audio.transcriptions.create({
-        file: audioFile as any, // Type assertion for OpenAI SDK compatibility
+        file: audioFile as File | Blob,
         model: 'whisper-1',
         language: 'en',
       })

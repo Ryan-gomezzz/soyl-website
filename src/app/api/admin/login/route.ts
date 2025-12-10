@@ -39,18 +39,6 @@ function recordFailedAttempt(ip: string) {
   }
 }
 
-function verifyPassword(password: string, hash: string): boolean {
-  // Simple constant-time comparison
-  if (password.length !== hash.length) {
-    return false
-  }
-  let result = 0
-  for (let i = 0; i < password.length; i++) {
-    result |= password.charCodeAt(i) ^ hash.charCodeAt(i)
-  }
-  return result === 0
-}
-
 export async function POST(req: NextRequest) {
   try {
     // Get client IP
