@@ -52,7 +52,7 @@ function useFocusTrap(isActive: boolean) {
   return containerRef
 }
 
-export function VoiceBotPanel({ requestModalModeForFlow }: VoiceBotPanelProps) {
+export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlow }: VoiceBotPanelProps) {
   const {
     open,
     setOpen,
@@ -328,7 +328,7 @@ export function VoiceBotPanel({ requestModalModeForFlow }: VoiceBotPanelProps) {
                 <Mic className="w-8 h-8 text-accent" />
               </motion.div>
               <p className="text-muted text-sm max-w-xs">
-                Press and hold the microphone button to ask me about SOYL's products, features, or pricing.
+                Press and hold the microphone button to ask me about SOYL&apos;s products, features, or pricing.
               </p>
             </div>
           )}

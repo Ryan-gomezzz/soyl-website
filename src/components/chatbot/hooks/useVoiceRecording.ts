@@ -86,7 +86,7 @@ export function useVoiceRecording(options: UseVoiceRecordingOptions = {}) {
       }
 
       // Handle errors
-      mediaRecorder.onerror = (event) => {
+      mediaRecorder.onerror = (_event) => {
         const error = new Error('Recording error occurred')
         setError('Recording error occurred')
         setState('error')
