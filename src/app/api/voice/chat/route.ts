@@ -173,7 +173,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Step 2: Get AI response using GPT-4
+    // Step 2: Get AI response using GPT-3.5-turbo (faster and more cost-effective)
     const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
       {
         role: 'system',
@@ -191,17 +191,19 @@ export async function POST(req: NextRequest) {
 
     let aiResponse: string
     try {
+      // Use gpt-3.5-turbo for faster responses (3-5x faster, 10x cheaper)
+      // Still provides excellent conversational quality
       const chatResponse = await openai.chat.completions.create({
-        model: 'gpt-4',
+        model: 'gpt-3.5-turbo',
         messages,
-        temperature: 0.7,
-        max_tokens: 500,
+        temperature: 0.8, // Slightly higher for more natural, sales-oriented responses
+        max_tokens: 400, // Reduced for faster generation and more concise responses
       })
       aiResponse = sanitizeText(
         chatResponse.choices[0]?.message?.content || 'I apologize, but I could not generate a response.'
       )
     } catch (error) {
-      console.error('GPT-4 chat error:', error)
+      console.error('GPT chat error:', error)
       // Don't expose internal error details
       return NextResponse.json(
         { error: 'Failed to generate response. Please try again.' },
@@ -212,9 +214,10 @@ export async function POST(req: NextRequest) {
     // Step 3: Generate TTS audio using TTS API
     let ttsAudio: Buffer
     try {
+      // Use tts-1 instead of tts-1-hd for faster generation (still high quality)
       const ttsResponse = await openai.audio.speech.create({
-        model: 'tts-1-hd',
-        voice: 'alloy', // Options: alloy, echo, fable, onyx, nova, shimmer
+        model: 'tts-1',
+        voice: 'nova', // More natural, friendly voice for sales conversations
         input: aiResponse,
       })
 

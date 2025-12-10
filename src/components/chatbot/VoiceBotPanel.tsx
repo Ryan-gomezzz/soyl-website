@@ -366,14 +366,20 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
                           if (playback.state === 'playing') {
                             playback.stop()
                           } else {
-                            playback.play(message.audioUrl!)
+                            playback.play(message.audioUrl!).catch((err) => {
+                              console.error('Failed to play audio:', err)
+                              // Audio will still be available as text
+                            })
                           }
                         }}
-                        className="p-1 rounded hover:bg-white/10 transition-colors"
-                        aria-label="Play audio response"
+                        className="p-1 rounded hover:bg-white/10 transition-colors disabled:opacity-50"
+                        aria-label={playback.state === 'playing' ? 'Stop audio' : 'Play audio response'}
+                        disabled={playback.state === 'error'}
                       >
                         {playback.state === 'playing' ? (
                           <VolumeX className="w-4 h-4 text-text" />
+                        ) : playback.state === 'error' ? (
+                          <Volume2 className="w-4 h-4 text-muted" />
                         ) : (
                           <Volume2 className="w-4 h-4 text-text" />
                         )}
@@ -387,13 +393,18 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
 
           {conversation.isLoading && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
               className="flex justify-start"
             >
               <div className="glass border border-white/10 rounded-lg p-3 flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin text-accent" />
-                <span className="text-sm text-muted">Thinking...</span>
+                <motion.div
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <Loader2 className="w-4 h-4 text-accent" />
+                </motion.div>
+                <span className="text-sm text-muted">Processing your request...</span>
               </div>
             </motion.div>
           )}

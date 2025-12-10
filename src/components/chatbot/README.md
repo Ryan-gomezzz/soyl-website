@@ -1,11 +1,11 @@
 # SOYL Voice Assistant
 
-A production-ready, AI-powered voice assistant component for the SOYL marketing website. The assistant uses OpenAI's Whisper API for speech-to-text, GPT-4 for conversational AI, and TTS API for text-to-speech responses.
+A production-ready, AI-powered voice assistant component for the SOYL marketing website. The assistant uses OpenAI's Whisper API for speech-to-text, GPT-3.5-turbo for conversational AI, and TTS API for text-to-speech responses.
 
 ## Features
 
 - **Voice Interaction**: Push-to-talk voice recording with real-time transcription
-- **AI-Powered**: Uses GPT-4 with comprehensive product knowledge system prompt
+- **AI-Powered**: Uses GPT-3.5-turbo with comprehensive product knowledge system prompt (optimized for speed and cost)
 - **Text-to-Speech**: Natural voice responses using OpenAI TTS API
 - **Non-blocking Panel**: Slide-in right panel that doesn't block page interactions by default
 - **Pin & Minimize**: Pin panel to keep it open across navigation, minimize to launcher bubble
@@ -32,7 +32,7 @@ A production-ready, AI-powered voice assistant component for the SOYL marketing 
 
 The voice chat API (`/api/voice/chat`) handles:
 1. **Speech-to-Text**: Transcribes audio using OpenAI Whisper API
-2. **AI Response**: Generates response using GPT-4 with product knowledge
+2. **AI Response**: Generates response using GPT-3.5-turbo with product knowledge (faster, more cost-effective)
 3. **Text-to-Speech**: Converts response to audio using OpenAI TTS API
 
 ### Security Features
