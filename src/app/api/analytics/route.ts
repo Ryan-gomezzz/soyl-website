@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
         if (!result.success) {
             // Log error but don't fail the request - analytics shouldn't break pages
-            if (isDatabaseConnectionError(result.error as any)) {
+            if (isDatabaseConnectionError(result.error as unknown)) {
                 // Only log connection errors at debug level to avoid spam
                 if (process.env.NODE_ENV === 'development') {
                     console.warn('[Analytics] Database unavailable, skipping page visit recording:', result.error)

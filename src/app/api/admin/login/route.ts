@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import crypto from 'crypto'
-import prisma, { isDatabaseConnectionError, safePrismaOperation } from '@/lib/prisma'
+import prisma, { safePrismaOperation } from '@/lib/prisma'
 
 // Force dynamic rendering since we use cookies()
 export const dynamic = 'force-dynamic'

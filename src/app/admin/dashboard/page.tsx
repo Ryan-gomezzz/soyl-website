@@ -1,13 +1,14 @@
 import { redirect } from 'next/navigation'
-import prisma, { safePrismaOperation, isDatabaseConnectionError } from '@/lib/prisma'
+import prisma, { safePrismaOperation } from '@/lib/prisma'
 import { requireAdminSession } from '@/lib/auth'
+import type { PilotRequest, Inquiry } from '@prisma/client'
 
 export const dynamic = 'force-dynamic'
 
 interface DashboardData {
     pageVisits: number | null
-    pilotRequests: any[]
-    inquiries: any[]
+    pilotRequests: PilotRequest[]
+    inquiries: Inquiry[]
     errors: {
         pageVisits?: string
         pilotRequests?: string

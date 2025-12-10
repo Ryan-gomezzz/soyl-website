@@ -47,7 +47,7 @@ export async function verifyAdminSession(
 
   // If database is unavailable, fall back to cookie-only verification
   // This allows the system to work even when database is temporarily down
-  if (isDatabaseConnectionError(sessionResult.error as any)) {
+  if (isDatabaseConnectionError(sessionResult.error as unknown)) {
     console.warn('[Auth] Database unavailable, using cookie-only session verification for token:', sessionToken.substring(0, 8) + '...')
     
     // For cookie-only fallback, we accept any non-empty token
