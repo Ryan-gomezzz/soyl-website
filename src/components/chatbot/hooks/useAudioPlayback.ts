@@ -17,7 +17,12 @@ export function useAudioPlayback(options: UseAudioPlaybackOptions = {}) {
   const play = useCallback(async (audioData: string | Blob | ArrayBuffer) => {
     try {
       setError(null)
-      setState('playing')
+      
+      // Stop any currently playing audio
+      if (audioRef.current && !audioRef.current.paused) {
+        audioRef.current.pause()
+        audioRef.current.currentTime = 0
+      }
 
       // Create audio element if it doesn't exist
       if (!audioRef.current) {
@@ -25,18 +30,60 @@ export function useAudioPlayback(options: UseAudioPlaybackOptions = {}) {
       }
 
       const audio = audioRef.current
+      
+      // Reset audio element
+      audio.src = ''
+      audio.load()
 
       // Handle different audio data types
       let audioUrl: string
+      let shouldRevokeUrl = false
+      
       if (typeof audioData === 'string') {
-        // Base64 string
-        audioUrl = `data:audio/mpeg;base64,${audioData}`
+        // Handle both data URIs and plain base64 strings
+        if (audioData.startsWith('data:')) {
+          // Extract base64 from data URI
+          const base64Match = audioData.match(/^data:audio\/([^;]+);base64,(.+)$/)
+          if (base64Match) {
+            const mimeType = `audio/${base64Match[1]}`
+            const base64Data = base64Match[2]
+            // Convert base64 to binary
+            const binaryString = atob(base64Data)
+            const bytes = new Uint8Array(binaryString.length)
+            for (let i = 0; i < binaryString.length; i++) {
+              bytes[i] = binaryString.charCodeAt(i)
+            }
+            const blob = new Blob([bytes], { type: mimeType })
+            audioUrl = URL.createObjectURL(blob)
+            shouldRevokeUrl = true
+          } else {
+            // Fallback: try as direct data URI (may not work in all browsers)
+            audioUrl = audioData
+          }
+        } else {
+          // Plain base64 string - convert to Blob
+          try {
+            const binaryString = atob(audioData)
+            const bytes = new Uint8Array(binaryString.length)
+            for (let i = 0; i < binaryString.length; i++) {
+              bytes[i] = binaryString.charCodeAt(i)
+            }
+            // Try to detect format, default to mp3/mpeg
+            const blob = new Blob([bytes], { type: 'audio/mpeg' })
+            audioUrl = URL.createObjectURL(blob)
+            shouldRevokeUrl = true
+          } catch (e) {
+            throw new Error('Invalid base64 audio data')
+          }
+        }
       } else if (audioData instanceof Blob) {
         audioUrl = URL.createObjectURL(audioData)
+        shouldRevokeUrl = true
       } else {
         // ArrayBuffer
         const blob = new Blob([audioData], { type: 'audio/mpeg' })
         audioUrl = URL.createObjectURL(blob)
+        shouldRevokeUrl = true
       }
 
       audio.src = audioUrl
@@ -48,20 +95,21 @@ export function useAudioPlayback(options: UseAudioPlaybackOptions = {}) {
           options.onPlaybackComplete()
         }
         // Clean up object URL if it was created
-        if (audioUrl.startsWith('blob:')) {
+        if (shouldRevokeUrl && audioUrl.startsWith('blob:')) {
           URL.revokeObjectURL(audioUrl)
         }
       }
 
-      audio.onerror = () => {
-        const error = new Error('Audio playback failed')
-        setError('Audio playback failed')
+      audio.onerror = (e) => {
+        console.error('Audio playback error:', e, audio.error)
+        const error = new Error(`Audio playback failed: ${audio.error?.message || 'Unknown error'}`)
+        setError(error.message)
         setState('error')
         if (options.onError) {
           options.onError(error)
         }
         // Clean up object URL if it was created
-        if (audioUrl.startsWith('blob:')) {
+        if (shouldRevokeUrl && audioUrl.startsWith('blob:')) {
           URL.revokeObjectURL(audioUrl)
         }
       }

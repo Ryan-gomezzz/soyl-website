@@ -156,7 +156,7 @@ The SOYL website includes an AI-powered voice assistant that uses OpenAI's APIs 
 ### Features
 
 - **Speech-to-Text**: Transcribes audio using OpenAI Whisper API
-- **Conversational AI**: Generates responses using GPT-4
+- **Conversational AI**: Generates responses using GPT-3.5-turbo (optimized for speed and latency)
 - **Text-to-Speech**: Converts response to audio using OpenAI TTS API
 
 ### Getting Your OpenAI API Key
@@ -170,7 +170,7 @@ The SOYL website includes an AI-powered voice assistant that uses OpenAI's APIs 
 
 The voice bot API is available at `/api/voice/chat` and handles:
 - Audio transcription (Whisper)
-- AI conversation (GPT-4)
+- AI conversation (GPT-3.5-turbo)
 - Speech synthesis (TTS)
 
 See `src/components/chatbot/README.md` for complete voice bot documentation.

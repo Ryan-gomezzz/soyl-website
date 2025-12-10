@@ -83,6 +83,13 @@ export function useConversation() {
           content: msg.content,
         }))
 
+      // Add optimistic user message placeholder (will be updated with transcription)
+      const userMessagePlaceholder = addMessage({
+        role: 'user',
+        content: '...',
+        transcription: 'Processing...',
+      })
+
       // Call API
       const response = await fetch('/api/voice/chat', {
         method: 'POST',
@@ -102,24 +109,47 @@ export function useConversation() {
 
       const data = await response.json()
 
-      // Add user message with transcription
-      addMessage({
-        role: 'user',
-        content: data.transcription,
-        transcription: data.transcription,
-      })
+      // Update user message with actual transcription
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === userMessagePlaceholder.id
+            ? {
+                ...msg,
+                content: data.transcription,
+                transcription: data.transcription,
+              }
+            : msg
+        )
+      )
+
+      // Convert base64 audio to Blob URL for better browser compatibility
+      let audioUrl: string
+      try {
+        const binaryString = atob(data.audio)
+        const bytes = new Uint8Array(binaryString.length)
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i)
+        }
+        const blob = new Blob([bytes], { type: 'audio/mpeg' })
+        audioUrl = URL.createObjectURL(blob)
+      } catch (e) {
+        // Fallback to data URI if conversion fails
+        audioUrl = `data:audio/mpeg;base64,${data.audio}`
+      }
 
       // Add assistant message with audio
       const assistantMessage = addMessage({
         role: 'assistant',
         content: data.text,
-        audioUrl: `data:audio/mpeg;base64,${data.audio}`,
+        audioUrl,
       })
 
       return assistantMessage
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred'
       setError(errorMessage)
+      // Remove optimistic message on error
+      setMessages((prev) => prev.filter((msg) => msg.content !== '...'))
       throw err
     } finally {
       setIsLoading(false)
@@ -127,11 +157,17 @@ export function useConversation() {
   }, [messages, addMessage])
 
   const clearConversation = useCallback(() => {
+    // Clean up blob URLs before clearing messages
+    messages.forEach((msg) => {
+      if (msg.audioUrl && msg.audioUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(msg.audioUrl)
+      }
+    })
     setMessages([])
     if (typeof window !== 'undefined') {
       sessionStorage.removeItem(CONVERSATION_STORAGE_KEY)
     }
-  }, [])
+  }, [messages])
 
   return {
     messages,
