@@ -1,6 +1,18 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { AssistantPromo } from '../AssistantPromo'
 
+// Mock next/navigation
+const mockPush = jest.fn()
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+    prefetch: jest.fn(),
+    replace: jest.fn(),
+    back: jest.fn(),
+    forward: jest.fn(),
+    refresh: jest.fn(),
+  }),
+}))
 
 // Mock DotPattern
 jest.mock('@/app/_components/DotPattern', () => ({
@@ -76,6 +88,7 @@ jest.mock('framer-motion', () => {
 describe('AssistantPromo', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockPush.mockClear()
     // Mock window.matchMedia
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
@@ -137,7 +150,7 @@ describe('AssistantPromo', () => {
     expect(tryButton).toBeInTheDocument()
 
     fireEvent.click(tryButton!)
-    expect(window.location.href).toBe('/under-development')
+    expect(mockPush).toHaveBeenCalledWith('/under-development')
   })
 
   it('renders secondary CTA link to how it works', async () => {

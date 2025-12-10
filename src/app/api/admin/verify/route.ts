@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
+// Force dynamic rendering since we use cookies()
+export const dynamic = 'force-dynamic'
+
 export async function GET(_req: NextRequest) {
   try {
     const cookieStore = await cookies()
