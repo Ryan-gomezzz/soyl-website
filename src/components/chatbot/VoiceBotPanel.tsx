@@ -94,15 +94,29 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [conversation.messages])
 
-  // Auto-play latest assistant audio if enabled
+  // Auto-play latest assistant audio if enabled (only once per message)
+  const lastAutoPlayedIdRef = useRef<string | null>(null)
   useEffect(() => {
     if (autoPlayAudio && conversation.messages.length > 0) {
       const lastMsg = conversation.messages[conversation.messages.length - 1]
-      if (lastMsg.role === 'assistant' && lastMsg.audioUrl && playback.state !== 'playing') {
+      // Only auto-play if:
+      // 1. It's an assistant message with audio
+      // 2. We haven't already auto-played this message
+      // 3. Audio is not currently playing or paused
+      if (
+        lastMsg.role === 'assistant' && 
+        lastMsg.audioUrl && 
+        lastMsg.id !== lastAutoPlayedIdRef.current &&
+        playback.state !== 'playing' &&
+        playback.state !== 'paused'
+      ) {
+        lastAutoPlayedIdRef.current = lastMsg.id
         playback.play(lastMsg.audioUrl).catch(err => console.log('Auto-play blocked or failed:', err))
       }
     }
-  }, [conversation.messages, autoPlayAudio, playback])
+    // Only depend on messages and playback state, not the play function itself
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversation.messages, autoPlayAudio, playback.state])
 
   // Listen for programmatic open/close/toggle events from ChatbotController
   useEffect(() => {
