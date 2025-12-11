@@ -24,13 +24,32 @@ export function useConversation() {
   const greetingInjectedRef = useRef(false)
 
   const buildAudioUrl = useCallback((base64: string): string | null => {
-    if (!base64 || typeof base64 !== 'string') return null
+    if (!base64 || typeof base64 !== 'string') {
+      console.warn('buildAudioUrl: Invalid input - not a string or empty')
+      return null
+    }
 
     let cleanBase64 = base64.trim()
-    if (!cleanBase64) return null
+    if (!cleanBase64) {
+      console.warn('buildAudioUrl: Empty base64 string after trim')
+      return null
+    }
 
-    // Extract base64 from data URI if present
+    // Extract MIME type and base64 from data URI if present
+    let mimeType = 'audio/mpeg'
     if (cleanBase64.startsWith('data:audio/')) {
+      const mimeMatch = cleanBase64.match(/^data:audio\/([^;]+)/)
+      if (mimeMatch && mimeMatch[1]) {
+        const detectedType = mimeMatch[1].toLowerCase()
+        // Validate and normalize MIME type
+        if (['mpeg', 'mp3'].includes(detectedType)) {
+          mimeType = 'audio/mpeg'
+        } else if (['wav', 'ogg', 'webm', 'aac', 'flac'].includes(detectedType)) {
+          mimeType = `audio/${detectedType}`
+        }
+      }
+      
+      // Extract base64 portion
       const match = cleanBase64.match(/^data:audio\/[^;]+;base64,(.+)$/)
       if (match && match[1]) {
         cleanBase64 = match[1].trim()
@@ -42,14 +61,32 @@ export function useConversation() {
       }
     }
 
-    // Remove all whitespace, newlines, and carriage returns
-    cleanBase64 = cleanBase64.replace(/\s/g, '').replace(/\n/g, '').replace(/\r/g, '')
-    if (!cleanBase64) return null
+    // Remove all whitespace, newlines, carriage returns, tabs, and URL encoding artifacts
+    cleanBase64 = cleanBase64.replace(/\s/g, '').replace(/\n/g, '').replace(/\r/g, '').replace(/\t/g, '')
+    cleanBase64 = cleanBase64.replace(/%[0-9A-Fa-f]{2}/g, '')
+    
+    if (!cleanBase64) {
+      console.warn('buildAudioUrl: Empty base64 string after cleaning')
+      return null
+    }
 
     // Validate base64 format
     const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/
     if (!base64Regex.test(cleanBase64)) {
-      console.error('Invalid base64 format in audio data')
+      // Find invalid characters for better error reporting
+      const invalidChars = cleanBase64.match(/[^A-Za-z0-9+/=]/g)
+      console.error('buildAudioUrl: Invalid base64 format', {
+        invalidChars: invalidChars ? invalidChars.slice(0, 10) : 'none',
+        length: cleanBase64.length,
+        preview: cleanBase64.substring(0, 50)
+      })
+      return null
+    }
+
+    // Validate padding
+    const paddingCount = (cleanBase64.match(/=/g) || []).length
+    if (paddingCount > 2) {
+      console.error('buildAudioUrl: Invalid base64 padding (too many = characters)')
       return null
     }
 
@@ -57,8 +94,13 @@ export function useConversation() {
       // Try to decode to verify it's valid
       const binaryString = atob(cleanBase64)
       if (!binaryString || binaryString.length === 0) {
-        console.error('Decoded base64 audio is empty')
+        console.error('buildAudioUrl: Decoded base64 audio is empty')
         return null
+      }
+
+      // Check minimum size (very small audio files are likely corrupted)
+      if (binaryString.length < 100) {
+        console.warn('buildAudioUrl: Decoded audio is suspiciously small, may be corrupted')
       }
 
       const bytes = new Uint8Array(binaryString.length)
@@ -66,15 +108,24 @@ export function useConversation() {
         bytes[i] = binaryString.charCodeAt(i)
       }
 
-      const blob = new Blob([bytes], { type: 'audio/mpeg' })
+      const blob = new Blob([bytes], { type: mimeType })
       if (blob.size === 0) {
-        console.error('Created blob is empty')
+        console.error('buildAudioUrl: Created blob is empty')
         return null
+      }
+
+      // Verify blob size matches decoded size
+      if (blob.size !== bytes.length) {
+        console.warn('buildAudioUrl: Blob size mismatch, but continuing')
       }
 
       return URL.createObjectURL(blob)
     } catch (err) {
-      console.error('Failed to convert base64 audio:', err)
+      console.error('buildAudioUrl: Failed to convert base64 audio:', {
+        error: err instanceof Error ? err.message : 'Unknown error',
+        base64Length: cleanBase64.length,
+        preview: cleanBase64.substring(0, 50)
+      })
       // Don't fallback to data URI - return null to let playback hook handle error
       return null
     }

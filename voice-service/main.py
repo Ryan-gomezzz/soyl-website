@@ -64,7 +64,29 @@ async def openai_tts(text: str) -> str:
         r = await client.post(url, json=payload, headers=headers)
         r.raise_for_status()
         audio_bytes = r.content
-        b64 = base64.b64encode(audio_bytes).decode()
+        
+        # Validate audio bytes are not empty
+        if not audio_bytes or len(audio_bytes) == 0:
+            raise HTTPException(status_code=500, detail="TTS returned empty audio")
+        
+        # Encode to base64 using UTF-8, ensuring clean output
+        b64 = base64.b64encode(audio_bytes).decode('utf-8')
+        
+        # Remove any whitespace/newlines that might have been introduced
+        b64 = b64.strip().replace('\n', '').replace('\r', '').replace(' ', '')
+        
+        # Validate base64 format (should only contain base64 characters)
+        if not all(c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=' for c in b64):
+            raise HTTPException(status_code=500, detail="Invalid base64 encoding generated")
+        
+        # Verify we can decode it back (sanity check)
+        try:
+            decoded = base64.b64decode(b64, validate=True)
+            if len(decoded) != len(audio_bytes):
+                raise HTTPException(status_code=500, detail="Base64 encoding validation failed")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Base64 validation error: {str(e)}")
+        
         return f"data:audio/mpeg;base64,{b64}"
 
 

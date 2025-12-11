@@ -61,23 +61,48 @@ export function useAudioPlayback(options: UseAudioPlaybackOptions = {}) {
             }
           }
         }
-        // Remove all whitespace and newlines
-        cleaned = cleaned.replace(/\s/g, '').replace(/\n/g, '').replace(/\r/g, '')
+        // Remove all whitespace, newlines, carriage returns, and other control characters
+        cleaned = cleaned.replace(/\s/g, '').replace(/\n/g, '').replace(/\r/g, '').replace(/\t/g, '')
+        // Remove any URL encoding artifacts
+        cleaned = cleaned.replace(/%[0-9A-Fa-f]{2}/g, '')
         return cleaned
       }
 
-      // Helper function to validate base64 format
-      const isValidBase64 = (str: string): boolean => {
-        if (!str || str.length === 0) return false
+      // Helper function to validate base64 format with detailed error reporting
+      const isValidBase64 = (str: string): { valid: boolean; error?: string } => {
+        if (!str || str.length === 0) {
+          return { valid: false, error: 'Base64 string is empty' }
+        }
+        
         // Base64 regex: alphanumeric, +, /, and = for padding (0-2 times)
         const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/
-        if (!base64Regex.test(str)) return false
+        if (!base64Regex.test(str)) {
+          // Find invalid characters for better error message
+          const invalidChars = str.match(/[^A-Za-z0-9+/=]/g)
+          return { 
+            valid: false, 
+            error: `Invalid base64 characters found: ${invalidChars ? invalidChars.slice(0, 5).join(', ') : 'unknown'}` 
+          }
+        }
+        
+        // Check padding - base64 length should be multiple of 4 (after padding)
+        const paddingCount = (str.match(/=/g) || []).length
+        if (paddingCount > 2) {
+          return { valid: false, error: 'Invalid base64 padding (too many = characters)' }
+        }
+        
         // Try to decode to verify it's valid
         try {
           const decoded = atob(str)
-          return decoded.length > 0
-        } catch {
-          return false
+          if (decoded.length === 0) {
+            return { valid: false, error: 'Base64 decodes to empty data' }
+          }
+          return { valid: true }
+        } catch (e) {
+          return { 
+            valid: false, 
+            error: `Base64 decode failed: ${e instanceof Error ? e.message : 'Unknown error'}` 
+          }
         }
       }
 
@@ -101,12 +126,22 @@ export function useAudioPlayback(options: UseAudioPlaybackOptions = {}) {
         const cleaned = cleanBase64(audioData)
         
         if (!cleaned || cleaned.length === 0) {
-          throw new Error('Invalid audio data: empty base64 string')
+          throw new Error('Invalid audio data: empty base64 string after cleaning')
         }
 
-        // Validate base64 format
-        if (!isValidBase64(cleaned)) {
-          throw new Error('Invalid audio data: corrupted or invalid base64 format')
+        // Validate base64 format with detailed error reporting
+        const validation = isValidBase64(cleaned)
+        if (!validation.valid) {
+          const errorMsg = validation.error 
+            ? `Invalid audio data: ${validation.error}`
+            : 'Invalid audio data: corrupted or invalid base64 format'
+          console.error('Base64 validation failed:', {
+            originalLength: audioData.length,
+            cleanedLength: cleaned.length,
+            error: validation.error,
+            preview: cleaned.substring(0, 50) + '...'
+          })
+          throw new Error(errorMsg)
         }
 
         // Determine MIME type from data URI if present, otherwise default to mpeg
@@ -114,7 +149,13 @@ export function useAudioPlayback(options: UseAudioPlaybackOptions = {}) {
         if (audioData.startsWith('data:audio/')) {
           const mimeMatch = audioData.match(/^data:audio\/([^;]+)/)
           if (mimeMatch && mimeMatch[1]) {
-            mimeType = `audio/${mimeMatch[1]}`
+            const detectedType = mimeMatch[1].toLowerCase()
+            // Validate MIME type and fallback to mpeg if invalid
+            if (['mpeg', 'mp3', 'wav', 'ogg', 'webm', 'aac', 'flac'].includes(detectedType)) {
+              mimeType = `audio/${detectedType === 'mp3' ? 'mpeg' : detectedType}`
+            } else {
+              console.warn(`Unknown audio MIME type: ${detectedType}, defaulting to audio/mpeg`)
+            }
           }
         }
 
