@@ -358,7 +358,7 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
                 <Mic className="relative w-12 h-12 text-accent" />
               </div>
               <p className="text-muted text-sm max-w-[250px] leading-relaxed">
-                Hi! I&apos;m your AI sales assistant. Hold the mic button below to ask me anything about SOYL.
+                Hi! I&apos;m your AI sales assistant. Hold the mic to ask how SOYL helps, pricing, or to request a pilot.
               </p>
             </div>
           )}
@@ -469,7 +469,17 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
             {/* Dynamic Status Text */}
             <div className="h-6 flex items-center justify-center">
               <AnimatePresence mode="wait">
-                {recording.state === 'recording' ? (
+                {recording.hasPermission === false ? (
+                  <motion.p
+                    key="perm"
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="text-sm text-red-300"
+                  >
+                    Microphone blocked. Please enable mic access to use voice.
+                  </motion.p>
+                ) : recording.state === 'recording' ? (
                   <motion.div
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -493,7 +503,7 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
                     animate={{ opacity: 1 }}
                     className="text-xs text-muted"
                   >
-                    Hold to speak • Tap Spacebar
+                    Hold to speak • Tap Spacebar • Or switch to keyboard
                   </motion.p>
                 )}
               </AnimatePresence>

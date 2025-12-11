@@ -18,24 +18,36 @@ export function useVoiceRecording(options: UseVoiceRecordingOptions = {}) {
   const audioChunksRef = useRef<Blob[]>([])
   const streamRef = useRef<MediaStream | null>(null)
 
-  // Check microphone permission
+  // Check microphone permission lazily
   useEffect(() => {
-    if (typeof navigator !== 'undefined' && navigator.mediaDevices) {
-      navigator.mediaDevices
-        .getUserMedia({ audio: true })
-        .then(() => {
-          setHasPermission(true)
-        })
-        .catch(() => {
-          setHasPermission(false)
-        })
-    } else {
+    let cancelled = false
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices) {
       setHasPermission(false)
+      return
     }
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then((stream) => {
+        if (cancelled) return
+        setHasPermission(true)
+        stream.getTracks().forEach((track) => track.stop())
+      })
+      .catch(() => {
+        if (cancelled) return
+        setHasPermission(false)
+      })
+    return () => { cancelled = true }
   }, [])
 
   const startRecording = useCallback(async () => {
     try {
+      if (state === 'recording' || state === 'processing') return
+      if (hasPermission === false) {
+        const permissionError = new Error('Microphone permission denied')
+        setError(permissionError.message)
+        setState('error')
+        options.onError?.(permissionError)
+        return
+      }
       setError(null)
       setState('recording')
       audioChunksRef.current = []
@@ -83,6 +95,8 @@ export function useVoiceRecording(options: UseVoiceRecordingOptions = {}) {
           streamRef.current.getTracks().forEach((track) => track.stop())
           streamRef.current = null
         }
+        audioChunksRef.current = []
+        setState('idle')
       }
 
       // Handle errors
@@ -107,7 +121,7 @@ export function useVoiceRecording(options: UseVoiceRecordingOptions = {}) {
         options.onError(error)
       }
     }
-  }, [options])
+  }, [options, state, hasPermission])
 
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && state === 'recording') {

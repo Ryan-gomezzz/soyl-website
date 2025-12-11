@@ -17,6 +17,7 @@ export function useAudioPlayback(options: UseAudioPlaybackOptions = {}) {
   const play = useCallback(async (audioData: string | Blob | ArrayBuffer) => {
     try {
       setError(null)
+      setState('idle')
       
       // Stop any currently playing audio
       if (audioRef.current && !audioRef.current.paused) {
@@ -34,6 +35,12 @@ export function useAudioPlayback(options: UseAudioPlaybackOptions = {}) {
       // Reset audio element
       audio.src = ''
       audio.load()
+      audio.onplay = () => setState('playing')
+      audio.onpause = () => {
+        if (state !== 'idle') {
+          setState('paused')
+        }
+      }
 
       // Handle different audio data types
       let audioUrl: string
@@ -143,6 +150,7 @@ export function useAudioPlayback(options: UseAudioPlaybackOptions = {}) {
 
       // Play audio
       await audio.play()
+      setState('playing')
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to play audio')
       setError(error.message)

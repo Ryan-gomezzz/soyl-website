@@ -11,6 +11,7 @@ const openai = new OpenAI({
 const MAX_AUDIO_SIZE = 10 * 1024 * 1024 // 10MB
 const MAX_CONVERSATION_HISTORY = 10 // Last 10 messages
 const MAX_MESSAGE_LENGTH = 5000 // Max characters per message
+const AUDIO_MIME_TYPE = 'audio/mpeg'
 
 export interface VoiceChatRequest {
   audio?: string // Base64 encoded audio (optional if text is provided)
@@ -182,7 +183,7 @@ export async function POST(req: NextRequest) {
         role: 'system',
         content: PRODUCT_KNOWLEDGE_SYSTEM_PROMPT,
       },
-      ...body.conversationHistory.map((msg) => ({
+      ...conversationHistory.map((msg) => ({
         role: msg.role,
         content: msg.content,
       })),
@@ -221,6 +222,7 @@ export async function POST(req: NextRequest) {
         model: 'tts-1',
         voice: 'nova', // More natural, friendly voice for sales conversations
         input: aiResponse,
+        format: 'mp3',
       })
 
       // Convert response to buffer
@@ -238,7 +240,7 @@ export async function POST(req: NextRequest) {
     // Return response with base64 encoded audio
     const response: VoiceChatResponse = {
       text: aiResponse,
-      audio: ttsAudio.toString('base64'),
+      audio: `data:${AUDIO_MIME_TYPE};base64,${ttsAudio.toString('base64')}`,
       transcription,
     }
 

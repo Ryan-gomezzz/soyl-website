@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 
 export interface Message {
   id: string
@@ -14,11 +14,46 @@ export interface Message {
 const CONVERSATION_STORAGE_KEY = '__soyl_voice_conversation'
 const MAX_MESSAGES = 20 // Keep last 20 messages in memory
 const MAX_STORAGE_MESSAGES = 10 // Keep last 10 messages in storage
+const VOICE_TIMEOUT_MS = 15000
+const TEXT_TIMEOUT_MS = 12000
 
 export function useConversation() {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const greetingInjectedRef = useRef(false)
+
+  const buildAudioUrl = useCallback((base64: string): string | null => {
+    let cleanBase64 = String(base64 || '').trim()
+    if (!cleanBase64) return null
+
+    if (cleanBase64.startsWith('data:audio')) {
+      const match = cleanBase64.match(/^data:audio\/[^;]+;base64,(.+)$/)
+      if (match && match[1]) {
+        cleanBase64 = match[1].trim()
+      } else {
+        const commaIndex = cleanBase64.indexOf(',')
+        if (commaIndex !== -1) cleanBase64 = cleanBase64.substring(commaIndex + 1).trim()
+      }
+    }
+
+    cleanBase64 = cleanBase64.replace(/\s/g, '')
+    if (!cleanBase64) return null
+
+    try {
+      const binaryString = atob(cleanBase64)
+      if (!binaryString) return null
+      const bytes = new Uint8Array(binaryString.length)
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i)
+      }
+      const blob = new Blob([bytes], { type: 'audio/mpeg' })
+      return URL.createObjectURL(blob)
+    } catch (err) {
+      console.error('Failed to convert base64 audio:', err)
+      return `data:audio/mpeg;base64,${cleanBase64}`
+    }
+  }, [])
 
   // Load conversation from sessionStorage on mount
   useEffect(() => {
@@ -44,6 +79,22 @@ export function useConversation() {
     const toSave = messages.slice(-MAX_STORAGE_MESSAGES)
     sessionStorage.setItem(CONVERSATION_STORAGE_KEY, JSON.stringify(toSave))
   }, [messages])
+
+  // Inject a friendly greeting when no conversation exists
+  useEffect(() => {
+    if (greetingInjectedRef.current) return
+    if (messages.length === 0) {
+      greetingInjectedRef.current = true
+      setMessages([
+        {
+          id: `msg-${Date.now()}`,
+          role: 'assistant',
+          content: "Hi! I'm SOYL's AI assistant. Hold the mic to ask how we help, pricing, or to request a pilot.",
+          timestamp: Date.now(),
+        },
+      ])
+    }
+  }, [messages.length])
 
   const addMessage = useCallback((message: Omit<Message, 'id' | 'timestamp'>) => {
     const newMessage: Message = {
@@ -96,8 +147,8 @@ export function useConversation() {
       // Create timeout promise (5 seconds)
       const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
-          reject(new Error('Voice request timed out after 5 seconds'))
-        }, 5000)
+          reject(new Error('Voice request timed out'))
+        }, VOICE_TIMEOUT_MS)
       })
 
       // Call API with timeout
@@ -137,71 +188,12 @@ export function useConversation() {
         )
       }
 
-      // Convert base64 audio to Blob URL for better browser compatibility
-      let audioUrl: string
-
-      // Validate base64 format first
-      if (!data.audio || typeof data.audio !== 'string') {
-        console.error('Invalid audio data received from API')
-        throw new Error('Invalid audio data format')
-      }
-
-      // Clean the base64 string (remove any whitespace or data URI prefix if present)
-      let cleanBase64 = String(data.audio || '').trim()
-
-      // Remove data URI prefix if present
-      if (cleanBase64.startsWith('data:audio')) {
-        // Extract base64 from data URI if present
-        const match = cleanBase64.match(/^data:audio\/[^;]+;base64,(.+)$/)
-        if (match && match[1]) {
-          cleanBase64 = match[1].trim()
-        } else {
-          // Try to extract just the base64 part after the comma
-          const commaIndex = cleanBase64.indexOf(',')
-          if (commaIndex !== -1) {
-            cleanBase64 = cleanBase64.substring(commaIndex + 1).trim()
-          }
-        }
-      }
-
-      // Remove any remaining whitespace (newlines, spaces, etc.)
-      cleanBase64 = cleanBase64.replace(/\s/g, '')
-
-      // Check if we have any data
-      if (!cleanBase64 || cleanBase64.length === 0) {
-        console.error('Empty audio data received from API')
-        throw new Error('Invalid audio data: empty base64 string')
-      }
-
-      // Validate base64 format (more lenient - allows padding)
-      const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/
-      if (!base64Regex.test(cleanBase64)) {
-        console.error('Invalid base64 format in audio data:', cleanBase64.substring(0, 50))
-        throw new Error('Invalid audio data: malformed base64 format')
-      }
-
-      try {
-        const binaryString = atob(cleanBase64)
-        if (binaryString.length === 0) {
-          throw new Error('Decoded audio data is empty')
-        }
-        const bytes = new Uint8Array(binaryString.length)
-        for (let i = 0; i < binaryString.length; i++) {
-          bytes[i] = binaryString.charCodeAt(i)
-        }
-        const blob = new Blob([bytes], { type: 'audio/mpeg' })
-        audioUrl = URL.createObjectURL(blob)
-      } catch (e) {
-        console.error('Failed to convert base64 to blob:', e)
-        // Fallback to data URI if conversion fails
-        audioUrl = `data:audio/mpeg;base64,${cleanBase64}`
-      }
-
+      const audioUrl = data.audio ? buildAudioUrl(data.audio) : null
       // Add assistant message with audio
       const assistantMessage = addMessage({
         role: 'assistant',
         content: data.text,
-        audioUrl,
+        audioUrl: audioUrl || undefined,
       })
 
       return assistantMessage
@@ -271,8 +263,8 @@ export function useConversation() {
       // Create timeout promise
       const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
-          reject(new Error('Request timed out after 10 seconds'))
-        }, 10000)
+          reject(new Error('Request timed out'))
+        }, TEXT_TIMEOUT_MS)
       })
 
       // Call API
@@ -300,29 +292,7 @@ export function useConversation() {
       let audioUrl: string | undefined
 
       if (data.audio) {
-        // Add logic to handle audio if needed, reusing the base64 processing from sendVoiceMessage is repetitive
-        // For now, let's keep it simple and just reuse the logic or duplicate it slightly modified
-        // To keep code clean, I will assume the same base64 processing is needed.
-
-        let cleanBase64 = String(data.audio || '').trim()
-        if (cleanBase64.startsWith('data:audio')) {
-          const match = cleanBase64.match(/^data:audio\/[^;]+;base64,(.+)$/)
-          if (match && match[1]) cleanBase64 = match[1].trim()
-        }
-        cleanBase64 = cleanBase64.replace(/\s/g, '')
-
-        try {
-          const binaryString = atob(cleanBase64)
-          const bytes = new Uint8Array(binaryString.length)
-          for (let i = 0; i < binaryString.length; i++) {
-            bytes[i] = binaryString.charCodeAt(i)
-          }
-          const blob = new Blob([bytes], { type: 'audio/mpeg' })
-          audioUrl = URL.createObjectURL(blob)
-        } catch (e) {
-          console.error('Failed to convert base64 to blob:', e)
-          audioUrl = `data:audio/mpeg;base64,${cleanBase64}`
-        }
+        audioUrl = buildAudioUrl(data.audio) || undefined
       }
 
       // Add assistant message
