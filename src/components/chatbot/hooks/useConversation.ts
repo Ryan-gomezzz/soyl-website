@@ -226,7 +226,7 @@ export function useConversation() {
     } finally {
       setIsLoading(false)
     }
-  }, [messages, addMessage])
+  }, [messages, addMessage, buildAudioUrl])
 
   const clearConversation = useCallback(() => {
     // Clean up blob URLs before clearing messages
@@ -317,7 +317,7 @@ export function useConversation() {
     } finally {
       setIsLoading(false)
     }
-  }, [messages, addMessage])
+  }, [messages, addMessage, buildAudioUrl])
 
   return {
     messages,

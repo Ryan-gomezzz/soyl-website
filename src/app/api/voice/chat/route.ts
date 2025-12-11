@@ -222,7 +222,6 @@ export async function POST(req: NextRequest) {
         model: 'tts-1',
         voice: 'nova', // More natural, friendly voice for sales conversations
         input: aiResponse,
-        format: 'mp3',
       })
 
       // Convert response to buffer
