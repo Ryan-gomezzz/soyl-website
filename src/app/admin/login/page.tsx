@@ -10,6 +10,10 @@ export default function AdminLogin() {
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
+        e.stopPropagation() // Prevent any form bubbling
+        
+        if (isLoading) return // Prevent double submission
+        
         setIsLoading(true)
         setError('')
 
@@ -21,12 +25,14 @@ export default function AdminLogin() {
                 },
                 body: JSON.stringify({ username, password }),
                 credentials: 'include', // Ensure cookies are sent and received
+                redirect: 'follow', // Follow redirects
             })
 
+            // Parse JSON response
             const data = await response.json()
 
             if (!response.ok) {
-                const errorMessage = data.error || 'Invalid credentials'
+                const errorMessage = data?.error || 'Invalid credentials'
                 setError(errorMessage)
                 
                 // Provide more helpful error messages
@@ -44,16 +50,25 @@ export default function AdminLogin() {
                 return
             }
 
-            // Small delay to ensure cookie is set before redirect
-            await new Promise(resolve => setTimeout(resolve, 100))
-            
-            // Use window.location for a full page reload to ensure cookie is read
-            window.location.href = '/admin/dashboard'
+            // Success - cookie should be set now
+            if (data.success) {
+                console.log('[Login] Login successful, redirecting to dashboard')
+                
+                // Small delay to ensure cookie is available in browser
+                await new Promise(resolve => setTimeout(resolve, 150))
+                
+                // Use window.location.replace to avoid adding to history
+                window.location.replace(data.redirect || '/admin/dashboard')
+            } else {
+                // Fallback if success flag is missing
+                setError('Login successful but redirect failed. Please try accessing the dashboard directly.')
+                setIsLoading(false)
+            }
         } catch (err) {
             console.error('Login error:', err)
             const errorMessage = err instanceof Error ? err.message : 'Unknown error'
             
-            if (errorMessage.includes('fetch')) {
+            if (errorMessage.includes('fetch') || err instanceof TypeError) {
                 setError('Unable to connect to the server. Please check your connection and try again.')
             } else {
                 setError('An unexpected error occurred. Please try again.')
@@ -66,7 +81,7 @@ export default function AdminLogin() {
         <div className="min-h-screen flex items-center justify-center bg-bg">
             <div className="w-full max-w-md p-8 glass rounded-xl border border-white/10">
                 <h1 className="text-2xl font-bold mb-6 text-center">Admin Login</h1>
-                <form onSubmit={handleLogin} className="space-y-4">
+                <form onSubmit={handleLogin} className="space-y-4" noValidate>
                     <div>
                         <label className="block text-sm font-medium mb-1">Username</label>
                         <input
@@ -88,7 +103,7 @@ export default function AdminLogin() {
                     {error && <p className="text-red-500 text-sm">{error}</p>}
                     <button
                         type="submit"
-                        disabled={isLoading}
+                        disabled={isLoading || !username || !password}
                         className="w-full py-2 bg-accent text-bg font-bold rounded hover:bg-accent-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isLoading ? 'Logging in...' : 'Login'}
