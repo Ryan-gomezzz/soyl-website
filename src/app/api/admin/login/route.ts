@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import crypto from 'crypto'
 import prisma, { safePrismaOperation } from '@/lib/prisma'
 
-// Force dynamic rendering since we use cookies()
+// Force dynamic rendering for this route
 export const dynamic = 'force-dynamic'
 
 // Rate limiting for login attempts
