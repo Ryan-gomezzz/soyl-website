@@ -122,17 +122,19 @@ export function useConversation() {
       const data = await response.json()
 
       // Update user message with actual transcription
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === userMessagePlaceholder.id
-            ? {
-                ...msg,
-                content: data.transcription,
-                transcription: data.transcription,
-              }
-            : msg
+      if (userMessagePlaceholder) {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === userMessagePlaceholder.id
+              ? {
+                  ...msg,
+                  content: data.transcription,
+                  transcription: data.transcription,
+                }
+              : msg
+          )
         )
-      )
+      }
 
       // Convert base64 audio to Blob URL for better browser compatibility
       let audioUrl: string
