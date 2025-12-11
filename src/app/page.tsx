@@ -14,7 +14,7 @@ import { Icon } from '@/components/Icon'
 
 export default function Home() {
   return (
-    <div className="pt-20">
+    <div className="pt-12">
       <Hero />
 
       {/* SOYL Assistant Promo */}
@@ -24,7 +24,7 @@ export default function Home() {
       <FlowchartSection />
 
       {/* What SOYL Does */}
-      <section className="py-16 lg:py-20">
+      <section className="py-12 lg:py-16">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -48,7 +48,7 @@ export default function Home() {
       <WhyChooseUs />
 
       {/* How it works */}
-      <section id="how-it-works" className="py-12 lg:py-16 bg-panel/30">
+      <section id="how-it-works" className="py-10 lg:py-14 bg-panel/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -173,7 +173,7 @@ export default function Home() {
       </section>
 
       {/* Product/Features */}
-      <section className="py-16 lg:py-20">
+      <section className="py-12 lg:py-16">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -239,7 +239,7 @@ export default function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 lg:py-20 bg-panel/30">
+      <section className="py-12 lg:py-16 bg-panel/30">
         <div className="mx-auto max-w-4xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -257,7 +257,7 @@ export default function Home() {
       </section>
 
       {/* Use Cases */}
-      <section className="py-12 lg:py-16">
+      <section className="py-10 lg:py-14">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -351,7 +351,7 @@ export default function Home() {
       </section>
 
       {/* SOYL R&D Snapshot */}
-      <section className="py-16 lg:py-20">
+      <section className="py-12 lg:py-16">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.98 }}
@@ -438,7 +438,7 @@ export default function Home() {
       </section>
 
       {/* Trust & Compliance */}
-      <section className="py-16 lg:py-20 bg-panel/30">
+      <section className="py-12 lg:py-16 bg-panel/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -484,7 +484,7 @@ export default function Home() {
       </section>
 
       {/* Footer CTA */}
-      <section id="request-pilot" className="py-24 lg:py-32">
+      <section id="request-pilot" className="py-16 lg:py-24">
         <div className="mx-auto max-w-4xl px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

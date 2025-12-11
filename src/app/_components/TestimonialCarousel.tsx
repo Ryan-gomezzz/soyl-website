@@ -51,7 +51,7 @@ export function TestimonialCarousel() {
   }
 
   return (
-    <section className="py-24 lg:py-32">
+    <section className="py-12 lg:py-16">
       <div className="mx-auto max-w-4xl px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -60,9 +60,6 @@ export function TestimonialCarousel() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            First Impressions
-          </h2>
           <p className="text-lg text-muted max-w-2xl mx-auto">
             Real feedback from developers and teams using SOYL
           </p>

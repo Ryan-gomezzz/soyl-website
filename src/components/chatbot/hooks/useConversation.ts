@@ -62,6 +62,9 @@ export function useConversation() {
   const sendVoiceMessage = useCallback(async (audioBlob: Blob) => {
     setIsLoading(true)
     setError(null)
+    
+    // Declare placeholder outside try block so it's accessible in catch
+    let userMessagePlaceholder: Message | null = null
 
     try {
       // Convert blob to base64
@@ -84,14 +87,21 @@ export function useConversation() {
         }))
 
       // Add optimistic user message placeholder (will be updated with transcription)
-      const userMessagePlaceholder = addMessage({
+      userMessagePlaceholder = addMessage({
         role: 'user',
         content: '...',
         transcription: 'Processing...',
       })
 
-      // Call API
-      const response = await fetch('/api/voice/chat', {
+      // Create timeout promise (5 seconds)
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          reject(new Error('Voice request timed out after 5 seconds'))
+        }, 5000)
+      })
+
+      // Call API with timeout
+      const fetchPromise = fetch('/api/voice/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,6 +111,8 @@ export function useConversation() {
           conversationHistory,
         }),
       })
+
+      const response = await Promise.race([fetchPromise, timeoutPromise])
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
@@ -192,9 +204,29 @@ export function useConversation() {
       return assistantMessage
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred'
-      setError(errorMessage)
+      
+      // Check if it's a timeout or network error
+      const isTimeout = errorMessage.includes('timed out') || errorMessage.includes('timeout')
+      const isNetworkError = errorMessage.includes('fetch') || errorMessage.includes('Failed to fetch')
+      
+      // Set user-friendly error message
+      if (isTimeout || isNetworkError) {
+        setError('Voice currently unavailable. Please try again or use text chat.')
+      } else {
+        setError('Voice service error. Please try again.')
+      }
+      
       // Remove optimistic message on error
-      setMessages((prev) => prev.filter((msg) => msg.content !== '...'))
+      if (userMessagePlaceholder) {
+        setMessages((prev) => prev.filter((msg) => msg.id !== userMessagePlaceholder!.id))
+      }
+      
+      // Add error message to conversation so user can see it
+      addMessage({
+        role: 'assistant',
+        content: 'Voice currently unavailable. Please try typing your question instead.',
+      })
+      
       throw err
     } finally {
       setIsLoading(false)

@@ -55,10 +55,26 @@ export default function AdminLogin() {
                 console.log('[Login] Login successful, redirecting to dashboard')
                 
                 // Small delay to ensure cookie is available in browser
-                await new Promise(resolve => setTimeout(resolve, 150))
+                await new Promise(resolve => setTimeout(resolve, 200))
                 
-                // Use window.location.replace to avoid adding to history
-                window.location.replace(data.redirect || '/admin/dashboard')
+                // Use window.location.href for more reliable redirect
+                // This ensures the browser processes the cookie before navigation
+                const redirectUrl = data.redirect || '/admin/dashboard'
+                
+                try {
+                    window.location.href = redirectUrl
+                    // Fallback after 1 second if redirect hasn't happened
+                    setTimeout(() => {
+                        if (window.location.pathname !== redirectUrl) {
+                            console.warn('[Login] Redirect may have failed, trying again')
+                            window.location.href = redirectUrl
+                        }
+                    }, 1000)
+                } catch (redirectError) {
+                    console.error('[Login] Redirect error:', redirectError)
+                    setError('Redirect failed. Please navigate to the dashboard manually.')
+                    setIsLoading(false)
+                }
             } else {
                 // Fallback if success flag is missing
                 setError('Login successful but redirect failed. Please try accessing the dashboard directly.')

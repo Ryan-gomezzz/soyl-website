@@ -56,7 +56,7 @@ export function FlowchartSection() {
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="relative flex justify-center"
+          className="relative flex justify-center items-center w-full"
         >
           <FlowchartCanvas />
         </motion.div>
