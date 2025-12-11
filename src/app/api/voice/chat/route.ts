@@ -114,6 +114,34 @@ export async function POST(req: NextRequest) {
         content: sanitizeText(msg.content),
       }))
 
+    // If a Python voice service is configured, proxy the request and return its response
+    if (process.env.VOICE_SERVICE_URL) {
+      try {
+        const controller = new AbortController()
+        const timer = setTimeout(() => controller.abort(), 20000)
+        const proxyRes = await fetch(`${process.env.VOICE_SERVICE_URL}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...body, conversationHistory }),
+          signal: controller.signal,
+        })
+        clearTimeout(timer)
+
+        const proxyData = await proxyRes.json().catch(() => ({}))
+        if (!proxyRes.ok) {
+          return NextResponse.json(
+            { error: proxyData.detail || proxyData.error || 'Voice service error' },
+            { status: proxyRes.status }
+          )
+        }
+
+        return NextResponse.json(proxyData as VoiceChatResponse)
+      } catch (error) {
+        console.error('Voice service proxy error:', error)
+        // fall through to local handling
+      }
+    }
+
     let transcription = ''
 
     // Case 1: Audio Input - Needs Transcription
@@ -199,17 +227,42 @@ export async function POST(req: NextRequest) {
       const chatResponse = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages,
-        temperature: 0.7, // Slightly lower for more focused sales responses
-        max_tokens: 300, // Concise responses are better for voice
+        temperature: 0.8, // Slightly higher for more natural, conversational responses
+        max_tokens: 400, // Increased for more natural conversation flow while staying concise
+        presence_penalty: 0.1, // Encourage variety in responses
+        frequency_penalty: 0.1, // Reduce repetition
       })
       aiResponse = sanitizeText(
         chatResponse.choices[0]?.message?.content || 'I apologize, but I could not generate a response.'
       )
+
+      // Ensure response isn't empty
+      if (!aiResponse || aiResponse.trim().length === 0) {
+        aiResponse = "I'm here to help! Could you tell me more about what you're looking for?"
+      }
     } catch (error) {
       console.error('GPT chat error:', error)
+      
+      // Provide more helpful error messages based on error type
+      if (error instanceof Error) {
+        if (error.message.includes('rate_limit') || error.message.includes('quota')) {
+          return NextResponse.json(
+            { error: 'Service is temporarily busy. Please try again in a moment.' },
+            { status: 503 }
+          )
+        }
+        if (error.message.includes('invalid_api_key')) {
+          console.error('OpenAI API key is invalid or missing')
+          return NextResponse.json(
+            { error: 'Service temporarily unavailable' },
+            { status: 503 }
+          )
+        }
+      }
+      
       // Don't expose internal error details
       return NextResponse.json(
-        { error: 'Failed to generate response. Please try again.' },
+        { error: 'I had trouble processing that. Could you try rephrasing your question?' },
         { status: 500 }
       )
     }
@@ -229,10 +282,16 @@ export async function POST(req: NextRequest) {
       ttsAudio = Buffer.from(arrayBuffer)
     } catch (error) {
       console.error('TTS error:', error)
-      // Don't expose internal error details
+      
+      // Return text response even if TTS fails, so conversation can continue
       return NextResponse.json(
-        { error: 'Failed to generate speech. Please try again.' },
-        { status: 500 }
+        {
+          text: aiResponse,
+          audio: '', // Empty audio - frontend can handle text-only response
+          transcription,
+          warning: 'Audio generation failed, but you can read the response above.',
+        },
+        { status: 200 }
       )
     }
 

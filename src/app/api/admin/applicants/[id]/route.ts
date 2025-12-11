@@ -1,72 +1,78 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { ApplicantStatus } from '@prisma/client'
-import { z } from 'zod'
 import prisma from '@/lib/prisma'
-import { requireAdminSession } from '@/lib/auth'
+import { isAdminAuthenticatedFromCookies } from '@/lib/adminAuth'
+import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
 
-const paramsSchema = z.object({
-  id: z.string().uuid(),
+const updateSchema = z.object({
+  status: z.enum(['NEW', 'SCREENING', 'INTERVIEW', 'REJECTED', 'HIRED']).optional(),
+  assignedTo: z.string().trim().max(200).optional(),
+  adminNotes: z.string().trim().max(2000).optional(),
 })
 
-const bodySchema = z
-  .object({
-    status: z.nativeEnum(ApplicantStatus).optional(),
-    adminNotes: z.string().trim().max(2000).optional(),
-    assignedTo: z.string().trim().max(120).optional(),
-  })
-  .refine((data) => Object.values(data).some((value) => value !== undefined), {
-    message: 'At least one field must be provided.',
-  })
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const authed = await isAdminAuthenticatedFromCookies()
+    if (!authed) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { id } = await params
+
+    const applicant = await prisma.applicant.findUnique({
+      where: { id },
+    })
+
+    if (!applicant) {
+      return NextResponse.json({ error: 'Applicant not found' }, { status: 404 })
+    }
+
+    return NextResponse.json(applicant)
+  } catch (error) {
+    console.error('[admin-applicants-get]', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
 
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Verify admin session
-    await requireAdminSession()
-
-    const { id } = await params
-    const parsedParams = paramsSchema.safeParse({ id })
-    if (!parsedParams.success) {
-      return NextResponse.json(
-        { error: 'Invalid applicant ID.' },
-        { status: 400 }
-      )
-    }
-
-    const body = await req.json()
-    const parsedBody = bodySchema.safeParse(body)
-    if (!parsedBody.success) {
-      return NextResponse.json(
-        { error: 'Invalid payload', details: parsedBody.error.flatten() },
-        { status: 400 }
-      )
-    }
-
-    const updated = await prisma.applicant.update({
-      where: { id: parsedParams.data.id },
-      data: parsedBody.data,
-    })
-
-    return NextResponse.json(updated)
-  } catch (error) {
-    if (error instanceof Error && error.message === 'Unauthorized') {
+    const authed = await isAdminAuthenticatedFromCookies()
+    if (!authed) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    if (error instanceof Error && error.message.includes('Record to update not found')) {
+
+    const { id } = await params
+    const body = await req.json()
+    const parseResult = updateSchema.safeParse(body)
+
+    if (!parseResult.success) {
       return NextResponse.json(
-        { error: 'Applicant not found' },
-        { status: 404 }
+        { error: 'Invalid payload', details: parseResult.error.flatten() },
+        { status: 400 }
       )
     }
-    console.error('Failed to update applicant', error)
-    return NextResponse.json(
-      { error: 'Internal server error.' },
-      { status: 500 }
-    )
+
+    const updateData = parseResult.data
+
+    const applicant = await prisma.applicant.update({
+      where: { id },
+      data: updateData,
+    })
+
+    return NextResponse.json(applicant)
+  } catch (error) {
+    console.error('[admin-applicants-update]', error)
+    if (error instanceof Error && error.message.includes('Record to update not found')) {
+      return NextResponse.json({ error: 'Applicant not found' }, { status: 404 })
+    }
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -75,35 +81,24 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Verify admin session
-    await requireAdminSession()
-
-    const { id } = await params
-    const parsedParams = paramsSchema.safeParse({ id })
-    if (!parsedParams.success) {
-      return NextResponse.json(
-        { error: 'Invalid applicant ID.' },
-        { status: 400 }
-      )
-    }
-
-    await prisma.applicant.delete({ where: { id: parsedParams.data.id } })
-    return new NextResponse(null, { status: 204 })
-  } catch (error) {
-    if (error instanceof Error && error.message === 'Unauthorized') {
+    const authed = await isAdminAuthenticatedFromCookies()
+    if (!authed) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    const { id } = await params
+
+    await prisma.applicant.delete({
+      where: { id },
+    })
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('[admin-applicants-delete]', error)
     if (error instanceof Error && error.message.includes('Record to delete does not exist')) {
-      return NextResponse.json(
-        { error: 'Applicant not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Applicant not found' }, { status: 404 })
     }
-    console.error('Failed to delete applicant', error)
-    return NextResponse.json(
-      { error: 'Internal server error.' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 

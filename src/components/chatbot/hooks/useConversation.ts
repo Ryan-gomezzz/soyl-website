@@ -51,6 +51,7 @@ export function useConversation() {
       return URL.createObjectURL(blob)
     } catch (err) {
       console.error('Failed to convert base64 audio:', err)
+      // Fallback to data URI so playback hook can still attempt
       return `data:audio/mpeg;base64,${cleanBase64}`
     }
   }, [])
