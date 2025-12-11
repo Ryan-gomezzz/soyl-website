@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function AdminLoginPage() {
+function AdminLoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams?.get('callbackUrl') || '/admin/dashboard'
@@ -79,6 +79,24 @@ export default function AdminLoginPage() {
         </form>
       </div>
     </div>
+  )
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0b1224] via-[#0e162d] to-[#0b1224]">
+        <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur">
+          <div className="mb-6">
+            <p className="text-sm text-accent font-semibold">SOYL Admin</p>
+            <h1 className="text-3xl font-bold text-white mt-2">Sign in</h1>
+            <p className="text-sm text-muted mt-1">Loading...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <AdminLoginForm />
+    </Suspense>
   )
 }
 

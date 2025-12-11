@@ -6,14 +6,19 @@ import { isAdminAuthenticatedFromCookies } from '@/lib/adminAuth'
 async function loadData() {
   try {
     const [pageVisits, pilotRequests, inquiries] = await Promise.all([
-      prisma.pageVisit.count(),
-      prisma.pilotRequest.findMany({ orderBy: { createdAt: 'desc' }, take: 100 }),
-      prisma.inquiry.findMany({ orderBy: { createdAt: 'desc' }, take: 100 }),
+      prisma.pageVisit.count().catch(() => null),
+      prisma.pilotRequest.findMany({ orderBy: { createdAt: 'desc' }, take: 100 }).catch(() => []),
+      prisma.inquiry.findMany({ orderBy: { createdAt: 'desc' }, take: 100 }).catch(() => []),
     ])
-    return { pageVisits, pilotRequests, inquiries }
+    return { pageVisits, pilotRequests, inquiries, error: null }
   } catch (error) {
     console.error('[admin-dashboard]', error)
-    return { pageVisits: null, pilotRequests: [], inquiries: [] }
+    return {
+      pageVisits: null,
+      pilotRequests: [],
+      inquiries: [],
+      error: error instanceof Error ? error.message : 'Failed to load data',
+    }
   }
 }
 
@@ -39,6 +44,13 @@ export default async function AdminDashboard() {
             </button>
           </form>
         </div>
+
+        {data.error && (
+          <div className="mb-6 rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-400">
+            <p className="font-semibold">Error loading data</p>
+            <p className="mt-1">{data.error}</p>
+          </div>
+        )}
 
         <div className="grid gap-4 md:grid-cols-3">
           <StatCard label="Page Visits" value={data.pageVisits ?? '—'} />

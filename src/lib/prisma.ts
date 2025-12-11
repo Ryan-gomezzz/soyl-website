@@ -6,10 +6,16 @@ const globalForPrisma = globalThis as unknown as {
 
 // Create PrismaClient - it will work during build even without DATABASE_URL
 // The client will only fail when actually trying to connect to the database
+// For Supabase, use the connection pooler URL (format: postgresql://...?pgbouncer=true)
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    log: process.env.NODE_ENV === 'production' ? ['error'] : ['error', 'warn']
+    log: process.env.NODE_ENV === 'production' ? ['error'] : ['error', 'warn'],
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL,
+      },
+    },
   });
 
 if (process.env.NODE_ENV !== 'production') {
