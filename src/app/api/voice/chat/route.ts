@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { PRODUCT_KNOWLEDGE_SYSTEM_PROMPT } from '@/lib/prompts/productKnowledge'
 import { rateLimitAppRouter } from '@/utils/rateLimitAppRouter'
-import { storeAudio } from '../audio/route'
+import { storeAudio } from '../audioCache'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || 'dummy_key_for_build',

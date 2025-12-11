@@ -1,50 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
-import crypto from 'crypto'
+import { getAudio } from '../audioCache'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || 'dummy_key_for_build',
 })
-
-// In-memory cache for audio buffers
-// Key: token, Value: { buffer: Buffer, expiresAt: number }
-const audioCache = new Map<string, { buffer: Buffer; expiresAt: number }>()
-
-// Clean up expired cache entries every 5 minutes
-setInterval(() => {
-  const now = Date.now()
-  for (const [token, entry] of audioCache.entries()) {
-    if (entry.expiresAt < now) {
-      audioCache.delete(token)
-    }
-  }
-}, 5 * 60 * 1000)
-
-// Generate a secure token
-function generateToken(): string {
-  return crypto.randomBytes(32).toString('hex')
-}
-
-// Store audio in cache
-export function storeAudio(buffer: Buffer, ttlMinutes: number = 5): string {
-  const token = generateToken()
-  const expiresAt = Date.now() + ttlMinutes * 60 * 1000
-  audioCache.set(token, { buffer, expiresAt })
-  return token
-}
-
-// Get audio from cache
-function getAudio(token: string): Buffer | null {
-  const entry = audioCache.get(token)
-  if (!entry) {
-    return null
-  }
-  if (entry.expiresAt < Date.now()) {
-    audioCache.delete(token)
-    return null
-  }
-  return entry.buffer
-}
 
 export async function GET(req: NextRequest) {
   try {
@@ -56,7 +16,7 @@ export async function GET(req: NextRequest) {
     if (token) {
       const cachedAudio = getAudio(token)
       if (cachedAudio) {
-        return new NextResponse(cachedAudio, {
+        return new NextResponse(new Uint8Array(cachedAudio), {
           headers: {
             'Content-Type': 'audio/mpeg',
             'Content-Length': String(cachedAudio.length),
@@ -85,13 +45,10 @@ export async function GET(req: NextRequest) {
           )
         }
 
-        // Cache it if we have a token, otherwise just return it
-        if (token) {
-          const expiresAt = Date.now() + 5 * 60 * 1000
-          audioCache.set(token, { buffer: audioBuffer, expiresAt })
-        }
+        // Note: On-demand generation - audio is generated fresh, not cached here
+        // Caching happens in the chat route when audio is first generated
 
-        return new NextResponse(audioBuffer, {
+        return new NextResponse(new Uint8Array(audioBuffer), {
           headers: {
             'Content-Type': 'audio/mpeg',
             'Content-Length': String(audioBuffer.length),
