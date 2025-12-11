@@ -42,8 +42,15 @@ export async function verifyAdminSession(
   )
 
   // If database query succeeded and found a session, return it
-  if (sessionResult.success && sessionResult.data !== null) {
-    return sessionResult.data
+  if (sessionResult.success) {
+    const sessionData = sessionResult.data
+    if (sessionData != null) {
+      return {
+        id: sessionData.id,
+        token: sessionData.token,
+        expiresAt: sessionData.expiresAt
+      }
+    }
   }
 
   // If database query succeeded but returned null (session not found in DB),
