@@ -63,7 +63,6 @@ export async function POST(req: NextRequest) {
     }
 
     // Generic error
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json(
       { error: 'Failed to create pilot request. Please try again.' },
       { status: 500 }
