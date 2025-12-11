@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import crypto from 'crypto'
 import prisma, { safePrismaOperation } from '@/lib/prisma'
 
-// Force dynamic rendering since we use cookies()
+// Force dynamic rendering for this route
 export const dynamic = 'force-dynamic'
 
 // Rate limiting for login attempts
@@ -129,25 +128,32 @@ export async function POST(req: NextRequest) {
       console.log('[Admin Login] Session created successfully in database')
     }
 
-    // Set httpOnly cookie (always set cookie, even if database session creation failed)
-    const cookieStore = await cookies()
-    cookieStore.set('admin_session', sessionToken, {
+    // Note: Cookie will be set on the redirect response below
+    // This ensures the cookie is available when the redirect happens
+
+    // Clear failed attempts on success
+    loginAttempts.delete(ip)
+
+    console.log(`[Admin Login] Successful login for user: ${username} from IP: ${ip}`)
+    
+    // Create response with JSON body and set cookie
+    const response = NextResponse.json({ 
+      success: true,
+      redirect: '/admin/dashboard',
+      // Include warning if database session wasn't created
+      warning: !sessionResult.success ? 'Session stored in cookie only (database unavailable)' : undefined
+    })
+    
+    // Set cookie on the response
+    response.cookies.set('admin_session', sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       expires: expiresAt,
       path: '/',
     })
-
-    // Clear failed attempts on success
-    loginAttempts.delete(ip)
-
-    console.log(`[Admin Login] Successful login for user: ${username} from IP: ${ip}`)
-    return NextResponse.json({ 
-      success: true,
-      // Include warning if database session wasn't created
-      warning: !sessionResult.success ? 'Session stored in cookie only (database unavailable)' : undefined
-    })
+    
+    return response
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     console.error('[Admin Login] Unexpected error:', errorMessage, error)
