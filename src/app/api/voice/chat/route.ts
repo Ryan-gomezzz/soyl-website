@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
 
         // Validate and clean base64 audio data from Python service
         if (proxyData.audio && typeof proxyData.audio === 'string') {
-          let cleanAudio = proxyData.audio.trim()
+          const cleanAudio = proxyData.audio.trim()
           
           // Extract base64 from data URI if present
           let base64Data = cleanAudio
