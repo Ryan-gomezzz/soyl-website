@@ -15,6 +15,10 @@ interface DashboardData {
         pilotRequests?: string
         inquiries?: string
     }
+    database: {
+        available: boolean
+        message?: string
+    }
 }
 
 async function fetchDashboardData(): Promise<DashboardData> {
@@ -22,7 +26,21 @@ async function fetchDashboardData(): Promise<DashboardData> {
         pageVisits: null,
         pilotRequests: [],
         inquiries: [],
-        errors: {}
+        errors: {},
+        database: { available: true },
+    }
+
+    // Quick health check before running multiple queries
+    const dbHealth = await safePrismaOperation(async () => await prisma.$queryRaw`SELECT 1`, null)
+    if (!dbHealth.success) {
+        data.database = {
+            available: false,
+            message: dbHealth.error || 'Database unavailable',
+        }
+        data.errors.pageVisits = dbHealth.error
+        data.errors.pilotRequests = dbHealth.error
+        data.errors.inquiries = dbHealth.error
+        return data
     }
 
     // Fetch each data source independently to allow partial success
@@ -71,6 +89,17 @@ async function fetchDashboardData(): Promise<DashboardData> {
         console.error('[Dashboard] Failed to fetch inquiries:', error)
     }
 
+    // Propagate DB status for banner messaging
+    const allErrors = [
+        data.errors.pageVisits,
+        data.errors.pilotRequests,
+        data.errors.inquiries,
+    ].filter(Boolean)
+    if (allErrors.length > 0) {
+        data.database.available = false
+        data.database.message = allErrors[0]
+    }
+
     return data
 }
 
@@ -93,8 +122,7 @@ export default async function AdminDashboard() {
         dashboardData.errors.inquiries
     ].filter(Boolean)
     
-    const isDatabaseUnavailable = allErrors.length > 0 && 
-        allErrors.some(err => err?.includes('connection') || err?.includes('Database') || err?.includes('unavailable'))
+    const isDatabaseUnavailable = !dashboardData.database.available || allErrors.some(err => err?.toLowerCase().includes('connection') || err?.toLowerCase().includes('database') || err?.toLowerCase().includes('unavailable'))
 
     return (
         <div className="min-h-screen pt-24 px-6 pb-12">
