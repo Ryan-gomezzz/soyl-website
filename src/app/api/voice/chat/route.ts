@@ -12,7 +12,6 @@ const openai = new OpenAI({
 const MAX_AUDIO_SIZE = 10 * 1024 * 1024 // 10MB
 const MAX_CONVERSATION_HISTORY = 10 // Last 10 messages
 const MAX_MESSAGE_LENGTH = 5000 // Max characters per message
-const AUDIO_MIME_TYPE = 'audio/mpeg'
 
 export interface VoiceChatRequest {
   audio?: string // Base64 encoded audio (optional if text is provided)
