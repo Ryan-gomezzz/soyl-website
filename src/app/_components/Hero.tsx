@@ -14,7 +14,7 @@ export function Hero() {
   return (
     <section className="relative min-h-[72vh] lg:min-h-[72vh] md:min-h-[56vh] flex items-center overflow-hidden">
       <DotPattern className="absolute inset-0 opacity-30 animate-parallax-slow" />
-      <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8 py-32 lg:py-40">
+      <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8 py-20 lg:py-28">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
