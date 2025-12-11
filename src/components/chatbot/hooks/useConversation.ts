@@ -122,10 +122,11 @@ export function useConversation() {
       const data = await response.json()
 
       // Update user message with actual transcription
-      if (userMessagePlaceholder) {
+      if (userMessagePlaceholder !== null) {
+        const placeholderId = userMessagePlaceholder.id
         setMessages((prev) =>
           prev.map((msg) =>
-            msg.id === userMessagePlaceholder.id
+            msg.id === placeholderId
               ? {
                   ...msg,
                   content: data.transcription,
