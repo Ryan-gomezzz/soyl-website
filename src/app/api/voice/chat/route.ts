@@ -280,6 +280,11 @@ export async function POST(req: NextRequest) {
       // Convert response to buffer
       const arrayBuffer = await ttsResponse.arrayBuffer()
       ttsAudio = Buffer.from(arrayBuffer)
+
+      // Validate audio buffer
+      if (!ttsAudio || ttsAudio.length === 0) {
+        throw new Error('TTS returned empty audio buffer')
+      }
     } catch (error) {
       console.error('TTS error:', error)
       
@@ -295,10 +300,33 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Return response with base64 encoded audio
+    // Encode to base64 with proper formatting (no whitespace, proper padding)
+    const base64Audio = ttsAudio.toString('base64')
+    
+    // Ensure base64 is clean (remove any potential whitespace)
+    const cleanBase64 = base64Audio.replace(/\s/g, '')
+    
+    // Validate the base64 encoding
+    try {
+      Buffer.from(cleanBase64, 'base64')
+    } catch (error) {
+      console.error('Invalid base64 encoding after conversion:', error)
+      // Return text-only response if base64 encoding fails
+      return NextResponse.json(
+        {
+          text: aiResponse,
+          audio: '',
+          transcription,
+          warning: 'Audio encoding failed, but you can read the response above.',
+        },
+        { status: 200 }
+      )
+    }
+
+    // Return response with clean base64 encoded audio
     const response: VoiceChatResponse = {
       text: aiResponse,
-      audio: `data:${AUDIO_MIME_TYPE};base64,${ttsAudio.toString('base64')}`,
+      audio: `data:${AUDIO_MIME_TYPE};base64,${cleanBase64}`,
       transcription,
     }
 

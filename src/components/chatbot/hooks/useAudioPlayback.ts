@@ -46,75 +46,106 @@ export function useAudioPlayback(options: UseAudioPlaybackOptions = {}) {
       let audioUrl: string
       let shouldRevokeUrl = false
       
-      if (typeof audioData === 'string') {
-        // Handle both data URIs and plain base64 strings
-        if (audioData.startsWith('data:')) {
-          // Extract base64 from data URI
-          const base64Match = audioData.match(/^data:audio\/([^;]+);base64,(.+)$/)
-          if (base64Match) {
-            const mimeType = `audio/${base64Match[1]}`
-            const base64Data = base64Match[2]
-            try {
-              const binaryString = atob(base64Data)
-              const bytes = new Uint8Array(binaryString.length)
-              for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i)
-              }
-              const blob = new Blob([bytes], { type: mimeType })
-              audioUrl = URL.createObjectURL(blob)
-              shouldRevokeUrl = true
-            } catch (e) {
-              console.error('Failed to decode data URI audio:', e)
-              audioUrl = audioData // fallback to direct data URI
-            }
+      // Helper function to clean and validate base64
+      const cleanBase64 = (str: string): string => {
+        // Remove data URI prefix if present
+        let cleaned = str.trim()
+        if (cleaned.startsWith('data:audio/')) {
+          const match = cleaned.match(/^data:audio\/[^;]+;base64,(.+)$/)
+          if (match && match[1]) {
+            cleaned = match[1]
           } else {
-            // Fallback: try as direct data URI (may not work in all browsers)
-            audioUrl = audioData
-          }
-        } else {
-          // Plain base64 string - convert to Blob
-          // Clean the string first (remove whitespace)
-          const cleanBase64 = String(audioData).trim().replace(/\s/g, '')
-          
-          // Check if empty
-          if (!cleanBase64 || cleanBase64.length === 0) {
-            throw new Error('Invalid base64: empty string')
-          }
-          
-          // Validate it's actually base64 (more lenient)
-          const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/
-          if (!base64Regex.test(cleanBase64)) {
-            console.warn('Base64 contained unexpected characters, falling back to data URI')
-            audioUrl = `data:audio/mpeg;base64,${cleanBase64}`
-          } else {
-            try {
-              const binaryString = atob(cleanBase64)
-              if (binaryString.length === 0) {
-                throw new Error('Invalid base64: decoded data is empty')
-              }
-              const bytes = new Uint8Array(binaryString.length)
-              for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i)
-              }
-              // Try to detect format, default to mp3/mpeg
-              const blob = new Blob([bytes], { type: 'audio/mpeg' })
-              audioUrl = URL.createObjectURL(blob)
-              shouldRevokeUrl = true
-            } catch (e) {
-              const errorMsg = e instanceof Error ? e.message : 'Unknown error'
-              console.error('Failed to decode base64 audio:', errorMsg)
-              audioUrl = `data:audio/mpeg;base64,${cleanBase64}`
+            const commaIndex = cleaned.indexOf(',')
+            if (commaIndex !== -1) {
+              cleaned = cleaned.substring(commaIndex + 1)
             }
           }
         }
+        // Remove all whitespace and newlines
+        cleaned = cleaned.replace(/\s/g, '').replace(/\n/g, '').replace(/\r/g, '')
+        return cleaned
+      }
+
+      // Helper function to validate base64 format
+      const isValidBase64 = (str: string): boolean => {
+        if (!str || str.length === 0) return false
+        // Base64 regex: alphanumeric, +, /, and = for padding (0-2 times)
+        const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/
+        if (!base64Regex.test(str)) return false
+        // Try to decode to verify it's valid
+        try {
+          const decoded = atob(str)
+          return decoded.length > 0
+        } catch {
+          return false
+        }
+      }
+
+      // Helper function to decode base64 to blob
+      const base64ToBlob = (base64: string, mimeType: string = 'audio/mpeg'): Blob | null => {
+        try {
+          const binaryString = atob(base64)
+          if (binaryString.length === 0) return null
+          const bytes = new Uint8Array(binaryString.length)
+          for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i)
+          }
+          return new Blob([bytes], { type: mimeType })
+        } catch (e) {
+          console.error('Failed to decode base64 to blob:', e)
+          return null
+        }
+      }
+      
+      if (typeof audioData === 'string') {
+        const cleaned = cleanBase64(audioData)
+        
+        if (!cleaned || cleaned.length === 0) {
+          throw new Error('Invalid audio data: empty base64 string')
+        }
+
+        // Validate base64 format
+        if (!isValidBase64(cleaned)) {
+          throw new Error('Invalid audio data: corrupted or invalid base64 format')
+        }
+
+        // Determine MIME type from data URI if present, otherwise default to mpeg
+        let mimeType = 'audio/mpeg'
+        if (audioData.startsWith('data:audio/')) {
+          const mimeMatch = audioData.match(/^data:audio\/([^;]+)/)
+          if (mimeMatch && mimeMatch[1]) {
+            mimeType = `audio/${mimeMatch[1]}`
+          }
+        }
+
+        // Convert to blob for better browser compatibility
+        const blob = base64ToBlob(cleaned, mimeType)
+        if (!blob) {
+          throw new Error('Failed to create audio blob from base64 data')
+        }
+
+        // Verify blob has content
+        if (blob.size === 0) {
+          throw new Error('Invalid audio data: blob is empty')
+        }
+
+        audioUrl = URL.createObjectURL(blob)
+        shouldRevokeUrl = true
       } else if (audioData instanceof Blob) {
+        if (audioData.size === 0) {
+          throw new Error('Invalid audio data: blob is empty')
+        }
         audioUrl = URL.createObjectURL(audioData)
         shouldRevokeUrl = true
-      } else {
-        // ArrayBuffer
+      } else if (audioData instanceof ArrayBuffer) {
+        if (audioData.byteLength === 0) {
+          throw new Error('Invalid audio data: ArrayBuffer is empty')
+        }
         const blob = new Blob([audioData], { type: 'audio/mpeg' })
         audioUrl = URL.createObjectURL(blob)
         shouldRevokeUrl = true
+      } else {
+        throw new Error('Invalid audio data type')
       }
 
       audio.src = audioUrl

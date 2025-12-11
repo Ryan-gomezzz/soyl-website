@@ -137,7 +137,8 @@ export default function ApplyForm({ roles }: ApplyFormProps) {
         throw new Error('Upload secret is not configured.');
       }
 
-      const response = await fetch('/api/upload-url', {
+      // Step 1: Get upload URL and file path
+      const urlResponse = await fetch('/api/upload-url', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -150,23 +151,34 @@ export default function ApplyForm({ roles }: ApplyFormProps) {
         })
       });
 
-      if (!response.ok) {
-        const { error } = await response.json();
+      if (!urlResponse.ok) {
+        const { error } = await urlResponse.json();
         throw new Error(error ?? 'Failed to fetch upload URL.');
       }
 
-      const { uploadUrl, fileUrl } = (await response.json()) as { uploadUrl: string; fileUrl: string };
+      const { uploadUrl, fileUrl, filePath } = (await urlResponse.json()) as { 
+        uploadUrl: string; 
+        fileUrl: string;
+        filePath: string;
+      };
 
-      const upload = await fetch(uploadUrl, {
-        method: 'PUT',
+      // Step 2: Upload file to server-side endpoint
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('filePath', filePath);
+      formData.append('fileName', file.name);
+
+      const uploadResponse = await fetch(uploadUrl, {
+        method: 'POST',
         headers: {
-          'Content-Type': file.type
+          'x-api-secret': uploadHint
         },
-        body: file
+        body: formData
       });
 
-      if (!upload.ok) {
-        throw new Error('Resume upload failed.');
+      if (!uploadResponse.ok) {
+        const { error } = await uploadResponse.json().catch(() => ({}));
+        throw new Error(error ?? 'Resume upload failed.');
       }
 
       return fileUrl;

@@ -1,21 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import crypto from 'node:crypto'
 import { z } from 'zod'
+import { generateFilePath } from '@/lib/supabase'
 
 const payloadSchema = z.object({
   fileName: z.string().min(1).max(180),
   fileType: z.string().min(1),
   fileSize: z.number().positive(),
-})
-
-const s3 = new S3Client({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.S3_UPLOAD_ACCESS_KEY_ID ?? '',
-    secretAccessKey: process.env.S3_UPLOAD_SECRET_ACCESS_KEY ?? '',
-  },
 })
 
 const ALLOWED_TYPES = new Set(['application/pdf'])
@@ -41,12 +31,8 @@ export async function POST(req: NextRequest) {
 
     const { fileName, fileType, fileSize } = parseResult.data
 
-    if (!process.env.RESUME_BUCKET) {
-      return NextResponse.json({ error: 'Resume bucket not configured.' }, { status: 500 })
-    }
-
-    if (!process.env.S3_UPLOAD_ACCESS_KEY_ID || !process.env.S3_UPLOAD_SECRET_ACCESS_KEY) {
-      return NextResponse.json({ error: 'S3 upload credentials missing.' }, { status: 500 })
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return NextResponse.json({ error: 'Supabase not configured.' }, { status: 500 })
     }
 
     if (!ALLOWED_TYPES.has(fileType)) {
@@ -57,22 +43,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'File exceeds 5 MB limit.' }, { status: 400 })
     }
 
-    const sanitizedFileName = fileName.replace(/[^\w.-]/g, '-').toLowerCase()
-    const key = `resumes/${crypto.randomUUID()}-${sanitizedFileName}`
+    // Generate file path for Supabase Storage
+    const { filePath } = generateFilePath(fileName)
+    
+    // For Supabase, we'll use server-side uploads
+    // Return the file path and upload endpoint URL
+    // The client will POST the file to /api/upload-resume with this path
+    const uploadUrl = `/api/upload-resume`
+    const fileUrl = `supabase://${process.env.SUPABASE_STORAGE_BUCKET || 'resumes'}/${filePath}`
 
-    const command = new PutObjectCommand({
-      Bucket: process.env.RESUME_BUCKET,
-      Key: key,
-      ContentType: fileType,
-      Metadata: {
-        uploadedAt: new Date().toISOString(),
-      },
+    return NextResponse.json({ 
+      uploadUrl, 
+      fileUrl, 
+      filePath,
+      expiresInSeconds: 60 * 5 // 5 minutes to complete upload
     })
-
-    const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 60 * 5 })
-    const fileUrl = `s3://${process.env.RESUME_BUCKET}/${key}`
-
-    return NextResponse.json({ uploadUrl, fileUrl, expiresInSeconds: 60 * 5 })
   } catch (error) {
     console.error('Error generating upload URL:', error)
     return NextResponse.json({ error: 'Internal server error.' }, { status: 500 })
