@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { useChatbotContext } from './ChatbotProvider'
 import './ChatbotStyles.css'
 import clsx from 'clsx'
-import { Mic, Volume2, VolumeX, X, Minimize2, Pin, PinOff, Loader2 } from 'lucide-react'
+import { Mic, Volume2, VolumeX, X, Minimize2, Pin, PinOff, Loader2, Keyboard, Send } from 'lucide-react'
 import { AudioVisualizer } from './AudioVisualizer'
 
 interface VoiceBotPanelProps {
@@ -69,8 +69,25 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
   } = useChatbotContext()
 
   const [isPressing, setIsPressing] = useState(false)
+  const [inputMode, setInputMode] = useState<'voice' | 'text'>('voice')
+  const [inputText, setInputText] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const containerRef = useFocusTrap(prefersModal && open)
+
+  const handleSendText = async () => {
+    if (!inputText.trim() || conversation.isLoading) return
+
+    const text = inputText
+    setInputText('') // Clear immediately
+
+    try {
+      await conversation.sendTextMessage(text)
+      // Audio will play automatically via the effect in the main component if processed
+    } catch (err) {
+      // Error is handled in hook
+      setInputText(text) // Restore text on error
+    }
+  }
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -482,74 +499,109 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
               </AnimatePresence>
             </div>
 
-            {/* Main Interactive Button */}
-            <motion.button
-              onMouseDown={handleVoiceButtonMouseDown}
-              onMouseUp={handleVoiceButtonMouseUp}
-              onMouseLeave={handleVoiceButtonMouseUp}
-              onTouchStart={handleVoiceButtonTouchStart}
-              onTouchEnd={handleVoiceButtonTouchEnd}
-              disabled={
-                recording.state === 'processing' ||
-                conversation.isLoading ||
-                recording.hasPermission === false
-              }
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={clsx(
-                'relative w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl focus:outline-none ring-offset-4 ring-offset-[var(--panel)] focus:ring-2 focus:ring-accent',
-                recording.state === 'recording' || isPressing
-                  ? 'bg-red-500 ring-4 ring-red-500/30'
-                  : conversation.isLoading
-                    ? 'bg-white/10 cursor-not-allowed'
-                    : 'bg-gradient-to-br from-accent to-[#0099cc] hover:shadow-accent/40'
-              )}
-              aria-label={
-                recording.state === 'recording'
-                  ? 'Stop recording'
-                  : 'Start recording'
-              }
-            >
-              {/* Outer Glow Ring */}
-              {(recording.state === 'recording' || isPressing) && (
-                <motion.div
-                  layoutId="recording-glow"
-                  className="absolute inset-0 rounded-full border-2 border-red-500 opacity-50"
-                  animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0, 0.5] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                />
-              )}
-
-              <AnimatePresence mode="wait">
-                {recording.state === 'recording' || isPressing ? (
-                  <motion.div
-                    key="recording"
-                    initial={{ scale: 0.5, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.5, opacity: 0 }}
-                  >
-                    <AudioVisualizer isActive={true} mode="listening" barCount={4} />
-                  </motion.div>
-                ) : conversation.isLoading || recording.state === 'processing' ? (
-                  <motion.div
-                    key="loading"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                  >
-                    <Loader2 className="w-8 h-8 text-white/50" />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="idle"
-                    initial={{ scale: 0.5, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.5, opacity: 0 }}
-                  >
-                    <Mic className="w-8 h-8 text-white" />
-                  </motion.div>
+            {/* Main Interactive Control */}
+            {inputMode === 'voice' ? (
+              <motion.button
+                onMouseDown={handleVoiceButtonMouseDown}
+                onMouseUp={handleVoiceButtonMouseUp}
+                onMouseLeave={handleVoiceButtonMouseUp}
+                onTouchStart={handleVoiceButtonTouchStart}
+                onTouchEnd={handleVoiceButtonTouchEnd}
+                disabled={
+                  recording.state === 'processing' ||
+                  conversation.isLoading ||
+                  recording.hasPermission === false
+                }
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={clsx(
+                  'relative w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl focus:outline-none ring-offset-4 ring-offset-[var(--panel)] focus:ring-2 focus:ring-accent',
+                  recording.state === 'recording' || isPressing
+                    ? 'bg-red-500 ring-4 ring-red-500/30'
+                    : conversation.isLoading
+                      ? 'bg-white/10 cursor-not-allowed'
+                      : 'bg-gradient-to-br from-accent to-[#0099cc] hover:shadow-accent/40'
                 )}
-              </AnimatePresence>
-            </motion.button>
+                aria-label={
+                  recording.state === 'recording'
+                    ? 'Stop recording'
+                    : 'Start recording'
+                }
+              >
+                {/* Outer Glow Ring */}
+                {(recording.state === 'recording' || isPressing) && (
+                  <motion.div
+                    layoutId="recording-glow"
+                    className="absolute inset-0 rounded-full border-2 border-red-500 opacity-50"
+                    animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0, 0.5] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  />
+                )}
+
+                <AnimatePresence mode="wait">
+                  {recording.state === 'recording' || isPressing ? (
+                    <motion.div
+                      key="recording"
+                      initial={{ scale: 0.5, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.5, opacity: 0 }}
+                    >
+                      <AudioVisualizer isActive={true} mode="listening" barCount={4} />
+                    </motion.div>
+                  ) : conversation.isLoading || recording.state === 'processing' ? (
+                    <motion.div
+                      key="loading"
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                    >
+                      <Loader2 className="w-8 h-8 text-white/50" />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="idle"
+                      initial={{ scale: 0.5, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.5, opacity: 0 }}
+                    >
+                      <Mic className="w-8 h-8 text-white" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.button>
+            ) : (
+              <div className="w-full flex gap-2 items-center">
+                <input
+                  type="text"
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSendText()}
+                  placeholder="Type your message..."
+                  className="flex-1 bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50 placeholder:text-muted/50"
+                  disabled={conversation.isLoading}
+                  autoFocus
+                />
+                <button
+                  onClick={handleSendText}
+                  disabled={!inputText.trim() || conversation.isLoading}
+                  className="p-3 bg-accent text-bg rounded-xl hover:bg-accent-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {conversation.isLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Send className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+            )}
+
+            {/* Mode Toggle */}
+            <button
+              onClick={() => setInputMode(prev => prev === 'voice' ? 'text' : 'voice')}
+              className="absolute right-4 bottom-4 p-2 rounded-full bg-white/5 hover:bg-white/10 text-muted hover:text-white transition-colors"
+              title={inputMode === 'voice' ? "Switch to keyboard" : "Switch to voice"}
+            >
+              {inputMode === 'voice' ? <Keyboard className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </button>
 
             {/* Clear Chat Option */}
             {conversation.messages.length > 0 && (

@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
     // Don't interfere with login API or login page
-    if (request.nextUrl.pathname.startsWith('/api/admin/login') || 
+    if (request.nextUrl.pathname.startsWith('/api/admin/login') ||
         request.nextUrl.pathname === '/admin/login') {
         return NextResponse.next()
     }
@@ -12,16 +12,22 @@ export function middleware(request: NextRequest) {
     if (request.nextUrl.pathname.startsWith('/admin/dashboard')) {
         const authCookie = request.cookies.get('admin_session')
 
+        // Debug logging for development
+        if (process.env.NODE_ENV === 'development') {
+            console.log(`[Middleware] Checking access for: ${request.nextUrl.pathname}`)
+            console.log(`[Middleware] Auth cookie present: ${!!authCookie}`)
+            if (authCookie) {
+                console.log(`[Middleware] Auth cookie value length: ${authCookie.value.length}`)
+            }
+        }
+
         // If no auth cookie or empty value, redirect to login
         if (!authCookie || !authCookie.value) {
-            if (process.env.NODE_ENV === 'development') {
-                console.log('[Middleware] No admin_session cookie found, redirecting to login')
-            }
-            return NextResponse.redirect(new URL('/admin/login', request.url))
-        }
-        
-        if (process.env.NODE_ENV === 'development') {
-            console.log('[Middleware] Admin session cookie found, allowing access')
+            console.warn('[Middleware] No admin_session cookie found, redirecting to login')
+            const loginUrl = new URL('/admin/login', request.url)
+            // Add callback URL to redirect back after login
+            loginUrl.searchParams.set('callbackUrl', request.nextUrl.pathname)
+            return NextResponse.redirect(loginUrl)
         }
     }
 
