@@ -44,10 +44,10 @@ Copy `.env.example` to `.env.local` and set:
 
 | Variable | Required | Notes |
 | --- | --- | --- |
-| `DATABASE_URL` | Yes (Careers) | Postgres connection string (RDS, Render, or Supabase) |
-| `AWS_REGION` | Yes (Careers) | Region for S3/Secrets (e.g. `us-east-1`) |
-| `RESUME_BUCKET` | Yes (Careers) | Private S3 bucket for resumes |
-| `S3_UPLOAD_ACCESS_KEY_ID` / `S3_UPLOAD_SECRET_ACCESS_KEY` | Yes (Careers) | IAM user keys limited to the resume bucket |
+| `DATABASE_URL` | Yes (Careers) | Postgres connection string (Supabase recommended) |
+| `SUPABASE_URL` | Yes (Careers) | Your Supabase project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes (Careers) | Supabase service role key (for server-side operations) |
+| `SUPABASE_STORAGE_BUCKET` | No (Careers) | Storage bucket name for resumes (defaults to 'resumes') |
 | `UPLOAD_API_SECRET` | Yes (Careers) | Shared secret for `/api/upload-url` |
 | `ADMIN_API_TOKEN` | Yes (Careers) | Secret token for admin API/UI access |
 | `SENDGRID_API_KEY` / `SENDGRID_FROM_EMAIL` / `HIRING_INBOX` | Yes (Careers) | Email notifications |
@@ -62,13 +62,13 @@ Copy `.env.example` to `.env.local` and set:
 
 ```bash
 # Database (Required for Careers System)
-DATABASE_URL="postgresql://username:password@host:5432/soyl_applicants?schema=public"
+# Get this from your Supabase project settings
+DATABASE_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
 
-# AWS S3 (Required for Careers System)
-AWS_REGION="us-east-1"
-RESUME_BUCKET="soyl-careers-resumes"
-S3_UPLOAD_ACCESS_KEY_ID="aws_access_key_id"
-S3_UPLOAD_SECRET_ACCESS_KEY="aws_secret_access_key"
+# Supabase (Required for Careers System)
+SUPABASE_URL="https://[YOUR-PROJECT-REF].supabase.co"
+SUPABASE_SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+SUPABASE_STORAGE_BUCKET="resumes"  # Optional, defaults to 'resumes'
 UPLOAD_API_SECRET="super-shared-secret"
 
 # Admin & Security (Required for Careers System)
@@ -109,32 +109,55 @@ OPENAI_API_KEY="sk-..."
    ```
 4. Visit `http://localhost:3000/careers` for the public page and `http://localhost:3000/admin/applicants` (requires `NEXT_PUBLIC_ADMIN_HINT` matching `ADMIN_API_TOKEN`).
 
-### Deployment Checklist (Vercel + AWS RDS)
+### Supabase Setup
 
-- Provision AWS resources with Terraform in `terraform/` (S3 bucket, Secrets Manager, RDS, IAM role).
-- Store DB credentials, SendGrid key, and other secrets in AWS Secrets Manager or Vercel environment variables (never commit).
-- Run `npx prisma migrate deploy` against the production database.
-- Set environment variables in Vercel (or ECS task definition) matching `.env.example`.
-- Configure reCAPTCHA keys and verify SendGrid sender identity.
-- Rotate `ADMIN_API_TOKEN` regularly and distribute via secure vault.
-- Add monitoring (Sentry/Log drains) and enable CloudWatch alarms for RDS.
+1. **Create a Supabase Project**
+   - Go to [supabase.com](https://supabase.com) and create a new project
+   - Wait for the database to be provisioned (usually 1-2 minutes)
 
-### Deployment Checklist (Supabase Alternative)
+2. **Get Your Credentials**
+   - Go to Project Settings → API
+   - Copy your `Project URL` (this is `SUPABASE_URL`)
+   - Copy your `service_role` key (this is `SUPABASE_SERVICE_ROLE_KEY` - keep it secret!)
+   - Go to Project Settings → Database
+   - Copy the connection string under "Connection string" → "URI" (this is `DATABASE_URL`)
 
-- Create Supabase project and copy the Postgres connection string into `DATABASE_URL`.
-- Use Supabase Storage instead of S3 by swapping the upload API (Supabase supports signed uploads natively).
-- Supabase Auth can replace the `ADMIN_API_TOKEN` check for the admin dashboard.
-- Costs remain minimal while preserving Prisma compatibility.
+3. **Create Storage Bucket**
+   - Go to Storage in your Supabase dashboard
+   - Click "New bucket"
+   - Name it `resumes` (or set `SUPABASE_STORAGE_BUCKET` to your preferred name)
+   - Set it to **Private** (only accessible via signed URLs)
+   - Click "Create bucket"
+
+4. **Run Database Migrations**
+   ```bash
+   npx prisma migrate deploy
+   ```
+   Or for development:
+   ```bash
+   npx prisma migrate dev --name init
+   ```
+
+### Deployment Checklist (Vercel + Supabase)
+
+- Create Supabase project and configure storage bucket as described above
+- Set all environment variables in Vercel matching the `.env.local` example
+- Run `npx prisma migrate deploy` against the production database
+- Configure reCAPTCHA keys and verify SendGrid sender identity
+- Rotate `ADMIN_API_TOKEN` and `SUPABASE_SERVICE_ROLE_KEY` regularly
+- Add monitoring (Sentry/Log drains) for production
+- Verify Supabase Storage bucket is set to private
 
 ### Security & Compliance Notes
 
-- The public form enforces reCAPTCHA v3, PDF-only uploads (≤5 MB), and shared-secret protection for presigned URLs.
-- Resumes live in a private S3 bucket; only signed PUT/GET URLs are exposed and expire quickly.
+- The public form enforces reCAPTCHA v3, PDF-only uploads (≤5 MB), and shared-secret protection for upload URLs.
+- Resumes live in a private Supabase Storage bucket; only signed download URLs are exposed and expire after 1 hour.
 - Admin API requires `ADMIN_API_TOKEN`; upgrade to JWT/SSO when ready.
-- Use `DELETE /api/admin/:id` for GDPR deletion requests and remove the corresponding S3 object (future enhancement).
-- Integrate Sentry (`@sentry/nextjs`) and ship structured logs to CloudWatch/Datadog.
+- Use `DELETE /api/admin/applicants/:id` for GDPR deletion requests (also removes the file from Supabase Storage).
+- Integrate Sentry (`@sentry/nextjs`) and ship structured logs for production monitoring.
 - Replace in-memory rate limiting with Redis/Upstash for distributed environments.
-- For automated resume parsing, hook `scoreResumeKeywords` into Textract + Bedrock or a lightweight LLM service.
+- For automated resume parsing, hook `scoreResumeKeywords` into a lightweight LLM service.
+- Never commit `SUPABASE_SERVICE_ROLE_KEY` - it has admin access to your Supabase project.
 
 ### Automations
 
@@ -341,11 +364,10 @@ Vercel is the recommended deployment platform for this Next.js application. Foll
 - `OPENAI_API_KEY` - Your OpenAI API key (starts with `sk-`)
 
 **For Careers System:**
-- `DATABASE_URL` - PostgreSQL connection string
-- `AWS_REGION` - AWS region (e.g., `us-east-1`)
-- `RESUME_BUCKET` - S3 bucket name
-- `S3_UPLOAD_ACCESS_KEY_ID` - AWS access key
-- `S3_UPLOAD_SECRET_ACCESS_KEY` - AWS secret key
+- `DATABASE_URL` - PostgreSQL connection string (from Supabase)
+- `SUPABASE_URL` - Your Supabase project URL
+- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key (keep secret!)
+- `SUPABASE_STORAGE_BUCKET` - Storage bucket name (defaults to 'resumes')
 - `UPLOAD_API_SECRET` - Shared secret for upload API
 - `ADMIN_API_TOKEN` - Admin dashboard token
 - `SENDGRID_API_KEY` - SendGrid API key
@@ -405,8 +427,9 @@ Vercel automatically detects Next.js and uses these build settings:
 
 **Build Failures:**
 - Ensure all required environment variables are set
-- Check that `DATABASE_URL` is valid and accessible
+- Check that `DATABASE_URL` is valid and accessible from Vercel
 - Verify Prisma client generation succeeds
+- Ensure `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are set correctly
 
 **Runtime Errors:**
 - Check Vercel function logs in the dashboard
@@ -433,9 +456,7 @@ MIT License - see [LICENSE](./LICENSE) for details.
 
 ## 🤝 Support
 
-- **Email**: hello@soyl.ai
-- **Jobs**: jobs@soyl.ai
-- **GitHub**: [soyl-ai](https://github.com/soyl-ai)
+- **Email**: ryan.gomez@soyl.cloud
 
 ---
 

@@ -21,7 +21,7 @@ const bodySchema = z.object({
     { message: 'LinkedIn URL must contain linkedin.com' }
   ),
   github: z.string().trim().url().optional().or(z.literal('')),
-  resumeUrl: z.string().trim().regex(/^s3:\/\//, 'Resume must be stored in S3'),
+  resumeUrl: z.string().trim().regex(/^supabase:\/\//, 'Resume must be stored in Supabase Storage'),
   coverLetter: z.string().trim().max(1600).optional(),
   workEligibility: z.string().trim().min(1),
   noticePeriod: z.string().trim().max(120).optional(),
@@ -92,7 +92,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Consent is required.' }, { status: 400 })
     }
 
-    if (!process.env.RESUME_BUCKET || !payload.resumeUrl.startsWith(`s3://${process.env.RESUME_BUCKET}/`)) {
+    const resumeBucket = process.env.SUPABASE_STORAGE_BUCKET || 'resumes'
+    if (!payload.resumeUrl.startsWith(`supabase://${resumeBucket}/`)) {
       return NextResponse.json({ error: 'Resume location is invalid.' }, { status: 400 })
     }
 

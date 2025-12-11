@@ -2,21 +2,24 @@ import prisma from '@/lib/prisma'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { isAdminAuthenticatedFromCookies } from '@/lib/adminAuth'
+import { DashboardAnalytics } from './DashboardAnalytics'
 
 async function loadData() {
   try {
-    const [pageVisits, pilotRequests, inquiries] = await Promise.all([
+    const [pageVisits, pilotRequests, inquiries, applicants] = await Promise.all([
       prisma.pageVisit.count().catch(() => null),
       prisma.pilotRequest.findMany({ orderBy: { createdAt: 'desc' }, take: 100 }).catch(() => []),
       prisma.inquiry.findMany({ orderBy: { createdAt: 'desc' }, take: 100 }).catch(() => []),
+      prisma.applicant.count().catch(() => null),
     ])
-    return { pageVisits, pilotRequests, inquiries, error: null }
+    return { pageVisits, pilotRequests, inquiries, applicants, error: null }
   } catch (error) {
     console.error('[admin-dashboard]', error)
     return {
       pageVisits: null,
       pilotRequests: [],
       inquiries: [],
+      applicants: null,
       error: error instanceof Error ? error.message : 'Failed to load data',
     }
   }
@@ -52,10 +55,15 @@ export default async function AdminDashboard() {
           </div>
         )}
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-4">
           <StatCard label="Page Visits" value={data.pageVisits ?? '—'} />
           <StatCard label="Pilot Requests" value={data.pilotRequests.length} />
           <StatCard label="Inquiries" value={data.inquiries.length} />
+          <StatCard label="Applicants" value={data.applicants ?? '—'} />
+        </div>
+
+        <div className="mt-10">
+          <DashboardAnalytics />
         </div>
 
         <div className="mt-10 space-y-8">

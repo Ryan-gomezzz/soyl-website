@@ -24,35 +24,59 @@ export function useConversation() {
   const greetingInjectedRef = useRef(false)
 
   const buildAudioUrl = useCallback((base64: string): string | null => {
-    let cleanBase64 = String(base64 || '').trim()
+    if (!base64 || typeof base64 !== 'string') return null
+
+    let cleanBase64 = base64.trim()
     if (!cleanBase64) return null
 
-    if (cleanBase64.startsWith('data:audio')) {
+    // Extract base64 from data URI if present
+    if (cleanBase64.startsWith('data:audio/')) {
       const match = cleanBase64.match(/^data:audio\/[^;]+;base64,(.+)$/)
       if (match && match[1]) {
         cleanBase64 = match[1].trim()
       } else {
         const commaIndex = cleanBase64.indexOf(',')
-        if (commaIndex !== -1) cleanBase64 = cleanBase64.substring(commaIndex + 1).trim()
+        if (commaIndex !== -1) {
+          cleanBase64 = cleanBase64.substring(commaIndex + 1).trim()
+        }
       }
     }
 
-    cleanBase64 = cleanBase64.replace(/\s/g, '')
+    // Remove all whitespace, newlines, and carriage returns
+    cleanBase64 = cleanBase64.replace(/\s/g, '').replace(/\n/g, '').replace(/\r/g, '')
     if (!cleanBase64) return null
 
+    // Validate base64 format
+    const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/
+    if (!base64Regex.test(cleanBase64)) {
+      console.error('Invalid base64 format in audio data')
+      return null
+    }
+
     try {
+      // Try to decode to verify it's valid
       const binaryString = atob(cleanBase64)
-      if (!binaryString) return null
+      if (!binaryString || binaryString.length === 0) {
+        console.error('Decoded base64 audio is empty')
+        return null
+      }
+
       const bytes = new Uint8Array(binaryString.length)
       for (let i = 0; i < binaryString.length; i++) {
         bytes[i] = binaryString.charCodeAt(i)
       }
+
       const blob = new Blob([bytes], { type: 'audio/mpeg' })
+      if (blob.size === 0) {
+        console.error('Created blob is empty')
+        return null
+      }
+
       return URL.createObjectURL(blob)
     } catch (err) {
       console.error('Failed to convert base64 audio:', err)
-      // Fallback to data URI so playback hook can still attempt
-      return `data:audio/mpeg;base64,${cleanBase64}`
+      // Don't fallback to data URI - return null to let playback hook handle error
+      return null
     }
   }, [])
 
