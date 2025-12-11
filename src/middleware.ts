@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { verifyToken, COOKIE_NAME } from './lib/adminAuth'
 
+const COOKIE_NAME = 'admin_session'
 const ADMIN_PATHS = ['/admin', '/api/admin']
 
 export function middleware(request: NextRequest) {
@@ -19,10 +19,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // Simple cookie check - actual verification happens in API routes (Node.js runtime)
   const cookie = request.cookies.get(COOKIE_NAME)?.value
-  const authorized = verifyToken(cookie)
 
-  if (!authorized) {
+  if (!cookie) {
     const loginUrl = new URL('/admin/login', request.url)
     loginUrl.searchParams.set('callbackUrl', pathname)
     return NextResponse.redirect(loginUrl)

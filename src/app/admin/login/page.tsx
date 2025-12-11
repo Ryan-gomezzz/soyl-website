@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 export default function AdminLoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/admin/dashboard'
+  const callbackUrl = searchParams?.get('callbackUrl') || '/admin/dashboard'
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
