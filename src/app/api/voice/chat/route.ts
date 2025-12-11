@@ -114,6 +114,34 @@ export async function POST(req: NextRequest) {
         content: sanitizeText(msg.content),
       }))
 
+    // If a Python voice service is configured, proxy the request and return its response
+    if (process.env.VOICE_SERVICE_URL) {
+      try {
+        const controller = new AbortController()
+        const timer = setTimeout(() => controller.abort(), 20000)
+        const proxyRes = await fetch(`${process.env.VOICE_SERVICE_URL}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...body, conversationHistory }),
+          signal: controller.signal,
+        })
+        clearTimeout(timer)
+
+        const proxyData = await proxyRes.json().catch(() => ({}))
+        if (!proxyRes.ok) {
+          return NextResponse.json(
+            { error: proxyData.detail || proxyData.error || 'Voice service error' },
+            { status: proxyRes.status }
+          )
+        }
+
+        return NextResponse.json(proxyData as VoiceChatResponse)
+      } catch (error) {
+        console.error('Voice service proxy error:', error)
+        // fall through to local handling
+      }
+    }
+
     let transcription = ''
 
     // Case 1: Audio Input - Needs Transcription

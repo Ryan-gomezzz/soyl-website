@@ -1,130 +1,84 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function AdminLogin() {
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
-    const [error, setError] = useState('')
-    const [isLoading, setIsLoading] = useState(false)
+export default function AdminLoginPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get('callbackUrl') || '/admin/dashboard'
 
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault()
-        e.stopPropagation() // Prevent any form bubbling
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-        if (isLoading) return // Prevent double submission
-
-        setIsLoading(true)
-        setError('')
-
-        try {
-            const response = await fetch('/api/admin/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, password }),
-                credentials: 'include', // Ensure cookies are sent and received
-                redirect: 'follow', // Follow redirects
-            })
-
-            // Parse JSON response
-            const data = await response.json()
-
-            if (!response.ok) {
-                const errorMessage = data?.error || 'Invalid credentials'
-                setError(errorMessage)
-
-                // Provide more helpful error messages
-                if (response.status === 500 && errorMessage.includes('ADMIN_PASSWORD')) {
-                    setError('Server configuration error. Please contact the administrator.')
-                } else if (response.status === 429) {
-                    setError('Too many login attempts. Please wait before trying again.')
-                } else if (response.status === 401) {
-                    setError('Invalid username or password. Please try again.')
-                } else {
-                    setError(errorMessage)
-                }
-
-                setIsLoading(false)
-                return
-            }
-
-            // Success - cookie should be set now
-            if (data.success) {
-                console.log('[Login] Login successful, redirecting to dashboard')
-                // Show specific success message based on backend warning
-                if (data.warning) {
-                    console.warn('[Login] ' + data.warning)
-                }
-
-                // Show "Redirecting..." state
-                setError('') // Clear any errors
-
-                // Small delay to ensure cookie is available in browser
-                await new Promise(resolve => setTimeout(resolve, 500))
-
-                const redirectUrl = data.redirect || '/admin/dashboard'
-
-                try {
-                    // Force a hard reload to ensure all state is fresh (including cookies for middleware)
-                    window.location.href = redirectUrl
-                } catch (redirectError) {
-                    console.error('[Login] Redirect error:', redirectError)
-                    setError('Redirect failed. Please navigate to the dashboard manually.')
-                    setIsLoading(false)
-                }
-            } else {
-                // Fallback if success flag is missing
-                setError('Login successful but redirect failed. Please try accessing the dashboard directly.')
-                setIsLoading(false)
-            }
-        } catch (err) {
-            console.error('Login error:', err)
-            const errorMessage = err instanceof Error ? err.message : 'Unknown error'
-
-            if (errorMessage.includes('fetch') || err instanceof TypeError) {
-                setError('Unable to connect to the server. Please check your connection and try again.')
-            } else {
-                setError('An unexpected error occurred. Please try again.')
-            }
-            setIsLoading(false)
-        }
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (loading) return
+    setLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/admin/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setError(data.error || 'Login failed')
+        setLoading(false)
+        return
+      }
+      router.push(callbackUrl)
+    } catch (err) {
+      console.error(err)
+      setError('Network error. Please try again.')
+      setLoading(false)
     }
+  }
 
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-bg">
-            <div className="w-full max-w-md p-8 glass rounded-xl border border-white/10">
-                <h1 className="text-2xl font-bold mb-6 text-center">Admin Login</h1>
-                <form onSubmit={handleLogin} className="space-y-4" noValidate>
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Username</label>
-                        <input
-                            type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            className="w-full p-2 rounded bg-bg/50 border border-white/10 focus:border-accent outline-none"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Password</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full p-2 rounded bg-bg/50 border border-white/10 focus:border-accent outline-none"
-                        />
-                    </div>
-                    {error && <p className="text-red-500 text-sm">{error}</p>}
-                    <button
-                        type="submit"
-                        disabled={isLoading || !username || !password}
-                        className="w-full py-2 bg-accent text-bg font-bold rounded hover:bg-accent-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {isLoading ? (error ? 'Login' : 'Redirecting...') : 'Login'}
-                    </button>
-                </form>
-            </div>
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0b1224] via-[#0e162d] to-[#0b1224]">
+      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur">
+        <div className="mb-6">
+          <p className="text-sm text-accent font-semibold">SOYL Admin</p>
+          <h1 className="text-3xl font-bold text-white mt-2">Sign in</h1>
+          <p className="text-sm text-muted mt-1">Access your dashboard</p>
         </div>
-    )
+        <form className="space-y-4" onSubmit={handleLogin}>
+          <div>
+            <label className="block text-sm text-muted mb-1">Username</label>
+            <input
+              className="w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-sm text-white outline-none focus:border-accent"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              autoComplete="username"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-muted mb-1">Password</label>
+            <input
+              className="w-full rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-sm text-white outline-none focus:border-accent"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              required
+            />
+          </div>
+          {error && <p className="text-sm text-red-400">{error}</p>}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-black hover:bg-accent-2 transition disabled:opacity-50"
+          >
+            {loading ? 'Signing in...' : 'Sign in'}
+          </button>
+        </form>
+      </div>
+    </div>
+  )
 }
+
