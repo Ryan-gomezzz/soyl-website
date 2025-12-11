@@ -53,14 +53,9 @@ export function ChatbotProvider({ children }: ChatbotProviderProps) {
   const recording = useVoiceRecording({
     onRecordingComplete: async (audioBlob) => {
       try {
-        const message = await conversation.sendVoiceMessage(audioBlob)
-        if (message.audioUrl) {
-          // Try to play audio, but don't fail if it doesn't work
-          playback.play(message.audioUrl).catch((err) => {
-            console.error('Failed to play audio response:', err)
-            // Audio failed but text response is still available
-          })
-        }
+        await conversation.sendVoiceMessage(audioBlob)
+        // Don't auto-play here - let VoiceBotPanel handle it to avoid duplicate playback
+        // The VoiceBotPanel's useEffect will automatically play the audio when the message is added
       } catch (error) {
         console.error('Error sending voice message:', error)
       }
