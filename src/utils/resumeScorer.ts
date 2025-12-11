@@ -1,49 +1,62 @@
-import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
-
-const client =
-  process.env.RESUME_BUCKET && process.env.AWS_REGION
-    ? new S3Client({
-        region: process.env.AWS_REGION,
-        credentials: process.env.S3_UPLOAD_ACCESS_KEY_ID
-          ? {
-              accessKeyId: process.env.S3_UPLOAD_ACCESS_KEY_ID,
-              secretAccessKey: process.env.S3_UPLOAD_SECRET_ACCESS_KEY ?? ''
-            }
-          : undefined
-      })
-    : null;
+import { supabase, RESUME_BUCKET } from '@/lib/supabase';
 
 const TEXT_DECODER = new TextDecoder();
 
-async function fetchResumeText(s3Uri: string): Promise<string> {
-  if (!client || !process.env.RESUME_BUCKET) {
+async function fetchResumeText(fileUri: string): Promise<string> {
+  if (!supabase) {
     return '';
   }
 
-  const [, , ...parts] = s3Uri.split('/');
-  const key = parts.join('/');
+  // Parse Supabase Storage URI: supabase://bucket/path
+  if (!fileUri.startsWith('supabase://')) {
+    return '';
+  }
 
-  const command = new GetObjectCommand({
-    Bucket: process.env.RESUME_BUCKET,
-    Key: key
-  });
+  const urlParts = fileUri.replace('supabase://', '').split('/');
+  if (urlParts.length < 2) {
+    return '';
+  }
+
+  const bucket = urlParts[0];
+  const filePath = urlParts.slice(1).join('/');
+
+  // Verify bucket matches configured bucket
+  if (bucket !== RESUME_BUCKET) {
+    return '';
+  }
 
   try {
-    const response = await client.send(command);
-    if (response.ContentType?.includes('pdf')) {
-      // PDF parsing requires an external service (Textract, LLM, etc.).
+    const { data, error } = await supabase.storage
+      .from(RESUME_BUCKET)
+      .download(filePath);
+
+    if (error) {
+      console.error('Unable to fetch resume for scoring', { error, filePath });
       return '';
     }
-    const body = await response.Body?.transformToByteArray();
-    return body ? TEXT_DECODER.decode(body) : '';
+
+    if (!data) {
+      return '';
+    }
+
+    // PDF parsing requires an external service (Textract, LLM, etc.).
+    // For now, return empty string for PDFs
+    const arrayBuffer = await data.arrayBuffer();
+    // Basic check: PDF files start with %PDF
+    const firstBytes = new Uint8Array(arrayBuffer.slice(0, 4));
+    if (String.fromCharCode(...firstBytes) === '%PDF') {
+      return '';
+    }
+
+    return TEXT_DECODER.decode(arrayBuffer);
   } catch (error) {
-    console.error('Unable to fetch resume for scoring', { error, key });
+    console.error('Unable to fetch resume for scoring', { error, filePath });
     return '';
   }
 }
 
-export async function scoreResumeKeywords(s3Uri: string, keywords: string[]) {
-  const text = await fetchResumeText(s3Uri);
+export async function scoreResumeKeywords(fileUri: string, keywords: string[]): Promise<number> {
+  const text = await fetchResumeText(fileUri);
   if (!text) {
     return 0;
   }
