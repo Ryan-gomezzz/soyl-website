@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import prisma, { safePrismaOperation } from '@/lib/prisma'
 import { requireAdminSession } from '@/lib/auth'
 import type { PilotRequest, Inquiry } from '@prisma/client'
+import { LogoutButton } from './LogoutButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -77,7 +78,8 @@ export default async function AdminDashboard() {
     // Verify admin session
     try {
         await requireAdminSession()
-    } catch {
+    } catch (error) {
+        console.warn('[Admin Dashboard] Authentication failed, redirecting to login:', error)
         redirect('/admin/login')
     }
 
@@ -97,15 +99,28 @@ export default async function AdminDashboard() {
     return (
         <div className="min-h-screen pt-24 px-6 pb-12">
             <div className="max-w-7xl mx-auto">
-                <h1 className="text-4xl font-bold mb-8">Admin Dashboard</h1>
+                <div className="flex items-center justify-between mb-8">
+                    <h1 className="text-4xl font-bold">Admin Dashboard</h1>
+                    <LogoutButton />
+                </div>
 
                 {/* Database Error Banner */}
                 {isDatabaseUnavailable && (
                     <div className="mb-6 glass p-4 rounded-xl border border-yellow-500/30 bg-yellow-500/10">
-                        <p className="text-yellow-400">
-                            <strong>Warning:</strong> Database connection unavailable. Some data may not be displayed. 
-                            Please check your DATABASE_URL configuration.
-                        </p>
+                        <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0">
+                                <svg className="w-5 h-5 text-yellow-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p className="text-yellow-400 font-semibold mb-1">Database Connection Warning</p>
+                                <p className="text-yellow-300/80 text-sm">
+                                    The database connection is currently unavailable. Some data may not be displayed correctly. 
+                                    Please verify your <code className="bg-yellow-500/20 px-1 rounded">DATABASE_URL</code> environment variable is correctly configured.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 )}
 
@@ -120,7 +135,7 @@ export default async function AdminDashboard() {
                                 <p className="text-2xl font-bold text-muted">—</p>
                                 {dashboardData.errors.pageVisits && (
                                     <p className="text-xs text-red-400 mt-1">
-                                        {dashboardData.errors.pageVisits.includes('connection') 
+                                        {dashboardData.errors.pageVisits.includes('connection') || dashboardData.errors.pageVisits.includes('Database')
                                             ? 'Database unavailable' 
                                             : 'Error loading data'}
                                     </p>
@@ -136,7 +151,7 @@ export default async function AdminDashboard() {
                             <div>
                                 <p className="text-2xl font-bold text-muted">—</p>
                                 <p className="text-xs text-red-400 mt-1">
-                                    {dashboardData.errors.pilotRequests.includes('connection')
+                                    {dashboardData.errors.pilotRequests.includes('connection') || dashboardData.errors.pilotRequests.includes('Database')
                                         ? 'Database unavailable'
                                         : 'Error loading data'}
                                 </p>
@@ -151,7 +166,7 @@ export default async function AdminDashboard() {
                             <div>
                                 <p className="text-2xl font-bold text-muted">—</p>
                                 <p className="text-xs text-red-400 mt-1">
-                                    {dashboardData.errors.inquiries.includes('connection')
+                                    {dashboardData.errors.inquiries.includes('connection') || dashboardData.errors.inquiries.includes('Database')
                                         ? 'Database unavailable'
                                         : 'Error loading data'}
                                 </p>
@@ -166,14 +181,18 @@ export default async function AdminDashboard() {
                     <div className="glass rounded-xl border border-white/10 overflow-hidden">
                         {dashboardData.errors.pilotRequests ? (
                             <div className="p-8 text-center">
-                                <p className="text-red-400 mb-2">
-                                    {dashboardData.errors.pilotRequests.includes('connection')
-                                        ? 'Database connection unavailable'
-                                        : 'Error loading pilot requests'}
-                                </p>
-                                <p className="text-sm text-muted">
-                                    {process.env.NODE_ENV === 'development' && dashboardData.errors.pilotRequests}
-                                </p>
+                                <div className="space-y-2">
+                                    <p className="text-red-400 font-medium">
+                                        {dashboardData.errors.pilotRequests.includes('connection') || dashboardData.errors.pilotRequests.includes('Database')
+                                            ? 'Database connection unavailable'
+                                            : 'Error loading pilot requests'}
+                                    </p>
+                                    {process.env.NODE_ENV === 'development' && (
+                                        <p className="text-xs text-muted font-mono bg-red-500/10 p-2 rounded">
+                                            {dashboardData.errors.pilotRequests}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         ) : (
                             <div className="overflow-x-auto">
@@ -220,14 +239,18 @@ export default async function AdminDashboard() {
                     <div className="glass rounded-xl border border-white/10 overflow-hidden">
                         {dashboardData.errors.inquiries ? (
                             <div className="p-8 text-center">
-                                <p className="text-red-400 mb-2">
-                                    {dashboardData.errors.inquiries.includes('connection')
-                                        ? 'Database connection unavailable'
-                                        : 'Error loading inquiries'}
-                                </p>
-                                <p className="text-sm text-muted">
-                                    {process.env.NODE_ENV === 'development' && dashboardData.errors.inquiries}
-                                </p>
+                                <div className="space-y-2">
+                                    <p className="text-red-400 font-medium">
+                                        {dashboardData.errors.inquiries.includes('connection') || dashboardData.errors.inquiries.includes('Database')
+                                            ? 'Database connection unavailable'
+                                            : 'Error loading inquiries'}
+                                    </p>
+                                    {process.env.NODE_ENV === 'development' && (
+                                        <p className="text-xs text-muted font-mono bg-red-500/10 p-2 rounded">
+                                            {dashboardData.errors.inquiries}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         ) : (
                             <div className="overflow-x-auto">

@@ -26,7 +26,20 @@ export default function AdminLogin() {
             const data = await response.json()
 
             if (!response.ok) {
-                setError(data.error || 'Invalid credentials')
+                const errorMessage = data.error || 'Invalid credentials'
+                setError(errorMessage)
+                
+                // Provide more helpful error messages
+                if (response.status === 500 && errorMessage.includes('ADMIN_PASSWORD')) {
+                    setError('Server configuration error. Please contact the administrator.')
+                } else if (response.status === 429) {
+                    setError('Too many login attempts. Please wait before trying again.')
+                } else if (response.status === 401) {
+                    setError('Invalid username or password. Please try again.')
+                } else {
+                    setError(errorMessage)
+                }
+                
                 setIsLoading(false)
                 return
             }
@@ -38,7 +51,13 @@ export default function AdminLogin() {
             window.location.href = '/admin/dashboard'
         } catch (err) {
             console.error('Login error:', err)
-            setError('An error occurred. Please try again.')
+            const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+            
+            if (errorMessage.includes('fetch')) {
+                setError('Unable to connect to the server. Please check your connection and try again.')
+            } else {
+                setError('An unexpected error occurred. Please try again.')
+            }
             setIsLoading(false)
         }
     }

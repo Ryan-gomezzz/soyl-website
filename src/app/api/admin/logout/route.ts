@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import prisma from '@/lib/prisma'
+import prisma, { safePrismaOperation } from '@/lib/prisma'
 
 // Force dynamic rendering since we use cookies()
 export const dynamic = 'force-dynamic'
@@ -11,15 +11,15 @@ export async function POST(_req: NextRequest) {
     const sessionToken = cookieStore.get('admin_session')
 
     if (sessionToken?.value) {
-      // Delete session from database
-      try {
-        await prisma.adminSession.deleteMany({
-          where: { token: sessionToken.value },
-        })
-      } catch (error) {
-        console.error('Failed to delete session from database:', error)
-        // Continue with cookie deletion even if DB deletion fails
-      }
+      // Delete session from database (with graceful fallback)
+      await safePrismaOperation(
+        async () => {
+          await prisma.adminSession.deleteMany({
+            where: { token: sessionToken.value },
+          })
+        }
+      )
+      // Continue with cookie deletion even if DB deletion fails
     }
 
     // Clear the cookie
