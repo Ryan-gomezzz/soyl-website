@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { PRODUCT_KNOWLEDGE_SYSTEM_PROMPT } from '@/lib/prompts/productKnowledge'
 import { rateLimitAppRouter } from '@/utils/rateLimitAppRouter'
+import { storeAudio } from '../audioCache'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || 'dummy_key_for_build',
@@ -11,7 +12,6 @@ const openai = new OpenAI({
 const MAX_AUDIO_SIZE = 10 * 1024 * 1024 // 10MB
 const MAX_CONVERSATION_HISTORY = 10 // Last 10 messages
 const MAX_MESSAGE_LENGTH = 5000 // Max characters per message
-const AUDIO_MIME_TYPE = 'audio/mpeg'
 
 export interface VoiceChatRequest {
   audio?: string // Base64 encoded audio (optional if text is provided)
@@ -24,7 +24,8 @@ export interface VoiceChatRequest {
 
 export interface VoiceChatResponse {
   text: string
-  audio: string // Base64 encoded audio
+  audioUrl?: string // URL to binary audio endpoint
+  audio?: string // Deprecated: base64 encoded audio (for backward compatibility)
   transcription: string
 }
 
@@ -135,72 +136,53 @@ export async function POST(req: NextRequest) {
           )
         }
 
-        // Validate and clean base64 audio data from Python service
+        // Convert Python service base64 audio to binary and store it
         if (proxyData.audio && typeof proxyData.audio === 'string') {
-          const cleanAudio = proxyData.audio.trim()
-          
-          // Extract base64 from data URI if present
-          let base64Data = cleanAudio
-          if (cleanAudio.startsWith('data:audio/')) {
-            const match = cleanAudio.match(/^data:audio\/[^;]+;base64,(.+)$/)
-            if (match && match[1]) {
-              base64Data = match[1]
-            } else {
-              const commaIndex = cleanAudio.indexOf(',')
-              if (commaIndex !== -1) {
-                base64Data = cleanAudio.substring(commaIndex + 1)
-              }
-            }
-          }
-          
-          // Remove all whitespace, newlines, and carriage returns
-          base64Data = base64Data.replace(/\s/g, '').replace(/\n/g, '').replace(/\r/g, '')
-          
-          // Validate base64 format
-          if (!isValidBase64(base64Data)) {
-            console.error('Invalid base64 audio from Python service, falling back to local handling')
-            // Fall through to local handling
-          } else {
-            // Verify we can decode it
-            try {
-              const decoded = Buffer.from(base64Data, 'base64')
-              if (decoded.length === 0) {
-                console.error('Empty decoded audio from Python service, falling back to local handling')
-                // Fall through to local handling
+          try {
+            // Extract base64 from data URI if present
+            let base64Data = proxyData.audio.trim()
+            if (base64Data.startsWith('data:audio/')) {
+              const match = base64Data.match(/^data:audio\/[^;]+;base64,(.+)$/)
+              if (match && match[1]) {
+                base64Data = match[1]
               } else {
-                // Reconstruct clean data URI
-                const mimeType = cleanAudio.startsWith('data:audio/') 
-                  ? cleanAudio.match(/^data:audio\/([^;]+)/)?.[1] || 'mpeg'
-                  : 'mpeg'
-                proxyData.audio = `data:audio/${mimeType};base64,${base64Data}`
+                const commaIndex = base64Data.indexOf(',')
+                if (commaIndex !== -1) {
+                  base64Data = base64Data.substring(commaIndex + 1)
+                }
               }
-            } catch (decodeError) {
-              console.error('Failed to decode base64 from Python service:', decodeError)
-              // Fall through to local handling
             }
-          }
-        }
-
-        // Only return proxy data if audio is valid, otherwise fall through to local handling
-        if (proxyData.audio && typeof proxyData.audio === 'string') {
-          // Extract base64 part for validation
-          const audioBase64 = proxyData.audio.replace(/^data:audio\/[^;]+;base64,/, '')
-          if (isValidBase64(audioBase64)) {
-            return NextResponse.json(proxyData as VoiceChatResponse, {
-              headers: {
-                'X-RateLimit-Limit': '10',
-                'X-RateLimit-Remaining': String(rateLimit.remaining),
-                'X-RateLimit-Reset': String(rateLimit.resetAt),
-              },
-            })
-          } else {
-            console.warn('Invalid audio from Python service, using local TTS instead')
+            
+            // Remove whitespace
+            base64Data = base64Data.replace(/\s/g, '')
+            
+            // Decode base64 to buffer
+            const audioBuffer = Buffer.from(base64Data, 'base64')
+            if (audioBuffer.length > 0) {
+              // Store in cache and get token
+              const token = storeAudio(audioBuffer, 5)
+              // Return with audioUrl instead of base64
+              const response: VoiceChatResponse = {
+                text: proxyData.text || '',
+                audioUrl: `/api/voice/audio?token=${token}`,
+                transcription: proxyData.transcription || '',
+              }
+              return NextResponse.json(response, {
+                headers: {
+                  'X-RateLimit-Limit': '10',
+                  'X-RateLimit-Remaining': String(rateLimit.remaining),
+                  'X-RateLimit-Reset': String(rateLimit.resetAt),
+                },
+              })
+            }
+          } catch (error) {
+            console.error('Failed to process audio from Python service:', error)
             // Fall through to local handling
           }
-        } else {
-          console.warn('Missing or invalid audio from Python service, using local TTS instead')
-          // Fall through to local handling
         }
+        
+        // If we get here, audio processing failed - fall through to local handling
+        console.warn('Invalid or missing audio from Python service, using local TTS instead')
       } catch (error) {
         console.error('Voice service proxy error:', error)
         // fall through to local handling
@@ -357,7 +339,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           text: aiResponse,
-          audio: '', // Empty audio - frontend can handle text-only response
           transcription,
           warning: 'Audio generation failed, but you can read the response above.',
         },
@@ -365,33 +346,13 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Encode to base64 with proper formatting (no whitespace, proper padding)
-    const base64Audio = ttsAudio.toString('base64')
+    // Store audio in cache and get token for binary endpoint
+    const token = storeAudio(ttsAudio, 5)
     
-    // Ensure base64 is clean (remove any potential whitespace)
-    const cleanBase64 = base64Audio.replace(/\s/g, '')
-    
-    // Validate the base64 encoding
-    try {
-      Buffer.from(cleanBase64, 'base64')
-    } catch (error) {
-      console.error('Invalid base64 encoding after conversion:', error)
-      // Return text-only response if base64 encoding fails
-      return NextResponse.json(
-        {
-          text: aiResponse,
-          audio: '',
-          transcription,
-          warning: 'Audio encoding failed, but you can read the response above.',
-        },
-        { status: 200 }
-      )
-    }
-
-    // Return response with clean base64 encoded audio
+    // Return response with audioUrl pointing to binary endpoint
     const response: VoiceChatResponse = {
       text: aiResponse,
-      audio: `data:${AUDIO_MIME_TYPE};base64,${cleanBase64}`,
+      audioUrl: `/api/voice/audio?token=${token}`,
       transcription,
     }
 
