@@ -112,9 +112,9 @@ export async function POST(req: NextRequest) {
     )
 
     if (!sessionResult.success) {
-      const isConnectionError = sessionResult.error?.includes('connection') || 
-                                sessionResult.error?.includes('Database')
-      
+      const isConnectionError = sessionResult.error?.includes('connection') ||
+        sessionResult.error?.includes('Database')
+
       if (isConnectionError) {
         console.warn('[Admin Login] Database unavailable, using cookie-only session. Error:', sessionResult.error)
         // Continue with cookie-only authentication as fallback
@@ -135,16 +135,17 @@ export async function POST(req: NextRequest) {
     loginAttempts.delete(ip)
 
     console.log(`[Admin Login] Successful login for user: ${username} from IP: ${ip}`)
-    
-    // Create response with JSON body and set cookie
-    const response = NextResponse.json({ 
+
+    // Create response with JSON body
+    const response = NextResponse.json({
       success: true,
       redirect: '/admin/dashboard',
       // Include warning if database session wasn't created
       warning: !sessionResult.success ? 'Session stored in cookie only (database unavailable)' : undefined
     })
-    
-    // Set cookie on the response
+
+    // Set cookie on the response with robust options
+    // using Lax sameSite for better compatibility during redirects
     response.cookies.set('admin_session', sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -152,12 +153,17 @@ export async function POST(req: NextRequest) {
       expires: expiresAt,
       path: '/',
     })
-    
+
+    // Explicitly set the Set-Cookie header as a fallback/reinforcement
+    // This helps in some edge cases where NextResponse.cookies.set might behave unexpectedly with middleware
+    const cookieString = `admin_session=${sessionToken}; Path=/; HttpOnly; SameSite=Lax; Expires=${expiresAt.toUTCString()}${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`
+    response.headers.append('Set-Cookie', cookieString)
+
     return response
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     console.error('[Admin Login] Unexpected error:', errorMessage, error)
-    
+
     // Provide more specific error messages
     if (error instanceof SyntaxError) {
       return NextResponse.json(
@@ -165,11 +171,11 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       )
     }
-    
+
     return NextResponse.json(
-      { 
-        error: process.env.NODE_ENV === 'development' 
-          ? `Internal server error: ${errorMessage}` 
+      {
+        error: process.env.NODE_ENV === 'development'
+          ? `Internal server error: ${errorMessage}`
           : 'Internal server error. Please try again later.'
       },
       { status: 500 }

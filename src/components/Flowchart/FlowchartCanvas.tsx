@@ -64,15 +64,15 @@ export function FlowchartCanvas({ onNodeClick }: FlowchartCanvasProps) {
   return (
     <div
       ref={canvasRef}
-      className="relative w-full h-[520px] md:h-[640px] min-h-[500px] overflow-visible mx-auto"
-      style={{ minWidth: '100%', maxWidth: '100%' }}
+      className="relative w-full h-[520px] md:h-[640px] min-h-[500px] overflow-visible mx-auto flex justify-center"
+      style={{ maxWidth: '100%' }}
     >
       {/* Background SVG for edges */}
       <svg
         width={size.w}
         height={size.h}
         className="absolute left-1/2 top-1/2 z-0 pointer-events-none"
-        style={{ 
+        style={{
           overflow: 'visible',
           transform: 'translate(-50%, -50%)',
           maxWidth: '100%',

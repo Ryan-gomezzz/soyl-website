@@ -11,9 +11,9 @@ export default function AdminLogin() {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
         e.stopPropagation() // Prevent any form bubbling
-        
+
         if (isLoading) return // Prevent double submission
-        
+
         setIsLoading(true)
         setError('')
 
@@ -34,7 +34,7 @@ export default function AdminLogin() {
             if (!response.ok) {
                 const errorMessage = data?.error || 'Invalid credentials'
                 setError(errorMessage)
-                
+
                 // Provide more helpful error messages
                 if (response.status === 500 && errorMessage.includes('ADMIN_PASSWORD')) {
                     setError('Server configuration error. Please contact the administrator.')
@@ -45,7 +45,7 @@ export default function AdminLogin() {
                 } else {
                     setError(errorMessage)
                 }
-                
+
                 setIsLoading(false)
                 return
             }
@@ -53,23 +53,22 @@ export default function AdminLogin() {
             // Success - cookie should be set now
             if (data.success) {
                 console.log('[Login] Login successful, redirecting to dashboard')
-                
+                // Show specific success message based on backend warning
+                if (data.warning) {
+                    console.warn('[Login] ' + data.warning)
+                }
+
+                // Show "Redirecting..." state
+                setError('') // Clear any errors
+
                 // Small delay to ensure cookie is available in browser
-                await new Promise(resolve => setTimeout(resolve, 200))
-                
-                // Use window.location.href for more reliable redirect
-                // This ensures the browser processes the cookie before navigation
+                await new Promise(resolve => setTimeout(resolve, 500))
+
                 const redirectUrl = data.redirect || '/admin/dashboard'
-                
+
                 try {
+                    // Force a hard reload to ensure all state is fresh (including cookies for middleware)
                     window.location.href = redirectUrl
-                    // Fallback after 1 second if redirect hasn't happened
-                    setTimeout(() => {
-                        if (window.location.pathname !== redirectUrl) {
-                            console.warn('[Login] Redirect may have failed, trying again')
-                            window.location.href = redirectUrl
-                        }
-                    }, 1000)
                 } catch (redirectError) {
                     console.error('[Login] Redirect error:', redirectError)
                     setError('Redirect failed. Please navigate to the dashboard manually.')
@@ -83,7 +82,7 @@ export default function AdminLogin() {
         } catch (err) {
             console.error('Login error:', err)
             const errorMessage = err instanceof Error ? err.message : 'Unknown error'
-            
+
             if (errorMessage.includes('fetch') || err instanceof TypeError) {
                 setError('Unable to connect to the server. Please check your connection and try again.')
             } else {
@@ -122,7 +121,7 @@ export default function AdminLogin() {
                         disabled={isLoading || !username || !password}
                         className="w-full py-2 bg-accent text-bg font-bold rounded hover:bg-accent-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {isLoading ? 'Logging in...' : 'Login'}
+                        {isLoading ? (error ? 'Login' : 'Redirecting...') : 'Login'}
                     </button>
                 </form>
             </div>

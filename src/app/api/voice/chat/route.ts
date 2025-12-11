@@ -13,7 +13,8 @@ const MAX_CONVERSATION_HISTORY = 10 // Last 10 messages
 const MAX_MESSAGE_LENGTH = 5000 // Max characters per message
 
 export interface VoiceChatRequest {
-  audio: string // Base64 encoded audio
+  audio?: string // Base64 encoded audio (optional if text is provided)
+  text?: string // Direct text input (optional if audio is provided)
   conversationHistory: Array<{
     role: 'user' | 'assistant'
     content: string
@@ -81,27 +82,10 @@ export async function POST(req: NextRequest) {
 
     const body: VoiceChatRequest = await req.json()
 
-    // Validate request body
-    if (!body.audio || typeof body.audio !== 'string') {
+    // Validate request body - require either audio or text
+    if ((!body.audio || typeof body.audio !== 'string') && (!body.text || typeof body.text !== 'string')) {
       return NextResponse.json(
-        { error: 'Invalid request: audio data is required' },
-        { status: 400 }
-      )
-    }
-
-    // Validate base64 format
-    if (!isValidBase64(body.audio)) {
-      return NextResponse.json(
-        { error: 'Invalid request: invalid audio format' },
-        { status: 400 }
-      )
-    }
-
-    // Check audio size
-    const audioSize = Buffer.from(body.audio, 'base64').length
-    if (audioSize > MAX_AUDIO_SIZE) {
-      return NextResponse.json(
-        { error: `Audio file too large. Maximum size is ${MAX_AUDIO_SIZE / 1024 / 1024}MB` },
+        { error: 'Invalid request: audio data or text input is required' },
         { status: 400 }
       )
     }
@@ -129,48 +113,67 @@ export async function POST(req: NextRequest) {
         content: sanitizeText(msg.content),
       }))
 
-    // Convert base64 audio to buffer
-    const audioBuffer = Buffer.from(body.audio, 'base64')
+    let transcription = ''
 
-    // Step 1: Transcribe audio using Whisper API
-    // Create a File object for OpenAI API
-    // Handle File API compatibility for different Node.js versions
-    let audioFile: File | Blob
-    try {
-      // Try to create File (Node.js 18+)
-      if (typeof File !== 'undefined') {
-        audioFile = new File([audioBuffer], 'audio.webm', {
-          type: 'audio/webm',
-        })
-      } else {
-        // Fallback to Blob
+    // Case 1: Audio Input - Needs Transcription
+    if (body.audio) {
+      // Validate base64 format
+      if (!isValidBase64(body.audio)) {
+        return NextResponse.json(
+          { error: 'Invalid request: invalid audio format' },
+          { status: 400 }
+        )
+      }
+
+      // Check audio size
+      const audioSize = Buffer.from(body.audio, 'base64').length
+      if (audioSize > MAX_AUDIO_SIZE) {
+        return NextResponse.json(
+          { error: `Audio file too large. Maximum size is ${MAX_AUDIO_SIZE / 1024 / 1024}MB` },
+          { status: 400 }
+        )
+      }
+
+      // Convert base64 audio to buffer
+      const audioBuffer = Buffer.from(body.audio, 'base64')
+
+      // Step 1: Transcribe audio using Whisper API
+      let audioFile: File | Blob
+      try {
+        if (typeof File !== 'undefined') {
+          audioFile = new File([audioBuffer], 'audio.webm', { type: 'audio/webm' })
+        } else {
+          audioFile = new Blob([audioBuffer], { type: 'audio/webm' })
+        }
+      } catch (error) {
         audioFile = new Blob([audioBuffer], { type: 'audio/webm' })
       }
-    } catch (error) {
-      // Final fallback: use Blob
-      audioFile = new Blob([audioBuffer], { type: 'audio/webm' })
-    }
 
-    let transcription: string
-    try {
-      const transcriptionResponse = await openai.audio.transcriptions.create({
-        file: audioFile as File | Blob,
-        model: 'whisper-1',
-        language: 'en',
-      })
-      transcription = sanitizeText(transcriptionResponse.text)
+      try {
+        const transcriptionResponse = await openai.audio.transcriptions.create({
+          file: audioFile as File | Blob,
+          model: 'whisper-1',
+          language: 'en',
+        })
+        transcription = sanitizeText(transcriptionResponse.text)
 
-      // Validate transcription length
+        // Validate transcription length
+        if (transcription.length > MAX_MESSAGE_LENGTH) {
+          transcription = transcription.substring(0, MAX_MESSAGE_LENGTH)
+        }
+      } catch (error) {
+        console.error('Whisper transcription error:', error)
+        return NextResponse.json(
+          { error: 'Failed to process audio. Please try again.' },
+          { status: 500 }
+        )
+      }
+    } else if (body.text) {
+      // Case 2: Direct Text Input
+      transcription = sanitizeText(body.text)
       if (transcription.length > MAX_MESSAGE_LENGTH) {
         transcription = transcription.substring(0, MAX_MESSAGE_LENGTH)
       }
-    } catch (error) {
-      console.error('Whisper transcription error:', error)
-      // Don't expose internal error details
-      return NextResponse.json(
-        { error: 'Failed to process audio. Please try again.' },
-        { status: 500 }
-      )
     }
 
     // Step 2: Get AI response using GPT-3.5-turbo (faster and more cost-effective)
@@ -191,13 +194,12 @@ export async function POST(req: NextRequest) {
 
     let aiResponse: string
     try {
-      // Use gpt-3.5-turbo for faster responses (3-5x faster, 10x cheaper)
-      // Still provides excellent conversational quality
+      // Use gpt-4o-mini for better intelligence and speed balance
       const chatResponse = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4o-mini',
         messages,
-        temperature: 0.8, // Slightly higher for more natural, sales-oriented responses
-        max_tokens: 400, // Reduced for faster generation and more concise responses
+        temperature: 0.7, // Slightly lower for more focused sales responses
+        max_tokens: 300, // Concise responses are better for voice
       })
       aiResponse = sanitizeText(
         chatResponse.choices[0]?.message?.content || 'I apologize, but I could not generate a response.'
