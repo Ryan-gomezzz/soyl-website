@@ -62,8 +62,12 @@ Copy `.env.example` to `.env.local` and set:
 
 ```bash
 # Database (Required for Careers System)
-# Get this from your Supabase project settings
-DATABASE_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
+# IMPORTANT: Use Session Pooler connection for production (Vercel, Render, etc.)
+# Direct connection (port 5432) only works with IPv6 - use Session Pooler (port 6543) for IPv4 networks
+# Get this from your Supabase project settings → Connection String → Session pooler
+DATABASE_URL="postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true"
+# Or for direct connection (local dev only, if you have IPv6):
+# DATABASE_URL="postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
 
 # Supabase (Required for Careers System)
 SUPABASE_URL="https://[YOUR-PROJECT-REF].supabase.co"
@@ -119,8 +123,11 @@ OPENAI_API_KEY="sk-..."
    - Go to Project Settings → API
    - Copy your `Project URL` (this is `SUPABASE_URL`)
    - Copy your `service_role` key (this is `SUPABASE_SERVICE_ROLE_KEY` - keep it secret!)
-   - Go to Project Settings → Database
-   - Copy the connection string under "Connection string" → "URI" (this is `DATABASE_URL`)
+   - Go to Project Settings → Database → Connection String
+   - **IMPORTANT**: Select "Session pooler" (not "Direct connection") for production deployments
+     - Direct connection (port 5432) only works with IPv6 networks
+     - Session pooler (port 6543) works with IPv4 networks (Vercel, Render, etc.)
+   - Copy the connection string with `?pgbouncer=true` parameter (this is `DATABASE_URL`)
 
 3. **Create Storage Bucket**
    - Go to Storage in your Supabase dashboard
@@ -141,6 +148,9 @@ OPENAI_API_KEY="sk-..."
 ### Deployment Checklist (Vercel + Supabase)
 
 - Create Supabase project and configure storage bucket as described above
+- **Use Session Pooler connection string** (not direct connection) for `DATABASE_URL` in Vercel
+  - This is required because Vercel is IPv4-only and direct connections require IPv6
+  - Get it from: Project Settings → Database → Connection String → Session pooler
 - Set all environment variables in Vercel matching the `.env.local` example
 - Run `npx prisma migrate deploy` against the production database
 - Configure reCAPTCHA keys and verify SendGrid sender identity

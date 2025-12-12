@@ -15,16 +15,22 @@ import { Icon } from '@/components/Icon'
 export default function Home() {
   return (
     <div className="pt-12">
-      <Hero />
+      <section id="hero">
+        <Hero />
+      </section>
 
       {/* SOYL Assistant Promo */}
-      <AssistantPromo />
+      <section id="assistant-promo">
+        <AssistantPromo />
+      </section>
 
       {/* Flowchart Section */}
-      <FlowchartSection />
+      <section id="flowchart">
+        <FlowchartSection />
+      </section>
 
       {/* What SOYL Does */}
-      <section className="py-12 lg:py-16">
+      <section id="what-soyl-does" className="py-12 lg:py-16">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -45,7 +51,9 @@ export default function Home() {
       </section>
 
       {/* Why Choose Us */}
-      <WhyChooseUs />
+      <section id="why-choose-us">
+        <WhyChooseUs />
+      </section>
 
       {/* How it works */}
       <section id="how-it-works" className="py-10 lg:py-14 bg-panel/30">
@@ -173,7 +181,7 @@ export default function Home() {
       </section>
 
       {/* Product/Features */}
-      <section className="py-12 lg:py-16">
+      <section id="product-features" className="py-12 lg:py-16">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -239,7 +247,7 @@ export default function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-12 lg:py-16 bg-panel/30">
+      <section id="testimonials" className="py-12 lg:py-16 bg-panel/30">
         <div className="mx-auto max-w-4xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -257,7 +265,7 @@ export default function Home() {
       </section>
 
       {/* Use Cases */}
-      <section className="py-10 lg:py-14">
+      <section id="use-cases" className="py-10 lg:py-14">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -351,7 +359,7 @@ export default function Home() {
       </section>
 
       {/* SOYL R&D Snapshot */}
-      <section className="py-12 lg:py-16">
+      <section id="soyl-rd" className="py-12 lg:py-16">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.98 }}
@@ -438,7 +446,7 @@ export default function Home() {
       </section>
 
       {/* Trust & Compliance */}
-      <section className="py-12 lg:py-16 bg-panel/30">
+      <section id="trust-compliance" className="py-12 lg:py-16 bg-panel/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { ChatbotProvider, useChatbotContext } from './ChatbotProvider'
 import { ChatbotLauncher } from './ChatbotLauncher'
 import { VoiceBotPanel } from './VoiceBotPanel'
+import { WelcomeModalWrapper } from './WelcomeModalWrapper'
 
 function ChatbotContent() {
   const { 
@@ -33,6 +34,7 @@ function ChatbotContent() {
         onLastYChange={setLastY}
       />
       <VoiceBotPanel requestModalModeForFlow={requestModalModeForFlow} />
+      <WelcomeModalWrapper />
     </>
   )
 }

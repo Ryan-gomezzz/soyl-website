@@ -1,10 +1,12 @@
 'use client'
 
-import { createContext, useContext, ReactNode } from 'react'
+import { createContext, useContext, ReactNode, useState } from 'react'
 import { useChatbotState } from './hooks/useChatbotState'
 import { useConversation } from './hooks/useConversation'
 import { useVoiceRecording } from './hooks/useVoiceRecording'
 import { useAudioPlayback } from './hooks/useAudioPlayback'
+import { useWebsiteNavigation } from '@/hooks/useWebsiteNavigation'
+import { WebsiteSection } from '@/lib/websiteSections'
 
 interface ChatbotContextType {
   open: boolean
@@ -22,6 +24,13 @@ interface ChatbotContextType {
   conversation: ReturnType<typeof useConversation>
   recording: ReturnType<typeof useVoiceRecording>
   playback: ReturnType<typeof useAudioPlayback>
+  // AI Navigation functionality
+  aiNavigationMode: boolean
+  setAiNavigationMode: (enabled: boolean) => void
+  currentSection: WebsiteSection | null
+  scrollToSection: (sectionId: string, smooth?: boolean) => Promise<void>
+  scrollToSectionByQuery: (query: string, smooth?: boolean) => Promise<void>
+  isNavigating: boolean
 }
 
 const ChatbotContextValue = createContext<ChatbotContextType | undefined>(undefined)
@@ -41,6 +50,7 @@ interface ChatbotProviderProps {
 export function ChatbotProvider({ children }: ChatbotProviderProps) {
   const state = useChatbotState()
   const conversation = useConversation()
+  const [aiNavigationMode, setAiNavigationMode] = useState(false)
   
   const playback = useAudioPlayback({
     onError: (error) => {
@@ -65,12 +75,26 @@ export function ChatbotProvider({ children }: ChatbotProviderProps) {
     },
   })
 
+  // Website navigation hook - only active when AI navigation mode is enabled
+  const navigation = useWebsiteNavigation({
+    enabled: aiNavigationMode,
+    onSectionChange: (section) => {
+      // Optional: handle section changes
+    },
+  })
+
   return (
     <ChatbotContextValue.Provider value={{
       ...state,
       conversation,
       recording,
       playback,
+      aiNavigationMode,
+      setAiNavigationMode,
+      currentSection: navigation.currentSection,
+      scrollToSection: navigation.scrollToSection,
+      scrollToSectionByQuery: navigation.scrollToSectionByQuery,
+      isNavigating: navigation.isScrolling,
     }}>
       {children}
     </ChatbotContextValue.Provider>

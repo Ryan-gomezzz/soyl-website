@@ -6,8 +6,9 @@ import { usePathname } from 'next/navigation'
 import { useChatbotContext } from './ChatbotProvider'
 import './ChatbotStyles.css'
 import clsx from 'clsx'
-import { Mic, Volume2, VolumeX, X, Minimize2, Pin, PinOff, Loader2, Keyboard, Send } from 'lucide-react'
+import { Mic, Volume2, VolumeX, X, Minimize2, Pin, PinOff, Loader2, Keyboard, Send, Navigation } from 'lucide-react'
 import { AudioVisualizer } from './AudioVisualizer'
+import { findSectionByQuery } from '@/lib/websiteSections'
 
 interface VoiceBotPanelProps {
   requestModalModeForFlow?: (enable: boolean) => void
@@ -66,6 +67,9 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
     conversation,
     recording,
     playback,
+    aiNavigationMode,
+    scrollToSectionByQuery,
+    isNavigating,
   } = useChatbotContext()
 
   const [isPressing, setIsPressing] = useState(false)
@@ -82,12 +86,41 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
 
     try {
       await conversation.sendTextMessage(text)
+      // Check if we should navigate to a section
+      if (aiNavigationMode) {
+        handleNavigationCheck(text)
+      }
       // Audio will play automatically via the effect in the main component if processed
     } catch (err) {
       // Error is handled in hook
       setInputText(text) // Restore text on error
     }
   }
+
+  // Check if message contains section-related queries and navigate if needed
+  const handleNavigationCheck = async (query: string) => {
+    if (!aiNavigationMode || isNavigating) return
+
+    const section = findSectionByQuery(query)
+    if (section) {
+      try {
+        await scrollToSectionByQuery(query, true)
+      } catch (error) {
+        console.error('Navigation error:', error)
+      }
+    }
+  }
+
+  // Monitor assistant messages for navigation triggers
+  useEffect(() => {
+    if (!aiNavigationMode || conversation.messages.length === 0) return
+
+    const lastMessage = conversation.messages[conversation.messages.length - 1]
+    if (lastMessage.role === 'assistant') {
+      // Check if assistant message mentions a section
+      handleNavigationCheck(lastMessage.content)
+    }
+  }, [conversation.messages, aiNavigationMode]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -483,7 +516,18 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
             {/* Dynamic Status Text */}
             <div className="h-6 flex items-center justify-center">
               <AnimatePresence mode="wait">
-                {recording.hasPermission === false ? (
+                {isNavigating ? (
+                  <motion.div
+                    key="navigating"
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="flex items-center gap-2"
+                  >
+                    <Navigation className="w-4 h-4 text-accent animate-pulse" />
+                    <span className="text-sm text-accent font-medium">Navigating to section...</span>
+                  </motion.div>
+                ) : recording.hasPermission === false ? (
                   <motion.p
                     key="perm"
                     initial={{ opacity: 0, y: 5 }}
