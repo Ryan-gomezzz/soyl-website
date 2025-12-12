@@ -78,7 +78,7 @@ export function ChatbotProvider({ children }: ChatbotProviderProps) {
   // Website navigation hook - only active when AI navigation mode is enabled
   const navigation = useWebsiteNavigation({
     enabled: aiNavigationMode,
-    onSectionChange: (section) => {
+    onSectionChange: (_section) => {
       // Optional: handle section changes
     },
   })

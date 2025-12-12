@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Sparkles } from 'lucide-react'
-import clsx from 'clsx'
 
 const STORAGE_KEY = 'soyl-welcome-modal-dismissed'
 const DELAY_MS = 4000 // 4 seconds delay

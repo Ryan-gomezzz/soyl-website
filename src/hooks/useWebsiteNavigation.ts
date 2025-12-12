@@ -41,47 +41,6 @@ export function useWebsiteNavigation(
     }
   }, [])
 
-  // Scroll to a section by ID
-  const scrollToSection = useCallback(
-    async (sectionId: string, smooth: boolean = true): Promise<void> => {
-      const section = getSectionById(sectionId)
-      if (!section) {
-        console.warn(`Section with ID "${sectionId}" not found`)
-        return
-      }
-
-      const element = sectionElementsRef.current.get(sectionId)
-      if (!element) {
-        // Try to find element by ID in DOM
-        const domElement = document.getElementById(sectionId)
-        if (domElement) {
-          sectionElementsRef.current.set(sectionId, domElement)
-          await scrollToElement(domElement, smooth)
-        } else {
-          console.warn(`Element for section "${sectionId}" not found in DOM`)
-        }
-        return
-      }
-
-      await scrollToElement(element, smooth)
-    },
-    []
-  )
-
-  // Scroll to a section by query
-  const scrollToSectionByQuery = useCallback(
-    async (query: string, smooth: boolean = true): Promise<void> => {
-      const section = findSectionByQuery(query)
-      if (!section) {
-        console.warn(`No section found for query: "${query}"`)
-        return
-      }
-
-      await scrollToSection(section.id, smooth)
-    },
-    [scrollToSection]
-  )
-
   // Helper to scroll to an element
   const scrollToElement = useCallback(
     async (element: HTMLElement, smooth: boolean): Promise<void> => {
@@ -115,6 +74,47 @@ export function useWebsiteNavigation(
       })
     },
     [prefersReducedMotion]
+  )
+
+  // Scroll to a section by ID
+  const scrollToSection = useCallback(
+    async (sectionId: string, smooth: boolean = true): Promise<void> => {
+      const section = getSectionById(sectionId)
+      if (!section) {
+        console.warn(`Section with ID "${sectionId}" not found`)
+        return
+      }
+
+      const element = sectionElementsRef.current.get(sectionId)
+      if (!element) {
+        // Try to find element by ID in DOM
+        const domElement = document.getElementById(sectionId)
+        if (domElement) {
+          sectionElementsRef.current.set(sectionId, domElement)
+          await scrollToElement(domElement, smooth)
+        } else {
+          console.warn(`Element for section "${sectionId}" not found in DOM`)
+        }
+        return
+      }
+
+      await scrollToElement(element, smooth)
+    },
+    [scrollToElement]
+  )
+
+  // Scroll to a section by query
+  const scrollToSectionByQuery = useCallback(
+    async (query: string, smooth: boolean = true): Promise<void> => {
+      const section = findSectionByQuery(query)
+      if (!section) {
+        console.warn(`No section found for query: "${query}"`)
+        return
+      }
+
+      await scrollToSection(section.id, smooth)
+    },
+    [scrollToSection]
   )
 
   // Set up Intersection Observer to detect current section
