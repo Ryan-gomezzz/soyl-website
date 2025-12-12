@@ -53,15 +53,15 @@ export function useWebsiteNavigation(
       }
 
       const scrollBehavior = smooth && !prefersReducedMotion ? 'smooth' : 'auto'
-      const scrollDuration = smooth && !prefersReducedMotion ? 1000 : 0
+      const scrollDuration = smooth && !prefersReducedMotion ? 1200 : 0
 
       // Calculate target position (accounting for fixed headers if any)
-      const headerOffset = 80 // Adjust based on your header height
+      const headerOffset = 100 // Adjust based on your header height
       const elementPosition = element.getBoundingClientRect().top
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset
 
       window.scrollTo({
-        top: offsetPosition,
+        top: Math.max(0, offsetPosition), // Ensure we don't scroll to negative position
         behavior: scrollBehavior,
       })
 

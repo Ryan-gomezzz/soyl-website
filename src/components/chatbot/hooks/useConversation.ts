@@ -103,7 +103,7 @@ export function useConversation() {
         {
           id: `msg-${Date.now()}`,
           role: 'assistant',
-          content: "Hi! I'm SOYL's AI assistant. Hold the mic to ask how we help, pricing, or to request a pilot.",
+          content: "Hi! I'm SOYL's AI assistant. I can guide you through our website and answer any questions. What would you like to know?",
           timestamp: Date.now(),
         },
       ])

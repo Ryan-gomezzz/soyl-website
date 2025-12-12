@@ -18,21 +18,42 @@ export function WelcomeModal({ onAccept, onDismiss }: WelcomeModalProps) {
 
   useEffect(() => {
     // Check if user has already dismissed the modal
-    if (typeof window !== 'undefined') {
-      const dismissed = localStorage.getItem(STORAGE_KEY)
-      setHasCheckedStorage(true)
-      
-      if (dismissed === 'true') {
-        // User has already dismissed, don't show
-        return
-      }
+    if (typeof window === 'undefined') return
 
-      // Show modal after delay
-      const timer = setTimeout(() => {
-        setIsVisible(true)
-      }, DELAY_MS)
+    const dismissed = localStorage.getItem(STORAGE_KEY)
+    setHasCheckedStorage(true)
+    
+    if (dismissed === 'true') {
+      // User has already dismissed, don't show
+      return
+    }
 
-      return () => clearTimeout(timer)
+    // Only show modal on initial page load, not on scroll
+    // Check if this is a fresh page load (no scroll position saved)
+    const hasScrolled = sessionStorage.getItem('soyl-has-scrolled') === 'true'
+    
+    if (hasScrolled) {
+      // User has already scrolled, don't show modal
+      return
+    }
+
+    // Show modal after delay
+    const timer = setTimeout(() => {
+      setIsVisible(true)
+    }, DELAY_MS)
+
+    // Track if user scrolls before modal appears
+    const handleScroll = () => {
+      sessionStorage.setItem('soyl-has-scrolled', 'true')
+      setIsVisible(false)
+      window.removeEventListener('scroll', handleScroll)
+    }
+
+    window.addEventListener('scroll', handleScroll, { once: true, passive: true })
+
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener('scroll', handleScroll)
     }
   }, [])
 

@@ -86,10 +86,7 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
 
     try {
       await conversation.sendTextMessage(text)
-      // Check if we should navigate to a section
-      if (aiNavigationMode) {
-        handleNavigationCheck(text)
-      }
+      // Navigation will be handled by the useEffect that monitors user messages
       // Audio will play automatically via the effect in the main component if processed
     } catch (err) {
       // Error is handled in hook
@@ -98,29 +95,33 @@ export function VoiceBotPanel({ requestModalModeForFlow: _requestModalModeForFlo
   }
 
   // Check if message contains section-related queries and navigate if needed
-  const handleNavigationCheck = async (query: string) => {
+  const handleNavigationCheck = async (query: string, shouldNavigate: boolean = true) => {
     if (!aiNavigationMode || isNavigating) return
 
     const section = findSectionByQuery(query)
-    if (section) {
+    if (section && shouldNavigate) {
       try {
+        // Wait a moment for the AI response to be visible, then navigate
+        await new Promise(resolve => setTimeout(resolve, 800))
         await scrollToSectionByQuery(query, true)
       } catch (error) {
         console.error('Navigation error:', error)
       }
     }
+    return section
   }
 
-  // Monitor assistant messages for navigation triggers
+  // Monitor user messages for navigation triggers - navigate AFTER AI responds
   useEffect(() => {
     if (!aiNavigationMode || conversation.messages.length === 0) return
+    if (conversation.isLoading) return // Wait for AI to finish responding
 
-    const lastMessage = conversation.messages[conversation.messages.length - 1]
-    if (lastMessage.role === 'assistant') {
-      // Check if assistant message mentions a section
-      handleNavigationCheck(lastMessage.content)
+    const lastUserMessage = [...conversation.messages].reverse().find(msg => msg.role === 'user')
+    if (lastUserMessage) {
+      // Check if user message mentions a section and navigate
+      handleNavigationCheck(lastUserMessage.content, true)
     }
-  }, [conversation.messages, aiNavigationMode]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [conversation.messages, conversation.isLoading, aiNavigationMode]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
