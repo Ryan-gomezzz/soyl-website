@@ -128,18 +128,20 @@ export function useWebsiteNavigation(
     }
 
     observerRef.current = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
-      // Find the entry with the highest intersection ratio
-      let maxRatio = 0
-      let activeEntry: IntersectionObserverEntry | null = null
+      if (isScrolling) return
 
-      entries.forEach((entry: IntersectionObserverEntry) => {
-        if (entry.intersectionRatio > maxRatio) {
+      // Find the entry with the highest intersection ratio that is intersecting
+      let maxRatio = 0
+      let activeEntry: IntersectionObserverEntry | undefined
+
+      for (const entry of entries) {
+        if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
           maxRatio = entry.intersectionRatio
           activeEntry = entry
         }
-      })
+      }
 
-      if (activeEntry && activeEntry.isIntersecting && !isScrolling) {
+      if (activeEntry) {
         const sectionId = activeEntry.target.id
         const section = getSectionById(sectionId)
         if (section && section.id !== currentSection?.id) {
