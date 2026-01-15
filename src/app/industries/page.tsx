@@ -1,7 +1,8 @@
 'use client'
 
 import { CTA } from '../_components/CTA'
-import { ShoppingBag, Building, Server, CheckCircle } from 'lucide-react'
+import { CheckCircle } from 'lucide-react'
+import Image from 'next/image'
 
 export default function IndustriesPage() {
     return (
@@ -36,12 +37,17 @@ export default function IndustriesPage() {
                             </ul>
                             <CTA href="/pricing" variant="primary">View Pricing</CTA>
                         </div>
-                        <div className="bg-panel rounded-2xl p-8 border border-white/10 relative overflow-hidden group">
-                            {/* Abstract Visual for E-com */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5" />
-                            <ShoppingBag className="w-16 h-16 text-white mb-6 relative z-10" />
+                        <div className="bg-panel rounded-2xl border border-white/10 relative overflow-hidden group min-h-[300px] flex flex-col justify-end p-8">
+                            <Image
+                                src="/images/ecommerce-bg.png"
+                                alt="Automated Logistics"
+                                fill
+                                className="object-cover opacity-50 group-hover:opacity-60 transition-opacity duration-500"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+
                             <h3 className="text-xl font-bold mb-2 relative z-10">B2C Automation</h3>
-                            <p className="text-sm text-muted relative z-10">
+                            <p className="text-sm text-muted relative z-10 w-full">
                                 From &quot;Order Placed&quot; to &quot;Delivered&quot;, our agents handle the noise so you can focus on brand.
                             </p>
                         </div>
@@ -65,9 +71,15 @@ export default function IndustriesPage() {
                             </ul>
                             <CTA href="/contact" variant="outline">Join Waitlist</CTA>
                         </div>
-                        <div className="bg-panel rounded-2xl p-8 border border-white/10 relative overflow-hidden group lg:order-1">
-                            <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-orange-500/5" />
-                            <Building className="w-16 h-16 text-white mb-6 relative z-10" />
+                        <div className="bg-panel rounded-2xl border border-white/10 relative overflow-hidden group min-h-[300px] flex flex-col justify-end p-8 lg:order-1">
+                            <Image
+                                src="/images/hospitality-bg.png"
+                                alt="Luxury Hospitality"
+                                fill
+                                className="object-cover opacity-50 group-hover:opacity-60 transition-opacity duration-500"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+
                             <h3 className="text-xl font-bold mb-2 relative z-10">Guest Experience AI</h3>
                             <p className="text-sm text-muted relative z-10">
                                 Give every guest a personal butler that never sleeps and speaks 30 languages.
@@ -93,9 +105,15 @@ export default function IndustriesPage() {
                             </ul>
                             <CTA href="/contact" variant="secondary">Contact Sales</CTA>
                         </div>
-                        <div className="bg-panel rounded-2xl p-8 border border-white/10 relative overflow-hidden group">
-                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-cyan-500/5" />
-                            <Server className="w-16 h-16 text-white mb-6 relative z-10" />
+                        <div className="bg-panel rounded-2xl border border-white/10 relative overflow-hidden group min-h-[300px] flex flex-col justify-end p-8">
+                            <Image
+                                src="/images/enterprise-bg.png"
+                                alt="Enterprise Infrastructure"
+                                fill
+                                className="object-cover opacity-50 group-hover:opacity-60 transition-opacity duration-500"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+
                             <h3 className="text-xl font-bold mb-2 relative z-10">Deep Integration</h3>
                             <p className="text-sm text-muted relative z-10">
                                 We don&apos;t just wrap APIs. We build deep integrations into your legacy ERPs and CRMs.
