@@ -1,9 +1,9 @@
-import { Target, Brain, Bot, LucideIcon } from 'lucide-react'
+import { Target, Brain, Bot } from 'lucide-react'
 
 export interface Feature {
   title: string
   description: string
-  icon: LucideIcon
+  icon: React.ElementType
 }
 
 export const features: Feature[] = [

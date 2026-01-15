@@ -8,21 +8,7 @@ jest.mock('framer-motion', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const React = require('react')
   const createMotionComponent = (tag: string) => {
-    const Component = React.forwardRef<HTMLElement, {
-      children?: React.ReactNode
-      animate?: unknown
-      initial?: unknown
-      whileInView?: unknown
-      whileHover?: unknown
-      whileTap?: unknown
-      whileFocus?: unknown
-      whileDrag?: unknown
-      transition?: unknown
-      viewport?: unknown
-      exit?: unknown
-      variants?: unknown
-      [key: string]: unknown
-    }>(({
+    const Component = React.forwardRef(({
       children,
       animate: _animate,
       initial: _initial,
@@ -36,7 +22,8 @@ jest.mock('framer-motion', () => {
       exit: _exit,
       variants: _variants,
       ...props
-    }, ref) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }: any, ref: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       return React.createElement(tag, { ...props, ref }, children)
     })
     Component.displayName = `motion.${tag}`
@@ -67,7 +54,7 @@ jest.mock('framer-motion', () => {
     'ellipse',
     'foreignObject',
   ]
-  const motion: Record<string, React.ComponentType<{ children?: React.ReactNode; [key: string]: unknown }>> = {}
+  const motion: Record<string, React.ComponentType<{ children?: React.ReactNode;[key: string]: unknown }>> = {}
 
   motionElements.forEach((tag) => {
     motion[tag] = createMotionComponent(tag)
@@ -75,8 +62,8 @@ jest.mock('framer-motion', () => {
 
   const createMotionValue = (value: number) => ({
     get: () => value,
-    set: () => {},
-    subscribe: () => () => {},
+    set: () => { },
+    subscribe: () => () => { },
   })
 
   return {
@@ -92,8 +79,9 @@ jest.mock('framer-motion', () => {
 jest.mock('../../FeatureGrid/DotCluster', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const React = require('react')
-  const DotClusterMock = React.forwardRef<SVGSVGElement, { size?: number }>(
-    ({ size }, _ref) => (
+  const DotClusterMock = React.forwardRef(
+    // eslint-disable-next-line
+    ({ size }: any, _ref: any) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
       <div data-testid="dot-cluster" data-size={size} />
     )
   )
@@ -113,26 +101,26 @@ jest.mock('../FlowNodePopup', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const React = require('react')
   return {
-    FlowNodePopup: ({ node, anchorRef, onClose }: { 
+    FlowNodePopup: ({ node, anchorRef, onClose }: {
       node: typeof flow.nodes[0]
       anchorRef: React.RefObject<HTMLElement>
-      onClose: () => void 
+      onClose: () => void
     }) => {
-      const popupRef = React.useRef<HTMLDivElement>(null)
-      
+      const popupRef = React.useRef(null)
+
       // eslint-disable-next-line react-hooks/rules-of-hooks
       React.useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
           const target = event.target as HTMLElement | null
           const popup = popupRef.current
           const anchor = anchorRef.current
-          
+
           if (!popup || !anchor || !target) return
-          
+
           // Check if click is outside both popup and anchor
           const isOutsidePopup = !popup.contains(target)
           const isOutsideAnchor = !anchor.contains(target)
-          
+
           if (isOutsidePopup && isOutsideAnchor) {
             // Use setTimeout to ensure React state updates are processed
             setTimeout(() => {
@@ -140,7 +128,7 @@ jest.mock('../FlowNodePopup', () => {
             }, 0)
           }
         }
-        
+
         // Add listener with capture phase to catch events earlier
         document.addEventListener('mousedown', handleClickOutside, true)
         return () => {
@@ -200,9 +188,9 @@ describe('Flowchart Hover/Focus/Tap Behavior', () => {
     render(<FlowNode node={mockNode} onHover={mockOnHover} onClick={mockOnClick} />)
 
     const button = screen.getByRole('button')
-    
+
     fireEvent.mouseEnter(button)
-    
+
     await waitFor(() => {
       const popup = screen.getByTestId('flow-node-popup')
       expect(popup).toBeInTheDocument()
@@ -220,14 +208,14 @@ describe('Flowchart Hover/Focus/Tap Behavior', () => {
     render(<FlowNode node={mockNode} onHover={mockOnHover} onClick={mockOnClick} />)
 
     const button = screen.getByRole('button')
-    
+
     fireEvent.mouseEnter(button)
     await waitFor(() => {
       expect(screen.getByRole('tooltip')).toBeInTheDocument()
     })
 
     fireEvent.mouseLeave(button)
-    
+
     await waitFor(() => {
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
     })
@@ -243,9 +231,9 @@ describe('Flowchart Hover/Focus/Tap Behavior', () => {
     render(<FlowNode node={mockNode} onHover={mockOnHover} onClick={mockOnClick} />)
 
     const button = screen.getByRole('button')
-    
+
     fireEvent.focus(button)
-    
+
     await waitFor(() => {
       const popup = screen.getByTestId('flow-node-popup')
       expect(popup).toBeInTheDocument()
@@ -263,19 +251,19 @@ describe('Flowchart Hover/Focus/Tap Behavior', () => {
     render(<FlowNode node={mockNode} onHover={mockOnHover} onClick={mockOnClick} />)
 
     const button = screen.getByRole('button')
-    
+
     fireEvent.focus(button)
     await waitFor(() => {
       expect(screen.getByRole('tooltip')).toBeInTheDocument()
     })
 
     fireEvent.blur(button)
-    
+
     // Wait for setTimeout in handleBlur (100ms delay)
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 150))
     })
-    
+
     await waitFor(() => {
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
     })
@@ -304,17 +292,17 @@ describe('Flowchart Hover/Focus/Tap Behavior', () => {
     render(<FlowNode node={mockNode} onHover={mockOnHover} onClick={mockOnClick} />)
 
     const button = screen.getByRole('button')
-    
+
     // First tap opens popup
     fireEvent.click(button)
-    
+
     await waitFor(() => {
       expect(screen.getByRole('tooltip')).toBeInTheDocument()
     })
 
     // Second tap closes popup
     fireEvent.click(button)
-    
+
     await waitFor(() => {
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
     })
@@ -338,7 +326,7 @@ describe('Flowchart Hover/Focus/Tap Behavior', () => {
 
     const { container } = render(<AmbientLayer enabled={true} width={1200} height={700} />)
     const canvas = container.querySelector('canvas')
-    
+
     expect(canvas).toBeInTheDocument()
     expect(canvas).toHaveAttribute('aria-hidden', 'true')
     expect(canvas?.className).toContain('pointer-events-none')
@@ -360,7 +348,7 @@ describe('Flowchart Hover/Focus/Tap Behavior', () => {
     })
 
     const { container } = render(<AmbientLayer enabled={true} width={1200} height={700} />)
-    
+
     // Ambient layer should not render when reduced motion is enabled
     // (the component returns null in that case)
     expect(container.querySelector('canvas')).not.toBeInTheDocument()
@@ -380,7 +368,7 @@ describe('Flowchart Hover/Focus/Tap Behavior', () => {
 
     const button = screen.getByRole('button')
     fireEvent.focus(button)
-    
+
     await waitFor(() => {
       expect(screen.getByTestId('flow-node-popup')).toBeInTheDocument()
     })
@@ -391,14 +379,14 @@ describe('Flowchart Hover/Focus/Tap Behavior', () => {
     })
 
     const outside = screen.getByTestId('outside')
-    
+
     // Use userEvent for more realistic interaction, or fireEvent with proper event
     await act(async () => {
       fireEvent.mouseDown(outside, { bubbles: true })
       // Give React time to process the state update
       await new Promise((resolve) => setTimeout(resolve, 50))
     })
-    
+
     await waitFor(() => {
       expect(screen.queryByTestId('flow-node-popup')).not.toBeInTheDocument()
     }, { timeout: 1000 })

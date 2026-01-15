@@ -1,6 +1,5 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { CTA } from '../_components/CTA'
 import Image from 'next/image'
 
@@ -17,14 +16,14 @@ export default function AboutPage() {
                     </h1>
                     <div className="prose prose-invert prose-lg text-muted">
                         <p>
-                            The current AI market is a mess of buzzwords, flash-in-the-pan demos, and "consultants" selling prompts.
+                            The current AI market is a mess of buzzwords, flash-in-the-pan demos, and &quot;consultants&quot; selling prompts.
                             Business owners are tired of excessive hype and minimal outcomes.
                         </p>
                         <p>
                             We built SOYL with a simple premise: <strong>Outcomes over experiments.</strong>
                         </p>
                         <p>
-                            We don't want to build you a "chatbot". We want to build an automated department that
+                            We don&apos;t want to build you a &quot;chatbot&quot;. We want to build an automated department that
                             handles customer service, sales, and operations with human-like reliability and machine-like speed.
                         </p>
                     </div>
@@ -45,8 +44,8 @@ export default function AboutPage() {
                     <div>
                         <h2 className="text-3xl font-bold mb-6">The 10-Year View</h2>
                         <p className="text-muted text-lg mb-6">
-                            We are building towards a future where "interacting with software" feels antiquated.
-                            You shouldn't have to click buttons to get food delivered or type shifting queries to find data.
+                            We are building towards a future where &quot;interacting with software&quot; feels antiquated.
+                            You shouldn&apos;t have to click buttons to get food delivered or type shifting queries to find data.
                         </p>
                         <p className="text-muted text-lg">
                             You should just ask. And the system should just do it.

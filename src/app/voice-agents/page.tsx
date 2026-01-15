@@ -73,12 +73,12 @@ export default function VoiceAgentsPage() {
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
                     <div className="text-center max-w-3xl mx-auto mb-16">
                         <h2 className="text-3xl font-bold mb-4">Why traditional voice fails</h2>
-                        <p className="text-muted">Most "AI" voice bots are just fancy text-to-speech readers wrapped in slow API calls.</p>
+                        <p className="text-muted">Most &quot;AI&quot; voice bots are just fancy text-to-speech readers wrapped in slow API calls.</p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <ProblemCard
                             title="Latency"
-                            desc="Standard LLM pipelines take 2-3 seconds to respond. That's an eternity in conversation."
+                            desc="Standard LLM pipelines take 2-3 seconds to respond. That&apos;s an eternity in conversation."
                         />
                         <ProblemCard
                             title="Rigidity"
@@ -154,7 +154,7 @@ function ProblemCard({ title, desc }: { title: string, desc: string }) {
     )
 }
 
-function FeatureCard({ icon: Icon, title, desc }: { icon: any, title: string, desc: string }) {
+function FeatureCard({ icon: Icon, title, desc }: { icon: React.ElementType, title: string, desc: string }) {
     return (
         <div className="p-6 rounded-xl bg-panel border border-white/5 hover:border-accent/20 transition-all">
             <Icon className="w-8 h-8 text-accent mb-4" />

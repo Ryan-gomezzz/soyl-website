@@ -1,6 +1,5 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { CTA } from '../_components/CTA'
 import { Search, PenTool, Rocket, RefreshCw } from 'lucide-react'
 
@@ -11,7 +10,7 @@ export default function HowItWorksPage() {
                 <div className="text-center mb-24">
                     <h1 className="text-4xl md:text-6xl font-bold mb-6">From Idea to Production in 2 Weeks</h1>
                     <p className="text-xl text-muted max-w-2xl mx-auto">
-                        No long consulting cycles. No "digital transformation" buzzwords.
+                        No long consulting cycles. No &quot;digital transformation&quot; buzzwords.
                         Just a streamlined process to get AI agents working for your business.
                     </p>
                 </div>
@@ -71,7 +70,7 @@ export default function HowItWorksPage() {
     )
 }
 
-function TimelineItem({ step, title, desc, icon: Icon, side, time }: any) {
+function TimelineItem({ step, title, desc, icon: Icon, side, time }: { step: string, title: string, desc: string, icon: React.ElementType, side: 'left' | 'right', time: string }) {
     const isLeft = side === 'left';
     return (
         <div className={`flex flex-col lg:flex-row items-center justify-between gap-12 relative ${isLeft ? '' : 'lg:flex-row-reverse'}`}>

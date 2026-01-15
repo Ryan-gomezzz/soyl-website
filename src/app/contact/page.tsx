@@ -1,7 +1,7 @@
 'use client'
 
 import { CTA } from '../_components/CTA'
-import { Mail, MessageSquare, Calendar } from 'lucide-react'
+import { Mail, Calendar } from 'lucide-react'
 
 export default function ContactPage() {
     return (
@@ -9,7 +9,7 @@ export default function ContactPage() {
             <div className="mx-auto max-w-7xl px-6 lg:px-8 py-16 w-full">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
                     <div>
-                        <h1 className="text-4xl md:text-6xl font-bold mb-6">Let's Talk.</h1>
+                        <h1 className="text-4xl md:text-6xl font-bold mb-6">Let&apos;s Talk.</h1>
                         <p className="text-xl text-muted mb-12">
                             Ready to deploy Autonomous Agents? We can get you live in 2 weeks.
                         </p>
@@ -53,7 +53,7 @@ export default function ContactPage() {
     )
 }
 
-function ContactOption({ icon: Icon, title, value, href, target }: any) {
+function ContactOption({ icon: Icon, title, value, href, target }: { icon: React.ElementType, title: string, value: string, href: string, target?: string }) {
     return (
         <a href={href} target={target} className="flex items-center gap-6 group">
             <div className="w-12 h-12 rounded-full bg-panel border border-white/10 flex items-center justify-center group-hover:border-accent/50 transition-colors">

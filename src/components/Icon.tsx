@@ -1,8 +1,8 @@
-import { LucideIcon, LucideProps } from 'lucide-react';
+import { LucideProps } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
 interface IconProps extends LucideProps {
-    icon: LucideIcon;
+    icon: React.ElementType;
     className?: string;
 }
 

@@ -1,8 +1,7 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { CTA } from '../_components/CTA'
-import { ShoppingBag, Building, Server, CheckCircle, ArrowRight } from 'lucide-react'
+import { ShoppingBag, Building, Server, CheckCircle } from 'lucide-react'
 
 export default function IndustriesPage() {
     return (
@@ -12,7 +11,7 @@ export default function IndustriesPage() {
                     <h1 className="text-4xl md:text-6xl font-bold mb-6">Industries</h1>
                     <p className="text-xl text-muted max-w-2xl mx-auto">
                         Purpose-built AI infrastructure for specific verticals.
-                        We don't do "general purpose" chat. We do outcomes.
+                        We don&apos;t do &quot;general purpose&quot; chat. We do outcomes.
                     </p>
                 </div>
 
@@ -26,7 +25,7 @@ export default function IndustriesPage() {
                             </div>
                             <h2 className="text-3xl md:text-4xl font-bold mb-4">E-Commerce Infrastructure</h2>
                             <p className="text-muted text-lg mb-8 leading-relaxed">
-                                We don't just build your site. We run your stack.
+                                We don&apos;t just build your site. We run your stack.
                                 SOYL provides complete e-commerce automation: hosting, maintenance,
                                 transactional emails, and scaling logic.
                             </p>
@@ -43,7 +42,7 @@ export default function IndustriesPage() {
                             <ShoppingBag className="w-16 h-16 text-white mb-6 relative z-10" />
                             <h3 className="text-xl font-bold mb-2 relative z-10">B2C Automation</h3>
                             <p className="text-sm text-muted relative z-10">
-                                From "Order Placed" to "Delivered", our agents handle the noise so you can focus on brand.
+                                From &quot;Order Placed&quot; to &quot;Delivered&quot;, our agents handle the noise so you can focus on brand.
                             </p>
                         </div>
                     </section>
@@ -99,7 +98,7 @@ export default function IndustriesPage() {
                             <Server className="w-16 h-16 text-white mb-6 relative z-10" />
                             <h3 className="text-xl font-bold mb-2 relative z-10">Deep Integration</h3>
                             <p className="text-sm text-muted relative z-10">
-                                We don't just wrap APIs. We build deep integrations into your legacy ERPs and CRMs.
+                                We don&apos;t just wrap APIs. We build deep integrations into your legacy ERPs and CRMs.
                             </p>
                         </div>
                     </section>

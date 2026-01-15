@@ -108,7 +108,7 @@ export default function Home() {
               <BarChart3 className="w-10 h-10 text-accent mb-6" />
               <h3 className="text-2xl font-bold mb-4">Outcome Oriented</h3>
               <p className="text-muted">
-                Most agencies sell "hours" or "features". We sell outcomes.
+                Most agencies sell &quot;hours&quot; or &quot;features&quot;. We sell outcomes.
                 Higher conversion rates, lower support costs, and faster launch times.
               </p>
             </div>
@@ -140,7 +140,7 @@ export default function Home() {
   )
 }
 
-function FeatureCard({ icon: Icon, title, desc }: { icon: any, title: string, desc: string }) {
+function FeatureCard({ icon: Icon, title, desc }: { icon: React.ElementType, title: string, desc: string }) {
   return (
     <motion.div
       whileHover={{ y: -5 }}

@@ -1,7 +1,7 @@
 'use client'
 
 import { CTA } from '../_components/CTA'
-import { Check, X } from 'lucide-react'
+import { Check } from 'lucide-react'
 
 export default function PricingPage() {
   return (
@@ -131,7 +131,7 @@ export default function PricingPage() {
   )
 }
 
-function PricingCard({ name, price, orders, desc, features, isPopular }: any) {
+function PricingCard({ name, price, orders, desc, features, isPopular }: { name: string, price: string, orders: string, desc: string, features: string[], isPopular?: boolean }) {
   return (
     <div className={`relative p-8 rounded-2xl bg-panel border ${isPopular ? 'border-accent shadow-lg shadow-accent/10' : 'border-white/10'} flex flex-col`}>
       {isPopular && (
@@ -160,7 +160,7 @@ function PricingCard({ name, price, orders, desc, features, isPopular }: any) {
   )
 }
 
-function AddOnCard({ title, price, desc }: any) {
+function AddOnCard({ title, price, desc }: { title: string, price: string, desc: string }) {
   return (
     <div className="p-6 rounded-xl border border-white/10 bg-black/20">
       <div className="flex justify-between items-start mb-2">

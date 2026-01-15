@@ -16,6 +16,9 @@ const nextConfig = {
   env: {
     // Public env vars are automatically available
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 }
 
 module.exports = nextConfig

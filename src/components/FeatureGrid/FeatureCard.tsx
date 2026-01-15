@@ -9,7 +9,7 @@ import { LucideIcon } from 'lucide-react'
 interface FeatureCardProps {
   title: string
   description: string
-  icon: LucideIcon
+  icon: React.ElementType
   slug?: string
   delay?: number
 }
