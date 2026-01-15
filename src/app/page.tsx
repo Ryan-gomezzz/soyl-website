@@ -71,7 +71,7 @@ export default function Home() {
                 <span className="text-gray-500">at scale.</span>
               </h2>
               <p className="text-lg text-muted mb-8 leading-relaxed">
-                Our voice agents don't sound like robots. They pause, think, and adapt.
+                Our voice agents don&apos;t sound like robots. They pause, think, and adapt.
                 Built on cutting-edge representation learning (JEPA-inspired) for human-like reasoning.
               </p>
               <ul className="space-y-4 mb-10">

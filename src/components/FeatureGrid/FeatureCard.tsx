@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { DotCluster } from './DotCluster'
 import { Icon } from '@/components/Icon'
-import { LucideIcon } from 'lucide-react'
+
 
 interface FeatureCardProps {
   title: string
