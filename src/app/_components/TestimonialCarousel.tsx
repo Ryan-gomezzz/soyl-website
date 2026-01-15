@@ -75,7 +75,7 @@ export function TestimonialCarousel() {
                 duration: 0.5,
                 ease: [0.22, 1, 0.36, 1]
               }}
-              className="glass rounded-xl p-8 border border-white/10 hover:border-accent/30 transition-all"
+              className="bg-panel rounded-xl p-8 border border-white/10 hover:border-accent/30 transition-all shadow-xl"
             >
               <blockquote className="text-lg md:text-xl text-text mb-6">
                 &ldquo;{testimonials[currentIndex].content}&rdquo;

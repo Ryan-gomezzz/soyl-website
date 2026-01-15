@@ -1,510 +1,167 @@
 'use client'
 
 import { Hero } from './_components/Hero'
-import { FeatureGrid } from '@/components/FeatureGrid/FeatureGrid'
-import { FlowchartSection } from '@/components/Flowchart/FlowchartSection'
-import { WhyChooseUs } from '@/components/WhyChoose/WhyChooseUs'
-import { TestimonialCarousel } from './_components/TestimonialCarousel'
 import { CTA } from './_components/CTA'
-import { AssistantPromo } from '@/components/AssistantPromo'
-import { features, productFeatures } from '@/lib/data/features'
 import { motion } from 'framer-motion'
-import { Camera, Brain, Bot, ShoppingBag, Monitor, Microscope, Lock, CheckCircle, Shield } from 'lucide-react'
-import { Icon } from '@/components/Icon'
+import { Mic, Globe, Zap, ArrowRight, Check, Activity, BarChart3, Shield } from 'lucide-react'
+import Image from 'next/image'
 
 export default function Home() {
   return (
-    <div className="pt-12">
+    <div className="bg-bg text-white overflow-hidden">
       <Hero />
 
-      {/* SOYL Assistant Promo */}
-      <AssistantPromo />
-
-      {/* Flowchart Section */}
-      <FlowchartSection />
-
-      {/* What SOYL Does */}
-      <section className="py-12 lg:py-16">
+      {/* Social Proof / Trusted By */}
+      <section className="py-10 border-b border-white/5 bg-panel/30">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-              What SOYL Does
+          <p className="text-center text-sm font-semibold text-muted mb-8 uppercase tracking-widest">
+            Trusted by forward-thinking companies
+          </p>
+          <div className="flex justify-center items-center opacity-70 grayscale hover:grayscale-0 transition-opacity duration-500">
+            <div className="text-2xl md:text-3xl font-bold tracking-tight text-white/90 font-serif italic">Hush Gentle</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Value Prop Section */}
+      <section className="py-24 lg:py-32 relative">
+        <div className="absolute inset-0 bg-subtle-glow opacity-30" />
+        <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
+          <div className="mx-auto max-w-2xl text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60 mb-6">
+              AI infrastructure, without the friction.
             </h2>
-            <p className="text-lg text-muted max-w-2xl mx-auto">
-              Building adaptive AI agents and intelligent automation solutions tailored to your business needs.
+            <p className="text-lg text-muted leading-relaxed">
+              We replace complex vendor negotiations with a simple promise:
+              <strong>Production-grade AI agents in 2 weeks.</strong> No experiments, just results.
             </p>
-          </motion.div>
-          <FeatureGrid features={features} />
-        </div>
-      </section>
+          </div>
 
-      {/* Why Choose Us */}
-      <WhyChooseUs />
-
-      {/* How it works */}
-      <section id="how-it-works" className="py-10 lg:py-14 bg-panel/30">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-              How it works
-            </h2>
-          </motion.div>
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={{
-              visible: {
-                transition: {
-                  staggerChildren: 0.2,
-                },
-              },
-            }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6"
-          >
-
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, y: 30, scale: 0.9 },
-                visible: { opacity: 1, y: 0, scale: 1 },
-              }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -8, scale: 1.03 }}
-              className="text-center"
-            >
-              <div className="glass rounded-xl p-8 border border-white/10 mb-6 hover:border-accent/30 transition-all">
-                <motion.div
-                  animate={{
-                    scale: [1, 1.2, 1],
-                    rotate: [0, 10, -10, 0]
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    repeatDelay: 2,
-                    ease: "easeInOut"
-                  }}
-                  className="mb-4 inline-block text-accent"
-                >
-                  <Icon icon={Camera} className="w-12 h-12" />
-                </motion.div>
-                <h3 className="text-2xl font-semibold mb-2">Detect</h3>
-                <p className="text-muted">
-                  Camera, microphone, and text input capture multimodal signals
-                </p>
-              </div>
-            </motion.div>
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, y: 30, scale: 0.9 },
-                visible: { opacity: 1, y: 0, scale: 1 },
-              }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -8, scale: 1.03 }}
-              className="text-center"
-            >
-              <div className="glass rounded-xl p-8 border border-white/10 mb-6 hover:border-accent/30 transition-all">
-                <motion.div
-                  animate={{
-                    scale: [1, 1.2, 1],
-                    rotate: [0, -10, 10, 0]
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    repeatDelay: 2,
-                    ease: "easeInOut"
-                  }}
-                  className="mb-4 inline-block text-accent"
-                >
-                  <Icon icon={Brain} className="w-12 h-12" />
-                </motion.div>
-                <h3 className="text-2xl font-semibold mb-2">Understand</h3>
-                <p className="text-muted">
-                  Fuse signals into unified Emotion State Vector
-                </p>
-              </div>
-            </motion.div>
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, y: 30, scale: 0.9 },
-                visible: { opacity: 1, y: 0, scale: 1 },
-              }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -8, scale: 1.03 }}
-              className="text-center"
-            >
-              <div className="glass rounded-xl p-8 border border-white/10 mb-6 hover:border-accent/30 transition-all">
-                <motion.div
-                  animate={{
-                    scale: [1, 1.2, 1],
-                    rotate: [0, 5, -5, 0]
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    repeatDelay: 2,
-                    ease: "easeInOut"
-                  }}
-                  className="mb-4 inline-block text-accent"
-                >
-                  <Icon icon={Bot} className="w-12 h-12" />
-                </motion.div>
-                <h3 className="text-2xl font-semibold mb-2">Act</h3>
-                <p className="text-muted">
-                  Adaptive Sales Agent responds with context-aware suggestions
-                </p>
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Product/Features */}
-      <section className="py-12 lg:py-16">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-              Product & Features
-            </h2>
-          </motion.div>
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={{
-              visible: {
-                transition: {
-                  staggerChildren: 0.15,
-                },
-              },
-            }}
-            className="space-y-12"
-          >
-            {productFeatures.map((feature) => (
-              <motion.div
-                key={feature.title}
-                variants={{
-                  hidden: { opacity: 0, y: 30, scale: 0.95 },
-                  visible: { opacity: 1, y: 0, scale: 1 },
-                }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                whileHover={{ y: -5, scale: 1.01 }}
-                className="glass rounded-xl p-8 border border-white/10 hover:border-accent/30 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center transition-all relative overflow-hidden group"
-              >
-                {/* Animated background gradient */}
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-accent-2/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  initial={false}
-                />
-                <div className="relative z-10">
-                  <motion.h3
-                    whileHover={{ x: 5 }}
-                    className="text-2xl font-semibold mb-3"
-                  >
-                    {feature.title}
-                  </motion.h3>
-                  <p className="text-muted mb-4">{feature.description}</p>
-                </div>
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className="bg-bg rounded-lg p-4 overflow-x-auto relative z-10"
-                >
-                  <pre className="text-sm text-text/80">
-                    <code>{feature.code}</code>
-                  </pre>
-                </motion.div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-12 lg:py-16 bg-panel/30">
-        <div className="mx-auto max-w-4xl px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-              First Impressions
-            </h2>
-          </motion.div>
-          <TestimonialCarousel />
-        </div>
-      </section>
-
-      {/* Use Cases */}
-      <section className="py-10 lg:py-14">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-              Use Cases
-            </h2>
-            <p className="text-lg text-muted max-w-2xl mx-auto">
-              Emotion-aware AI for modern commerce across industries
-            </p>
-          </motion.div>
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={{
-              visible: {
-                transition: {
-                  staggerChildren: 0.15,
-                },
-              },
-            }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-          >
-            {[
-              {
-                title: 'Operations',
-                description: 'Streamline internal processes with intelligent automation agents.',
-                icon: Monitor,
-              },
-              {
-                title: 'Marketing',
-                description: 'Personalized campaigns driven by emotion-aware customer insights.',
-                icon: ShoppingBag,
-              },
-              {
-                title: 'Automation',
-                description: 'End-to-end workflow automation tailored to your specific needs.',
-                icon: Bot,
-              },
-              {
-                title: 'Healthcare',
-                description: 'Empathetic patient support and automated scheduling systems.',
-                icon: Microscope,
-              },
-              {
-                title: 'Banking',
-                description: 'Secure, intelligent financial assistants for personalized service.',
-                icon: Lock,
-              },
-            ].map((usecase) => (
-              <motion.div
-                key={usecase.title}
-                variants={{
-                  hidden: { opacity: 0, y: 30, scale: 0.9 },
-                  visible: { opacity: 1, y: 0, scale: 1 },
-                }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                whileHover={{ y: -8, scale: 1.03 }}
-                className="glass rounded-xl p-6 border border-white/10 hover:border-accent/30 transition-all text-center relative overflow-hidden group"
-              >
-                {/* Animated background */}
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-accent-2/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  initial={false}
-                />
-                <motion.div
-                  animate={{
-                    scale: [1, 1.1, 1],
-                    rotate: [0, 5, -5, 0],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  className="mb-4 relative z-10 text-accent"
-                >
-                  <Icon icon={usecase.icon} className="w-10 h-10" />
-                </motion.div>
-                <h3 className="text-xl font-semibold mb-2 relative z-10">{usecase.title}</h3>
-                <p className="text-sm text-muted relative z-10">{usecase.description}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* SOYL R&D Snapshot */}
-      <section className="py-12 lg:py-16">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.98 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            whileHover={{ y: -5 }}
-            className="glass rounded-2xl p-12 border border-white/10 relative overflow-hidden group"
-          >
-            {/* Animated background gradient */}
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-accent-2/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-              initial={false}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <FeatureCard
+              icon={Mic}
+              title="Voice Agents"
+              desc="Natural, latency-free voice interfaces for customer support and operations."
             />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div className="relative z-10">
-                <motion.h2
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6 }}
-                  className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6"
-                >
-                  SOYL R&D Roadmap
-                </motion.h2>
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.1 }}
-                  className="text-lg text-muted mb-6"
-                >
-                  Our staged R&D roadmap moves from a feasibility MVP (real-time
-                  emotion sensing + AR demo) to a unified affect foundation model
-                  and commercial SDK for B2B licensing. Key milestone: functional
-                  adaptive AI salesperson within 12 months; foundation model in
-                  18–24 months.
-                </motion.p>
-                <div className="space-y-4">
-                  {[
-                    { phase: 'Phase 1', desc: 'Foundation MVP: Real-time emotion sensing + AR demo' },
-                    { phase: 'Phase 2', desc: 'Cognitive Signal Layer: Unified Emotion State Vector' },
-                    { phase: 'Phase 3', desc: 'Agentic Layer: Adaptive AI salesperson' },
-                  ].map((item, index) => (
-                    <motion.div
-                      key={item.phase}
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
-                      whileHover={{ x: 5 }}
-                      className="flex items-start gap-3"
-                    >
-                      <motion.div
-                        whileHover={{ scale: 1.1 }}
-                        className="text-accent font-bold"
-                      >
-                        {item.phase}
-                      </motion.div>
-                      <p className="text-muted">{item.desc}</p>
-                    </motion.div>
-                  ))}
-                </div>
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.5 }}
-                  className="mt-8"
-                >
-                  <CTA href="/soyl-rd" variant="primary" size="md">
-                    Explore R&D Details
-                  </CTA>
-                </motion.div>
-              </div>
-              <div className="relative aspect-square rounded-xl overflow-hidden bg-panel">
-                <div className="absolute inset-0 flex items-center justify-center text-accent/20">
-                  <Icon icon={Microscope} className="w-32 h-32" />
-                </div>
-              </div>
-            </div>
-          </motion.div>
+            <FeatureCard
+              icon={Globe}
+              title="E-commerce"
+              desc="Full-stack automation. We manage the infra, you manage the brand."
+            />
+            <FeatureCard
+              icon={Zap}
+              title="Custom AI"
+              desc="Tailored solutions for enterprise needs. From zero to deployed in days."
+            />
+          </div>
         </div>
       </section>
 
-      {/* Trust & Compliance */}
-      <section className="py-12 lg:py-16 bg-panel/30">
+      {/* Deep Dive: Voice (Primary Focus) */}
+      <section className="py-24 bg-panel border-y border-white/5 overflow-hidden">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center"
-          >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-8">
-              Trust & Compliance
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-              <div className="glass rounded-lg p-6 border border-white/10">
-                <div className="mb-3 text-accent">
-                  <Icon icon={Lock} className="w-8 h-8" />
-                </div>
-                <h3 className="font-semibold mb-2">GDPR-Ready Pipeline</h3>
-                <p className="text-sm text-muted">
-                  Compliant data processing and storage
-                </p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-sm font-medium mb-6">
+                <Activity className="w-4 h-4" />
+                <span>Next-Gen Voice</span>
               </div>
-              <div className="glass rounded-lg p-6 border border-white/10">
-                <div className="mb-3 text-accent-2">
-                  <Icon icon={CheckCircle} className="w-8 h-8" />
-                </div>
-                <h3 className="font-semibold mb-2">Opt-in Consent</h3>
-                <p className="text-sm text-muted">
-                  Clear consent flows before data capture
-                </p>
-              </div>
-              <div className="glass rounded-lg p-6 border border-white/10">
-                <div className="mb-3 text-accent">
-                  <Icon icon={Shield} className="w-8 h-8" />
-                </div>
-                <h3 className="font-semibold mb-2">Privacy-First</h3>
-                <p className="text-sm text-muted">
-                  On-device inference options available
-                </p>
+              <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white">
+                Talk to your customers,<br />
+                <span className="text-gray-500">at scale.</span>
+              </h2>
+              <p className="text-lg text-muted mb-8 leading-relaxed">
+                Our voice agents don't sound like robots. They pause, think, and adapt.
+                Built on cutting-edge representation learning (JEPA-inspired) for human-like reasoning.
+              </p>
+              <ul className="space-y-4 mb-10">
+                <CheckItem text="Sub-500ms latency" />
+                <CheckItem text="Handles interruptions gracefully" />
+                <CheckItem text="Seamless handoff to humans" />
+              </ul>
+              <div className="flex gap-4">
+                <CTA href="/voice-agents" variant="primary">Explore Voice Agents</CTA>
+                <CTA href="/contact" variant="outline">Schedule Demo</CTA>
               </div>
             </div>
-          </motion.div>
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10 group">
+              {/* Placeholder for the voice visualization image */}
+              <div className="aspect-[4/3] bg-black relative">
+                <Image
+                  src="/assets/voice-vis.png"
+                  alt="Voice Visualization"
+                  fill
+                  className="object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Footer CTA */}
-      <section id="request-pilot" className="py-16 lg:py-24">
-        <div className="mx-auto max-w-4xl px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-              Ready to Transform Customer Interactions?
-            </h2>
-            <p className="text-lg text-muted mb-8 max-w-2xl mx-auto">
-              Request a pilot and see how emotion-aware AI can elevate your
-              sales and customer experience.
-            </p>
-            <CTA href="mailto:hello@soyl.ai?subject=Pilot Request" variant="primary" size="lg">
-              Request a pilot
-            </CTA>
-          </motion.div>
+      {/* Why SOYL Wins */}
+      <section className="py-24">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="bg-panel rounded-2xl p-10 border border-white/5">
+              <BarChart3 className="w-10 h-10 text-accent mb-6" />
+              <h3 className="text-2xl font-bold mb-4">Outcome Oriented</h3>
+              <p className="text-muted">
+                Most agencies sell "hours" or "features". We sell outcomes.
+                Higher conversion rates, lower support costs, and faster launch times.
+              </p>
+            </div>
+            <div className="bg-panel rounded-2xl p-10 border border-white/5">
+              <Shield className="w-10 h-10 text-accent mb-6" />
+              <h3 className="text-2xl font-bold mb-4">Enterprise Grade</h3>
+              <p className="text-muted">
+                Security, compliance, and reliability are baked in.
+                We treat AI as critical infrastructure, not a side project.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
+
+      {/* Final CTA */}
+      <section className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-accent/5" />
+        <div className="mx-auto max-w-3xl text-center px-6 relative z-10">
+          <h2 className="text-4xl md:text-6xl font-bold mb-8">
+            Build the future.<br />Without the wait.
+          </h2>
+          <CTA href="/contact" variant="primary" size="lg" className="px-8 py-4 text-lg">
+            Start Building with SOYL <ArrowRight className="ml-2 w-5 h-5" />
+          </CTA>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+function FeatureCard({ icon: Icon, title, desc }: { icon: any, title: string, desc: string }) {
+  return (
+    <motion.div
+      whileHover={{ y: -5 }}
+      className="p-8 rounded-2xl bg-panel border border-white/5 hover:border-accent/20 transition-all duration-300"
+    >
+      <div className="w-12 h-12 bg-white/5 rounded-lg flex items-center justify-center mb-6 text-accent">
+        <Icon className="w-6 h-6" />
+      </div>
+      <h3 className="text-xl font-bold mb-3">{title}</h3>
+      <p className="text-sm text-muted leading-relaxed">{desc}</p>
+    </motion.div>
+  )
+}
+
+function CheckItem({ text }: { text: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center text-accent">
+        <Check className="w-3.5 h-3.5" />
+      </div>
+      <span className="text-muted">{text}</span>
     </div>
   )
 }

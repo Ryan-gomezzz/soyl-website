@@ -9,21 +9,22 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: '#020408', // Deepest black/blue for infinite depth
-        panel: '#0B101B', // Rich dark blue-gray for panels
-        muted: '#94A3B8', // Cool gray text
-        accent: '#00D4FF', // Electric Cyan - High energy
-        'accent-hover': '#00B8DE',
-        'accent-2': '#7C3AED', // Electric Violet - Secondary accent
-        text: '#F8FAFC', // Crisp white text
-        border: '#1E293B', // Subtle border
+        bg: '#050505', // Almost pure black for depth
+        panel: '#0A0A0A', // Slightly lighter for cards/sections
+        surface: '#121212', // Interactive elements
+        muted: '#A1A1AA', // Neutral gray for secondary text
+        accent: '#3B82F6', // Professional Royal Blue (Stripe/Linear vibes)
+        'accent-hover': '#2563EB',
+        'accent-subtle': 'rgba(59, 130, 246, 0.1)',
+        text: '#FFFFFF', // High contrast white
+        border: '#27272A', // Subtle dark border
         success: '#10B981',
         error: '#EF4444',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-        'subtle-glow': 'radial-gradient(circle at center, rgba(0, 212, 255, 0.15) 0%, transparent 70%)',
+        'subtle-glow': 'radial-gradient(circle at center, rgba(59, 130, 246, 0.08) 0%, transparent 70%)',
+        'hero-gradient': 'linear-gradient(to bottom, transparent, #050505)',
       },
       animation: {
         'fade-in': 'fadeIn 0.6s ease-in-out',

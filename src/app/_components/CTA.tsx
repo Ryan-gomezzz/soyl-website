@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 
 interface CTAProps {
   href: string
-  variant?: 'primary' | 'secondary'
+  variant?: 'primary' | 'secondary' | 'outline'
   size?: 'sm' | 'md' | 'lg'
   children: React.ReactNode
   className?: string
@@ -25,9 +25,10 @@ export function CTA({
     'inline-flex items-center justify-center rounded-lg font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-bg focus:ring-accent'
 
   const variants = {
-    primary: 'bg-accent text-bg hover:bg-accent/90 focus:ring-accent',
+    primary: 'bg-accent text-bg hover:bg-accent-hover focus:ring-accent shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_30px_rgba(59,130,246,0.5)]',
     secondary:
-      'bg-transparent border border-text/20 text-text hover:border-accent hover:text-accent focus:ring-accent',
+      'bg-transparent border border-white/10 text-white hover:border-accent hover:text-accent focus:ring-accent backdrop-blur-sm',
+    outline: 'border border-gray-700 text-gray-300 hover:border-white hover:text-white',
   }
 
   const sizes = {

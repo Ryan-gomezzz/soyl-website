@@ -1,186 +1,173 @@
 'use client'
 
 import { CTA } from '../_components/CTA'
-import { motion } from 'framer-motion'
+import { Check, X } from 'lucide-react'
 
 export default function PricingPage() {
-  const tiers = [
-    {
-      name: 'Pilot Program',
-      price: '14 Days',
-      period: '',
-      description: 'Validate profitability and feasibility before full commitment.',
-      features: [
-        'Comprehensive Cost Analysis',
-        'Feasibility Check',
-        'Profitability Report',
-        'Custom Implementation Plan',
-        'Risk Assessment',
-      ],
-      cta: 'Request Pilot',
-      ctaLink: '/request-pilot',
-      highlighted: false,
-    },
-    {
-      name: 'AI Voice Agents',
-      price: '₹5',
-      period: '/min',
-      description: 'Custom built AI agents tailored to your specific business needs.',
-      features: [
-        'Custom Built to Your Needs',
-        '24/7 Support',
-        'Unlimited Concurrent Calls',
-        'Multimodal Intelligence',
-        'Real-time Adaptation',
-        'Seamless Integration',
-      ],
-      cta: 'Contact Sales',
-      ctaLink: '/inquiry',
-      highlighted: true,
-    },
-  ]
-
   return (
-    <div className="pt-32 pb-24">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Pricing
-          </h1>
-          <p className="text-xl text-muted max-w-3xl mx-auto">
-            Transparent pricing designed to scale with your needs.
+    <div className="pt-24 min-h-screen bg-bg">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8 py-16">
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">Transparent Infrastructure Pricing</h1>
+          <p className="text-xl text-muted max-w-2xl mx-auto">
+            Predictable monthly costs for your e-commerce stack. Scale as you grow.
+            No hidden retainer fees.
           </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 max-w-4xl mx-auto">
-          {tiers.map((tier, index) => (
-            <motion.div
-              key={tier.name}
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{
-                duration: 0.6,
-                delay: index * 0.15,
-                ease: [0.22, 1, 0.36, 1]
-              }}
-              whileHover={{
-                y: -8,
-                scale: 1.02,
-                transition: { duration: 0.3 }
-              }}
-              className={`glass rounded-xl p-8 border ${tier.highlighted
-                  ? 'border-accent/50 bg-panel/50 animate-border-glow'
-                  : 'border-white/10'
-                } relative overflow-hidden group`}
-            >
-              {tier.highlighted && (
-                <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 200,
-                    damping: 15,
-                    delay: index * 0.15 + 0.3
-                  }}
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  className="absolute top-4 right-4 px-3 py-1 bg-accent text-bg rounded-full text-xs font-semibold z-10"
-                >
-                  Popular
-                </motion.div>
-              )}
-              {/* Animated background gradient */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-accent-2/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                initial={false}
-              />
-              <div className="mb-6 relative z-10">
-                <motion.h2
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.15 + 0.2 }}
-                  className="text-2xl font-bold mb-2"
-                >
-                  {tier.name}
-                </motion.h2>
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.15 + 0.3 }}
-                  className="flex items-baseline gap-1 mb-2"
-                >
-                  <motion.span
-                    whileHover={{ scale: 1.1 }}
-                    className="text-4xl font-bold"
-                  >
-                    {tier.price}
-                  </motion.span>
-                  <span className="text-muted">{tier.period}</span>
-                </motion.div>
-                <p className="text-sm text-muted">{tier.description}</p>
-              </div>
-              <ul className="space-y-3 mb-8 relative z-10">
-                {tier.features.map((feature, featureIndex) => (
-                  <motion.li
-                    key={feature}
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{
-                      duration: 0.4,
-                      delay: index * 0.15 + featureIndex * 0.05 + 0.4
-                    }}
-                    whileHover={{ x: 5 }}
-                    className="flex items-start gap-2"
-                  >
-                    <motion.span
-                      animate={{
-                        scale: [1, 1.2, 1],
-                        rotate: [0, 10, 0]
-                      }}
-                      transition={{
-                        duration: 0.5,
-                        delay: index * 0.15 + featureIndex * 0.05 + 0.6,
-                        ease: "easeOut"
-                      }}
-                      className="text-accent mt-1"
-                    >
-                      ✓
-                    </motion.span>
-                    <span className="text-muted text-sm">{feature}</span>
-                  </motion.li>
-                ))}
-              </ul>
-              <CTA
-                href={tier.ctaLink}
-                variant={tier.highlighted ? 'primary' : 'secondary'}
-                size="md"
-                className="w-full"
-              >
-                {tier.cta}
-              </CTA>
-            </motion.div>
-          ))}
         </div>
 
-        <div className="text-center mt-12">
-          <p className="text-muted mb-4">
-            Need custom pricing? Contact our sales team.
-          </p>
-          <CTA href="/inquiry" variant="primary" size="lg">
-            Contact Sales
-          </CTA>
+        {/* Pricing Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-24">
+          <PricingCard
+            name="Starter"
+            price="₹2,100"
+            orders="Up to 150 orders/mo"
+            desc="Ideal for early-stage D2C brands."
+            features={[
+              "Shared infrastructure",
+              "Standard email support (24-48h)",
+              "Full e-commerce website",
+              "Hosting & DB management",
+              "Secure infrastructure"
+            ]}
+          />
+          <PricingCard
+            name="Growth"
+            price="₹3,500"
+            orders="150-500 orders/mo"
+            desc="For scaling brands necessitating speed."
+            isPopular
+            features={[
+              "Priority email support",
+              "Higher performance infra",
+              "Mobile + Desktop responsive",
+              "Admin dashboard",
+              "Platform monitoring"
+            ]}
+          />
+          <PricingCard
+            name="Scale"
+            price="₹6,500"
+            orders="500-2,000 orders/mo"
+            desc="Performance tuning for high volume."
+            features={[
+              "Performance tuning",
+              "Analytics-ready",
+              "Stability-focused infra",
+              "Maintenance & Bug fixes",
+              "Transactional email system"
+            ]}
+          />
+          <PricingCard
+            name="Enterprise"
+            price="₹10,000+"
+            orders="2,000+ orders/mo"
+            desc="Dedicated resources and SLAs."
+            features={[
+              "Dedicated infrastructure",
+              "SLA-backed support",
+              "Custom integrations",
+              "Advanced analytics",
+              "Priority feature development"
+            ]}
+          />
+        </div>
+
+        {/* Setup Fee & Responsibility Split */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-24">
+          <div className="bg-panel rounded-2xl p-8 border border-white/10">
+            <h3 className="text-2xl font-bold mb-4">One-Time Setup Fee</h3>
+            <div className="text-3xl font-bold text-accent mb-2">₹5,000 – ₹20,000</div>
+            <p className="text-muted mb-6">
+              Depends on catalog size, store complexity, and required integrations.
+              This ensures your store is launched production-ready.
+            </p>
+            <div className="p-4 bg-white/5 rounded-lg text-sm text-muted">
+              Includes: Initial deployment, domain setup, payment gateway integration, and catalog upload.
+            </div>
+          </div>
+
+          <div className="bg-panel rounded-2xl p-8 border border-white/10">
+            <h3 className="text-2xl font-bold mb-6">Responsibility Split</h3>
+            <div className="grid grid-cols-2 gap-8">
+              <div>
+                <h4 className="font-semibold text-accent mb-3">SOYL Handles</h4>
+                <ul className="space-y-2 text-sm text-muted">
+                  <li className="flex gap-2"><Check className="w-4 h-4 text-accent" /> Tech Infrastructure</li>
+                  <li className="flex gap-2"><Check className="w-4 h-4 text-accent" /> Hosting & Security</li>
+                  <li className="flex gap-2"><Check className="w-4 h-4 text-accent" /> Platform Stability</li>
+                  <li className="flex gap-2"><Check className="w-4 h-4 text-accent" /> Backend Systems</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold text-white mb-3">Client Handles</h4>
+                <ul className="space-y-2 text-sm text-muted">
+                  <li className="flex gap-2"><Check className="w-4 h-4 text-white" /> Products & Inventory</li>
+                  <li className="flex gap-2"><Check className="w-4 h-4 text-white" /> Pricing & Margins</li>
+                  <li className="flex gap-2"><Check className="w-4 h-4 text-white" /> Logistics</li>
+                  <li className="flex gap-2"><Check className="w-4 h-4 text-white" /> Marketing Strategy</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Add-ons */}
+        <div className="mb-24">
+          <h2 className="text-3xl font-bold mb-8 text-center">Modular Add-Ons</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <AddOnCard title="AI Chatbot" price="₹500/mo base + usage" desc="Automate customer support queries." />
+            <AddOnCard title="OTP Login" price="₹199/mo" desc="Seamless mobile number authentication." />
+            <AddOnCard title="Marketing Automation" price="Custom" desc="Email flows and auto-calling campaigns." />
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div className="text-center">
+          <h2 className="text-3xl font-bold mb-6">Ready to launch?</h2>
+          <CTA href="/contact" variant="primary" size="lg">Get Started</CTA>
         </div>
       </div>
     </div>
   )
 }
 
+function PricingCard({ name, price, orders, desc, features, isPopular }: any) {
+  return (
+    <div className={`relative p-8 rounded-2xl bg-panel border ${isPopular ? 'border-accent shadow-lg shadow-accent/10' : 'border-white/10'} flex flex-col`}>
+      {isPopular && (
+        <div className="absolute top-0 right-0 transform translate-x-2 -translate-y-2">
+          <span className="bg-accent text-bg text-xs font-bold px-3 py-1 rounded-full">POPULAR</span>
+        </div>
+      )}
+      <h3 className="text-xl font-bold mb-2">{name}</h3>
+      <div className="text-3xl font-bold text-white mb-1">{price}</div>
+      <div className="text-sm text-accent mb-4">{orders}</div>
+      <p className="text-sm text-muted mb-6 pb-6 border-b border-white/5">{desc}</p>
+
+      <ul className="space-y-3 mb-8 flex-1">
+        {features.map((feat: string, i: number) => (
+          <li key={i} className="flex gap-3 text-sm text-muted">
+            <Check className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
+            <span>{feat}</span>
+          </li>
+        ))}
+      </ul>
+
+      <CTA href="/contact" variant={isPopular ? 'primary' : 'outline'} className="w-full justify-center">
+        Choose Plan
+      </CTA>
+    </div>
+  )
+}
+
+function AddOnCard({ title, price, desc }: any) {
+  return (
+    <div className="p-6 rounded-xl border border-white/10 bg-black/20">
+      <div className="flex justify-between items-start mb-2">
+        <h3 className="font-bold">{title}</h3>
+        <span className="text-sm font-mono text-accent">{price}</span>
+      </div>
+      <p className="text-sm text-muted">{desc}</p>
+    </div>
+  )
+}
